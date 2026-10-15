@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        .flex{
+            /* 容器 */
+            display: flex;
+            /* 子元素自动压缩为一行 */
+            flex-wrap: wrap;
+            /* 不自动压缩 */
+        }
+        .flex li{
+            /* float: left; */
+
+            border: 1px solid #0333;
+            width: 49%;
+            height: 100px;
+            list-style: none;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+        }
+        .flex li:nth-child(1){
+            align-items: center;
+            /* 水平居中 */
+            justify-content: center;
+        }
+        .box{
+            width: 25%;
+            height: 25%;
+            background: #f1f2f3;
+        }
+        .flex li:nth-child(1) .box{
+            background: black;
+        }
+        .flex li:nth-child(2){
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding:5px;
+        }
+        .flex li:nth-child(2) .box{
+            background: black;
+        }
+        .flex li:nth-child(3){
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding:5px;
+        }
+        .flex li:nth-child(3) .box{
+            background: black;
+        }
+    </style>
+</head>
+<body>
+    <h2>安家成 flex</h2>
+    <ul class="flex">
+        <li>
+            <div class="box"></div>
+        </li>
+        <li>
+            <!-- 上下两个矩形，水平垂直居中，两矩阵中间有10px空隙，离边框有2px空隙 -->
+            <div class="box"></div>
+            <div class="box"></div>
+        </li>
+        <li>
+            <!-- 左上，右上，左下，右下四个矩形，均匀分布，彼此之间留有10px空隙，离边框有2px空隙,一行两个矩阵，一列两个矩阵 -->
+            <div class="box"></div>
+            <div class="box"></div>
+            <div class="box"></div>
+            <div class="box"></div>
+        </li>
+        <li></li>
+    </ul>
+</body>
+</html>

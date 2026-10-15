@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>媒体查询响应式布局</title>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			min-width: 320px;
+			min-height: 100vh;
+			margin: 0;
+			display: grid;
+			place-items: center;
+			background: #f1f5f2;
+			color: #203a34;
+			font-family: "Microsoft YaHei", sans-serif;
+		}
+
+		main {
+			width: 100%;
+			max-width: 1120px;
+			padding: 2rem;
+		}
+
+		h1 {
+			margin: 0 0 1.5rem;
+			font-size: 2rem;
+			text-align: center;
+		}
+
+		.boxes {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+
+		.box {
+			min-height: 6rem;
+			display: grid;
+			place-items: center;
+			border-radius: 8px;
+			background: #248277;
+			color: #fff;
+			font-size: 1.5rem;
+			font-weight: 700;
+		}
+
+		.box:nth-child(even) {
+			background: #e76f51;
+		}
+
+		@media screen and (min-width: 320px) {
+			.boxes {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+		}
+
+		@media screen and (min-width: 600px) {
+			.boxes {
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+			}
+		}
+
+		@media screen and (min-width: 900px) {
+			.boxes {
+				grid-template-columns: repeat(8, minmax(0, 1fr));
+			}
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<h1>安家成</h1>
+		<div class="boxes">
+			<div class="box">1</div>
+			<div class="box">2</div>
+			<div class="box">3</div>
+			<div class="box">4</div>
+			<div class="box">5</div>
+			<div class="box">6</div>
+			<div class="box">7</div>
+			<div class="box">8</div>
+		</div>
+	</main>
+</body>
+</html>

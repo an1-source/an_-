@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>媒体查询与背景颜色</title>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			font-size: 16px;
+		}
+
+		body {
+			margin: 0;
+			font-family: "Microsoft YaHei", sans-serif;
+		}
+
+		.screen {
+			width: 100%;
+			min-height: 100vh;
+			min-height: 100dvh;
+			display: grid;
+			place-items: center;
+			background-color: #e76f51;
+			color: #fff;
+		}
+
+		h1 {
+			margin: 0;
+			font-size: 2rem;
+		}
+
+		@media screen and (min-width: 600px) {
+			html {
+				font-size: 20px;
+			}
+
+			.screen {
+				background-color: #248277;
+			}
+		}
+
+		@media screen and (min-width: 900px) {
+			html {
+				font-size: 24px;
+			}
+
+			.screen {
+				background-color: #315f9d;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="screen">
+		<h1>安家成</h1>
+	</main>
+</body>
+</html>

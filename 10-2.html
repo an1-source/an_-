@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>CSS Animation 幻灯片</title>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			min-height: 100vh;
+			margin: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background: #edf2f0;
+			color: #18332d;
+			font-family: "Microsoft YaHei", sans-serif;
+		}
+
+		.slideshow {
+			width: min(900px, calc(100% - 32px));
+			margin: 0;
+			overflow: hidden;
+			border-radius: 12px;
+			background: #fff;
+			box-shadow: 0 18px 48px rgb(24 51 45 / 16%);
+		}
+
+		.viewport {
+			overflow: hidden;
+			aspect-ratio: 16 / 9;
+			background: #dbe4e1;
+		}
+
+		.slides {
+			display: flex;
+			width: 400%;
+			height: 100%;
+			animation: slide 12s linear infinite;
+		}
+
+		.slides img {
+			flex: 0 0 25%;
+			width: 25%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		figcaption {
+			padding: 18px 24px;
+			text-align: center;
+			font-size: 24px;
+			font-weight: 700;
+		}
+
+		@keyframes slide {
+			0%, 20% {
+				transform: translateX(0);
+			}
+			25%, 45% {
+				transform: translateX(-25%);
+			}
+			50%, 70% {
+				transform: translateX(-50%);
+			}
+			75%, 100% {
+				transform: translateX(-75%);
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.slides {
+				animation: none;
+			}
+		}
+	</style>
+</head>
+<body>
+	<figure class="slideshow" aria-label="自动播放的图片幻灯片">
+		<div class="viewport">
+			<div class="slides">
+				<img src="1.png" alt="跑步的同学">
+				<img src="2.png" alt="走在街道上的学生">
+				<img src="3.png" alt="日落时一起登山的朋友">
+				<img src="1.png" alt="" aria-hidden="true">
+			</div>
+		</div>
+		<figcaption>安家成</figcaption>
+	</figure>
+</body>
+</html>

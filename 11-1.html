@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11-1 Web前端长度单位</title>
+    <style>
+        /* ============ 全局 ============ */
+        /* 约定：所有类名、id、JS 变量均以 an_ 开头 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            padding: 24px;
+            overflow-x: hidden;   /* 防止 100vw 色条撑出横向滚动条 */
+            font-size: 16px;      /* 固定基准字号，拖动滑块时页面文字不跟着缩放 */
+            background: #f5f6f8;
+            color: #222;
+            font-family: "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+        }
+        .an_back {
+            display: block;
+            max-width: 900px;
+            margin: 0 auto 12px;
+            font-size: 14px;
+            color: #0366c4;
+            text-decoration: none;
+        }
+        .an_back:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+        .an_sub {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        section {
+            max-width: 900px;
+            margin: 0 auto 24px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px 24px;
+        }
+        h2 {
+            font-size: 20px;
+            border-left: 5px solid #039;
+            padding-left: 10px;
+            margin-bottom: 14px;
+        }
+        p.an_tip {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+        code {
+            background: #eef2f7;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-family: Consolas, monospace;
+            color: #c7254e;
+        }
+
+        /* ============ 1. 绝对单位：固定大小的色条 ============ */
+        .an_unit-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .an_unit-name {
+            width: 130px;
+            flex: none;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            color: #039;
+        }
+        .an_bar {
+            height: 36px;
+            background: linear-gradient(90deg, #039, #39c);
+            border-radius: 4px;
+        }
+        .an_u-px  { width: 96px; }   /* 96px  = 1in */
+        .an_u-cm  { width: 1cm; }
+        .an_u-mm  { width: 10mm; }   /* 1mm 太小，用 10mm 便于观察 */
+        .an_u-in  { width: 1in; }
+        .an_u-pt  { width: 72pt; }   /* 72pt = 1in */
+        .an_u-pc  { width: 6pc; }    /* 6pc  = 1in */
+
+        /* ============ 2. 百分比 %：相对父元素 ============ */
+        .an_parent {
+            width: 400px;         /* 父元素基准宽度 */
+            outline: 2px dashed #f90;  /* 用 outline 不占宽度，保证内容区正好 400px */
+            outline-offset: 2px;
+            padding: 8px 0;       /* 只留上下内边距，不影响 400px 的宽度基准 */
+            background: #fff8f0;
+        }
+        .an_parent p {
+            font-size: 13px;
+            color: #b66;
+        }
+        .an_pct-25 { width: 25%; }
+        .an_pct-50 { width: 50%; }
+        .an_pct-100 { width: 100%; }
+        .an_parent div {
+            height: 30px;
+            margin-bottom: 6px;
+            background: #f90;
+            color: #fff;
+            font-size: 13px;
+            line-height: 30px;
+            padding-left: 8px;
+        }
+
+        /* ============ 3. em / rem 对比 ============ */
+        .an_em-box {
+            font-size: 16px;      /* 父容器字号 */
+            border: 1px solid #093;
+            padding: 10px;
+            background: #f3fbf5;
+        }
+        .an_em-box .an_level1 {
+            font-size: 2em;       /* 2 × 16px = 32px */
+            background: #cde;
+            padding: 4px;
+        }
+        .an_em-box .an_level1 .an_level2 {
+            font-size: 2em;       /* 2 × 32px = 64px，em 逐层累乘 */
+            background: #9bd;
+            padding: 4px;
+        }
+        .an_rem-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+        }
+        .an_rem-row figure {
+            font-size: 13px;
+            color: #666;
+        }
+        .an_rem-row figcaption {
+            margin-top: 4px;
+        }
+        .an_rem-row i {
+            display: block;
+            height: 30px;
+            border-radius: 4px;
+        }
+        .an_r1 { width: 1rem; background: #e58; }  /* 1 × 根字号 */
+        .an_r2 { width: 2rem; background: #09c; }
+        .an_r3 { width: 4rem; background: #6a0; }
+        .an_ctrl {
+            margin-top: 14px;
+            font-size: 14px;
+        }
+        #an_rootSize {
+            vertical-align: middle;
+        }
+        #an_rootValue {
+            color: #039;
+            font-weight: bold;
+        }
+
+        /* ============ 4. 视口单位 vw / vh ============ */
+        .an_vw-bar {
+            height: 32px;
+            margin-bottom: 8px;
+            background: #93c;
+            color: #fff;
+            font-size: 13px;
+            line-height: 32px;
+            padding-left: 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .an_vw25 { width: 25vw; }
+        .an_vw50 { width: 50vw; }
+        .an_vw100 { width: 100vw; }
+        .an_vh-demo {
+            width: 200px;
+            height: 30vh;         /* 视口高度的 30% */
+            background: #fc3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border-radius: 6px;
+        }
+
+        /* ============ 5. 字符单位 ex / ch ============ */
+        .an_char-demo {
+            font-size: 20px;
+            font-family: Consolas, "Microsoft YaHei", monospace;
+            background: #eef;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .an_w-ex { width: 10ex; }    /* 10 个小写 x 的高度 */
+        .an_w-ch { width: 10ch; }    /* 10 个数字 0 的宽度 */
+        .an_char-demo div {
+            height: 28px;
+            margin-top: 6px;
+            background: #66d;
+            color: #fff;
+            font-size: 13px;
+            line-height: 28px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">&larr; 返回首页</a>
+    <h1>Web 前端长度单位</h1>
+    <p class="an_sub">11-1 · 安家成 · CSS 长度单位演示（绝对单位 / 相对单位）</p>
+
+    <!-- 1. 绝对单位：换算基准 1in = 96px = 2.54cm = 72pt = 6pc -->
+    <section>
+        <h2>一、绝对单位（固定大小，不随父元素变化）</h2>
+        <p class="an_tip">
+            换算关系：<code>1in = 96px = 2.54cm = 25.4mm = 72pt = 6pc</code>。
+            下面六条色条按各自单位设定宽度，除 <code>mm</code> 用 10mm 便于观察外，其余都正好等于 1 英寸。
+        </p>
+        <div class="an_unit-row"><span class="an_unit-name">width: 96px</span><div class="an_bar an_u-px"></div></div>
+        <div class="an_unit-row"><span class="an_unit-name">width: 1cm</span><div class="an_bar an_u-cm"></div></div>
+        <div class="an_unit-row"><span class="an_unit-name">width: 10mm</span><div class="an_bar an_u-mm"></div></div>
+        <div class="an_unit-row"><span class="an_unit-name">width: 1in</span><div class="an_bar an_u-in"></div></div>
+        <div class="an_unit-row"><span class="an_unit-name">width: 72pt</span><div class="an_bar an_u-pt"></div></div>
+        <div class="an_unit-row"><span class="an_unit-name">width: 6pc</span><div class="an_bar an_u-pc"></div></div>
+    </section>
+
+    <!-- 2. 百分比：相对父元素宽度 -->
+    <section>
+        <h2>二、百分比 %（相对父元素）</h2>
+        <p class="an_tip">父元素固定 <code>400px</code>，子元素用 <code>%</code> 即可按比例自适应，父宽变化时子元素跟着变。</p>
+        <div class="an_parent">
+            <p>父元素 width: 400px（虚线框）</p>
+            <div class="an_pct-25">width: 25% = 100px</div>
+            <div class="an_pct-50">width: 50% = 200px</div>
+            <div class="an_pct-100">width: 100% = 400px</div>
+        </div>
+    </section>
+
+    <!-- 3. em / rem -->
+    <section>
+        <h2>三、em 与 rem（相对字号单位）</h2>
+        <p class="an_tip">
+            <code>em</code> 相对<b>当前元素自身的字号</b>，层层嵌套会相乘；<code>rem</code> 只相对<b>根元素 html 的字号</b>，永远是同一基准。
+        </p>
+        <div class="an_em-box">
+            父容器 16px：
+            <div class="an_level1">an_level1：2em = 32px
+                <div class="an_level2">an_level2：2em = 64px（em 逐层累乘）</div>
+            </div>
+        </div>
+        <div class="an_rem-row">
+            <figure><i class="an_r1"></i><figcaption>width: 1rem</figcaption></figure>
+            <figure><i class="an_r2"></i><figcaption>width: 2rem</figcaption></figure>
+            <figure><i class="an_r3"></i><figcaption>width: 4rem</figcaption></figure>
+        </div>
+        <div class="an_ctrl">
+            拖动滑块修改根字号（<code>html { font-size }</code>），rem 色块会整体缩放：
+            <input type="range" id="an_rootSize" min="10" max="32" value="16">
+            当前根字号：<span id="an_rootValue">16px</span>
+        </div>
+    </section>
+
+    <!-- 4. vw / vh -->
+    <section>
+        <h2>四、视口单位 vw / vh（相对浏览器窗口）</h2>
+        <p class="an_tip">
+            <code>1vw = 视口宽度的 1%</code>，<code>1vh = 视口高度的 1%</code>。
+            色条宽度 = 浏览器窗口宽度的百分比，拖动窗口大小试试。
+        </p>
+        <div class="an_vw-bar an_vw25">width: 25vw</div>
+        <div class="an_vw-bar an_vw50">width: 50vw</div>
+        <div class="an_vw-bar an_vw100">width: 100vw</div>
+        <div class="an_vh-demo">height: 30vh</div>
+    </section>
+
+    <!-- 5. 字符单位 ex / ch -->
+    <section>
+        <h2>五、字符单位 ex / ch（相对字体中的字符）</h2>
+        <p class="an_tip">
+            <code>ex</code> 相对小写字母 <code>x</code> 的高度，<code>ch</code> 相对数字 <code>0</code> 的宽度。
+            下方色块宽 <code>10ex</code> 和 <code>10ch</code>，随字号变化而变化。
+        </p>
+        <div class="an_char-demo">
+            字号 20px 的等宽字体示例：0123456789 xxxx
+            <div class="an_w-ex">width: 10ex</div>
+            <div class="an_w-ch">width: 10ch</div>
+        </div>
+    </section>
+
+    <script>
+        // 拖动滑块修改根字号，演示 rem 相对根元素（变量统一以 an_ 开头）
+        const an_slider = document.getElementById('an_rootSize');
+        const an_label = document.getElementById('an_rootValue');
+        an_slider.addEventListener('input', function () {
+            document.documentElement.style.fontSize = this.value + 'px';
+            an_label.textContent = this.value + 'px';
+        });
+    </script>
+</body>
+</html>

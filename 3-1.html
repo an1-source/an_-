@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>415 安家成</title>
+</head>
+<body>
+    <h2>HTML 表单form</h2>
+    <form action="http://huanqiu.com" name="yl">
+        <p>
+            用户名：<input type="text" name="username" placeholder="请输入用户名"><br>
+        </p>
+        <p>
+            密码：<input type="password" name="password" placeholder="请输入密码">
+        </p>
+        <!-- 性别radio单选项 -->
+        <p>
+            性别：<input type="radio" name="sex" value="m" >男
+            <input type="radio" name="sex" value="f" >女
+            <input type="radio" name="sex" value="s" >保密
+        </p>
+        <!-- 爱好checkbox复选框 -->
+        <p>
+            爱好：<input type="checkbox" name="hobby" value="篮球">篮球
+            <input type="checkbox" name="hobby" value="足球">足球
+            <input type="checkbox" name="hobby" value="乒乓球">乒乓球
+        </p>
+        <!-- 籍贯下拉列表select -->
+        <p>
+            籍贯：
+            <select name="city">
+                <option value="bj">北京</option>
+                <option value="sh">上海</option>
+                <option value="gz">广州</option>
+                <option value="sz">深圳</option>
+            </select>
+        </p>
+        <!-- 个人简介textarea文本域 -->
+        <p>
+            个人简介：<br>
+            <textarea name="intro" cols="30" rows="5" placeholder="请输入个人简介"></textarea>
+        </p>
+        <!-- 出生日期 -->
+        <p>
+            出生日期：<input type="date" name="birthday">
+        </p>
+        <!-- 多文件上传 -->
+        <p>
+            多文件上传：<input type="file" name="files" multiple>
+        </p>
+        <!-- 按钮：普通按钮、提交按钮、重置按钮 -->
+        <p>
+            <input type="button" value="普通按钮">
+            <input type="submit" value="提交按钮">
+            <input type="reset" value="重置按钮">
+        </p>
+    </form>
+    <form>  
+    <!-- 按钮：button -->
+    <button>表单外的按钮</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .main{
+           background-color: #ccc;
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: center; 
+            padding: 10px; 
+            gap:10px; 
+            box-sizing: border-box;
+        }
+        .box{
+            width: 150px;
+            height:195px;
+            border: 1px solid #ccc;
+            margin: 10px;
+            background-color: white;
+            font-size: 14px;
+            display:flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.6s;
+            box-sizing: border-box;
+        }
+        .box:first-child:hover{
+            background-color: #000;
+            color: #fff;
+            font-size: 100px;
+            border-width: 30px;
+        }
+        .box:nth-child(2):hover{
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
+        }
+        .box:nth-child(3):hover{
+            text-shadow: 100px 0px 20px rgba(0,0,0,0.5);
+        }
+        .box:nth-child(4):hover{
+            border-radius:50% ;
+        }
+        .box:nth-of-type(5){
+            background: linear-gradient(#000,#fff);
+        }
+        .box:nth-of-type(6){
+            background: radial-gradient(#000,#fff);
+        }
+        .box:nth-of-type(6)+.box:hover{
+            transform: scale(1.5);
+        }
+        .box:nth-of-type(8):hover{
+            transform: translateX(-100px);
+        }
+        .box:nth-of-type(9):hover{
+            transform: rotateX(-180deg);
+        }
+        .box:nth-of-type(10):hover{
+            transform: skewX(-45deg);
+        }
+        .box:nth-last-child(2):hover::before{
+            content:"#"
+            color red;
+        }
+        .box:last-child:hover::after{
+            content:"安家成";
+            color: #fff;
+            font-size: 6px;
+            display:block;
+            width:40px;
+            height: 40px;
+            margin: 10px;
+            /* 扩展：黑底白字居中圆角安家成*/
+
+        }
+        .box:nth-of-type(3n):hover{
+            border: 3px solid #f00;
+        }
+        /* 扩展：鼠标在偶数盒子上有变化，变化效果自定义 */
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div class="box">1</div>
+        <div class="box">2</div>
+        <div class="box">3</div>
+        <div class="box">4</div>
+        <div class="box">5</div>
+        <div class="box">6</div>
+        <div class="box">7</div>
+        <div class="box">8</div>
+        <div class="box">9</div>
+        <div class="box">10</div>
+        <div class="box">11</div>
+        <div class="box">12</div>
+    </div>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .main{
+           background-color: #ccc;
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: center; 
+            padding: 10px; 
+            gap:10px; 
+            box-sizing: border-box;
+        }
+        .box{
+            width: 150px;
+            height:195px;
+            border: 1px solid #ccc;
+            margin: 10px;
+            background-color: white;
+            font-size: 14px;
+            display:flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.6s;
+            box-sizing: border-box;
+        }
+        .box:first-child:hover{
+            background-color: #000;
+            color: #fff;
+            font-size: 100px;
+            border-width: 30px;
+        }
+        .box:nth-child(2):hover{
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
+        }
+        .box:nth-child(3):hover{
+            text-shadow: 100px 0px 20px rgba(0,0,0,0.5);
+        }
+        .box:nth-child(4):hover{
+            border-radius:50% ;
+        }
+        .box:nth-of-type(5){
+            background: linear-gradient(#000,#fff);
+        }
+        .box:nth-of-type(6){
+            background: radial-gradient(#000,#fff);
+        }
+        .box:nth-of-type(6)+.box:hover{
+            transform: scale(1.5);
+        }
+        .box:nth-of-type(8):hover{
+            transform: translateX(-100px);
+        }
+        .box:nth-of-type(9):hover{
+            transform: rotateX(-180deg);
+        }
+        .box:nth-of-type(10):hover{
+            transform: skewX(-45deg);
+        }
+        .box:nth-last-child(2):hover::before{
+            content:"#";
+            color: red;
+        }
+        .box:last-child:hover::after{
+            content:"安家成";
+            color: #fff;
+            font-size: 6px;
+            display:block;
+            width:40px;
+            height: 40px;
+            margin: 10px;
+            /* 扩展：黑底白字居中圆角安家成*/
+            background-color: #000;
+            border-radius: 8px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        .box:nth-of-type(3n):hover{
+            border: 3px solid #f00;
+        }
+        /* 扩展：鼠标在偶数盒子上有变化，变化效果自定义 */
+        .box:nth-child(even):hover{
+            background-color: #2277dd;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div class="box">1</div>
+        <div class="box">2</div>
+        <div class="box">3</div>
+        <div class="box">4</div>
+        <div class="box">5</div>
+        <div class="box">6</div>
+        <div class="box">7</div>
+        <div class="box">8</div>
+        <div class="box">9</div>
+        <div class="box">10</div>
+        <div class="box">11</div>
+        <div class="box">12</div>
+    </div>
+</body>
+</html>

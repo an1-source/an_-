@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>背景颜色动画</title>
+	<style>
+		body {
+			min-height: 100vh;
+			margin: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background-color: #f4f4f4;
+		}
+
+		.box {
+			width: 200px;
+			height: 200px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			color: white;
+			font-size: 20px;
+			animation: color-change 4s linear infinite;
+		}
+
+		@keyframes color-change {
+			0% {
+				background-color: #e74c3c;
+			}
+			25% {
+				background-color: #f1c40f;
+			}
+			50% {
+				background-color: #2ecc71;
+			}
+			75% {
+				background-color: #3498db;
+			}
+			100% {
+				background-color: #e74c3c;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="box">颜色循环变化</div>
+</body>
+</html>

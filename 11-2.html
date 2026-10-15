@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11-2 CSS3 3D动画</title>
+    <style>
+        /* ============ 全局 ============ */
+        /* 约定：所有类名、id、keyframes、JS 变量均以 an_ 开头 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            padding: 24px;
+            background: #f5f6f8;
+            color: #222;
+            font-family: "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+        }
+        .an_back {
+            display: block;
+            max-width: 900px;
+            margin: 0 auto 12px;
+            font-size: 14px;
+            color: #0366c4;
+            text-decoration: none;
+        }
+        .an_back:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+        .an_sub {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        section {
+            max-width: 900px;
+            margin: 0 auto 24px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px 24px;
+        }
+        h2 {
+            font-size: 20px;
+            border-left: 5px solid #039;
+            padding-left: 10px;
+            margin-bottom: 14px;
+        }
+        p.an_tip {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+        code {
+            background: #eef2f7;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-family: Consolas, monospace;
+            color: #c7254e;
+        }
+
+        /* ============ 1. 旋转立方体 ============ */
+        .an_cube-stage {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 800px;              /* 设置 3D 视距 */
+            background: radial-gradient(circle, #eaf2fb, #fff);
+            border-radius: 8px;
+        }
+        .an_cube {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            transform-style: preserve-3d;    /* 子元素保留 3D 空间 */
+            animation: an_spin 8s linear infinite;
+        }
+        .an_cube.an_paused {
+            animation-play-state: paused;    /* 控制面板：暂停动画 */
+        }
+        .an_face {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, .7);
+            background: rgba(3, 102, 204, .55);
+        }
+        .an_face-front  { transform: translateZ(80px); }
+        .an_face-back   { transform: rotateY(180deg) translateZ(80px); background: rgba(204, 51, 102, .55); }
+        .an_face-right  { transform: rotateY(90deg) translateZ(80px);  background: rgba(51, 153, 102, .55); }
+        .an_face-left   { transform: rotateY(-90deg) translateZ(80px); background: rgba(204, 153, 0, .55); }
+        .an_face-top    { transform: rotateX(90deg) translateZ(80px);  background: rgba(120, 80, 200, .55); }
+        .an_face-bottom { transform: rotateX(-90deg) translateZ(80px); background: rgba(0, 150, 180, .55); }
+
+        @keyframes an_spin {
+            from { transform: rotateX(0deg) rotateY(0deg); }
+            to   { transform: rotateX(360deg) rotateY(360deg); }
+        }
+        @keyframes an_spinX {
+            from { transform: rotateX(0deg); }
+            to   { transform: rotateX(360deg); }
+        }
+        @keyframes an_spinY {
+            from { transform: rotateY(0deg); }
+            to   { transform: rotateY(360deg); }
+        }
+
+        /* 控制面板 */
+        .an_ctrl {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 18px;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        .an_ctrl button {
+            padding: 6px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #0366c4;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .an_ctrl button:hover { background: #02509e; }
+        .an_speed-value { color: #0366c4; font-weight: bold; }
+
+        /* ============ 2. rotateX / rotateY / rotateZ 三轴对比 ============ */
+        .an_axis-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .an_axis-item {
+            flex: 1;
+            min-width: 220px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+        }
+        .an_axis-stage {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 600px;
+            background: radial-gradient(circle, #eaf2fb, #fff);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .an_axis-plate {
+            width: 140px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #0366c4, #39c);
+            box-shadow: 0 10px 20px rgba(3, 102, 204, .3);
+        }
+        .an_rot-x { animation: an_rotX 4s linear infinite; }
+        .an_rot-y { animation: an_rotY 4s linear infinite; }
+        .an_rot-z { animation: an_rotZ 4s linear infinite; }
+        @keyframes an_rotX {
+            from { transform: rotateX(0deg); }
+            to   { transform: rotateX(360deg); }
+        }
+        @keyframes an_rotY {
+            from { transform: rotateY(0deg); }
+            to   { transform: rotateY(360deg); }
+        }
+        @keyframes an_rotZ {
+            from { transform: rotateZ(0deg); }
+            to   { transform: rotateZ(360deg); }
+        }
+
+        /* ============ 3. 3D 翻转卡片 ============ */
+        .an_flip-card {
+            width: 260px;
+            height: 160px;
+            perspective: 800px;              /* 给翻转设置视距 */
+            cursor: pointer;
+        }
+        .an_flip-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform .8s;       /* 翻转过渡动画 */
+        }
+        .an_flip-card:hover .an_flip-inner {
+            transform: rotateY(180deg);      /* 悬停时绕 Y 轴翻面 */
+        }
+        .an_flip-face {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border-radius: 10px;
+            backface-visibility: hidden;     /* 背面不可见，翻转的关键 */
+            color: #fff;
+            font-size: 16px;
+        }
+        .an_flip-front {
+            background: linear-gradient(135deg, #0366c4, #39c);
+        }
+        .an_flip-back {
+            background: linear-gradient(135deg, #d9466e, #f97a5a);
+            transform: rotateY(180deg);
+        }
+        .an_flip-face small {
+            font-size: 12px;
+            font-weight: normal;
+            opacity: .9;
+        }
+
+        /* ============ 4. perspective 视距对比 ============ */
+        .an_persp-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .an_persp-item {
+            flex: 1;
+            min-width: 220px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+        }
+        .an_persp-stage {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, #eaf2fb, #fff);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .an_persp-200 { perspective: 200px; }
+        .an_persp-600 { perspective: 600px; }
+        .an_persp-1200 { perspective: 1200px; }
+        .an_paddle {
+            width: 180px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #7a4dd6, #b07aff);
+            animation: an_rotY 6s linear infinite;   /* 同一动画，视距不同，近大远小不同 */
+        }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">&larr; 返回首页</a>
+    <h1>CSS3 3D 动画</h1>
+    <p class="an_sub">11-2 · 安家成 · transform + perspective + preserve-3d + animation</p>
+
+    <!-- 1. 旋转立方体 -->
+    <section>
+        <h2>一、旋转立方体（preserve-3d + translateZ）</h2>
+        <p class="an_tip">
+            舞台元素设置 <code>perspective: 800px</code> 提供透视；立方体设置
+            <code>transform-style: preserve-3d</code> 让六个面处于同一 3D 空间，
+            每个面用 <code>rotateX/rotateY</code> 定向后 <code>translateZ(80px)</code> 推出到立方体表面。
+        </p>
+        <div class="an_cube-stage">
+            <div class="an_cube" id="an_cube">
+                <div class="an_face an_face-front">前面</div>
+                <div class="an_face an_face-back">后面</div>
+                <div class="an_face an_face-right">右面</div>
+                <div class="an_face an_face-left">左面</div>
+                <div class="an_face an_face-top">上面</div>
+                <div class="an_face an_face-bottom">下面</div>
+            </div>
+        </div>
+        <div class="an_ctrl">
+            <button id="an_pauseBtn" type="button">暂停动画</button>
+            <label>
+                旋转速度（周期）：
+                <input type="range" id="an_speed" min="2" max="16" step="1" value="8">
+                <span class="an_speed-value" id="an_speedValue">8s</span>
+            </label>
+            <label><input type="radio" name="an_axis" value="an_spin" checked> 双轴旋转</label>
+            <label><input type="radio" name="an_axis" value="an_spinX"> 仅绕 X 轴</label>
+            <label><input type="radio" name="an_axis" value="an_spinY"> 仅绕 Y 轴</label>
+        </div>
+    </section>
+
+    <!-- 2. 三轴对比 -->
+    <section>
+        <h2>二、rotateX / rotateY / rotateZ 三轴对比</h2>
+        <p class="an_tip">
+            同一个面板分别绕三个轴旋转：绕 <code>X</code> 轴上下翻、绕 <code>Y</code> 轴左右翻、绕 <code>Z</code> 轴平面内打转（无近大远小）。
+        </p>
+        <div class="an_axis-row">
+            <div class="an_axis-item">
+                <div class="an_axis-stage"><div class="an_axis-plate an_rot-x">rotateX</div></div>
+                transform: rotateX(360deg)
+            </div>
+            <div class="an_axis-item">
+                <div class="an_axis-stage"><div class="an_axis-plate an_rot-y">rotateY</div></div>
+                transform: rotateY(360deg)
+            </div>
+            <div class="an_axis-item">
+                <div class="an_axis-stage"><div class="an_axis-plate an_rot-z">rotateZ</div></div>
+                transform: rotateZ(360deg)
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 3D 翻转卡片 -->
+    <section>
+        <h2>三、3D 翻转卡片（transition + backface-visibility）</h2>
+        <p class="an_tip">
+            悬停卡片时 <code>transition</code> 让 <code>.an_flip-inner</code> 从 0° 转到 <code>rotateY(180deg)</code>；
+            两面都设 <code>backface-visibility: hidden</code>，背面才能在翻转后正确显示。
+        </p>
+        <div class="an_flip-card">
+            <div class="an_flip-inner">
+                <div class="an_flip-face an_flip-front">
+                    正面（Front）
+                    <small>把鼠标悬停在我上面</small>
+                </div>
+                <div class="an_flip-face an_flip-back">
+                    背面（Back）
+                    <small>transform: rotateY(180deg)</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. perspective 对比 -->
+    <section>
+        <h2>四、perspective 视距对比</h2>
+        <p class="an_tip">
+            三个面板播放<b>完全相同</b>的旋转动画，只是 <code>perspective</code> 值不同：
+            值越小透视越夸张（近大远小越明显），值越大越接近正交、越平。
+        </p>
+        <div class="an_persp-row">
+            <div class="an_persp-item">
+                <div class="an_persp-stage an_persp-200"><div class="an_paddle">200px</div></div>
+                perspective: 200px（透视强）
+            </div>
+            <div class="an_persp-item">
+                <div class="an_persp-stage an_persp-600"><div class="an_paddle">600px</div></div>
+                perspective: 600px（适中）
+            </div>
+            <div class="an_persp-item">
+                <div class="an_persp-stage an_persp-1200"><div class="an_paddle">1200px</div></div>
+                perspective: 1200px（透视弱）
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // 控制面板：暂停/继续、速度、旋转轴（变量统一以 an_ 开头）
+        const an_cube = document.getElementById('an_cube');
+        const an_pauseBtn = document.getElementById('an_pauseBtn');
+        const an_speed = document.getElementById('an_speed');
+        const an_speedValue = document.getElementById('an_speedValue');
+        const an_axisRadios = document.getElementsByName('an_axis');
+        let an_paused = false;
+
+        // 暂停 / 继续
+        an_pauseBtn.addEventListener('click', function () {
+            an_paused = !an_paused;
+            an_cube.classList.toggle('an_paused', an_paused);
+            an_pauseBtn.textContent = an_paused ? '继续动画' : '暂停动画';
+        });
+
+        // 旋转速度：修改动画周期
+        an_speed.addEventListener('input', function () {
+            an_cube.style.animationDuration = this.value + 's';
+            an_speedValue.textContent = this.value + 's';
+        });
+
+        // 旋转轴：切换 keyframes
+        for (let an_i = 0; an_i < an_axisRadios.length; an_i++) {
+            an_axisRadios[an_i].addEventListener('change', function () {
+                an_cube.style.animationName = this.value;
+            });
+        }
+    </script>
+</body>
+</html>
