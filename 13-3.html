@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13-3 移动端底部导航</title>
+    <style>
+        /* ============ 全局 ============ */
+        /* 约定：所有类名、id、CSS 变量、JS 变量均以 an_ 开头 */
+        :root {
+            --an_green: #0F8F63;        /* 选中绿（图标/文字） */
+            --an_green_dark: #0A6B49;   /* 角标 / 圆点 深绿 */
+            --an_green_bg: #DDF3E8;     /* 选中胶囊底色 */
+            --an_ico_off: #AEB4BA;      /* 未选中图标颜色 */
+            --an_txt_off: #6E747B;      /* 未选中文字颜色 */
+            --an_dark: #16181A;         /* 深色区域背景 */
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            padding: 24px 16px 40px;
+            background: #f5f6f8;
+            color: #222;
+            font-family: "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+        }
+        .an_back {
+            display: block;
+            max-width: 960px;
+            margin: 0 auto 12px;
+            font-size: 14px;
+            color: #0366c4;
+            text-decoration: none;
+        }
+        .an_back:hover { text-decoration: underline; }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+        .an_sub {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        /* ============ 1. 手机舞台 ============ */
+        .an_stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .an_phone {
+            width: 390px;
+            max-width: 100%;
+            height: 720px;
+            background: var(--an_dark);
+            border-radius: 36px;
+            border: 8px solid #2b2e31;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        /* 状态栏 */
+        .an_statusbar {
+            flex: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 22px 6px;
+            color: #fff;
+            font-size: 13px;
+            background: var(--an_dark);
+        }
+        .an_statusbar .an_status_right { letter-spacing: 2px; opacity: .9; }
+
+        /* 内容区（浅色） */
+        .an_content {
+            flex: 1;
+            overflow: auto;
+            padding: 16px 16px 18px;
+            background: #f4f5f7;
+        }
+        .an_page_title { font-size: 21px; }
+        .an_page_desc {
+            font-size: 13px;
+            color: #7a828a;
+            margin: 4px 0 14px;
+        }
+        .an_cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .an_card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 14px;
+            min-height: 88px;
+            font-size: 12px;
+            color: #6b7280;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
+        }
+        .an_card b {
+            display: block;
+            font-size: 22px;
+            color: var(--an_green);
+            margin-bottom: 2px;
+        }
+
+        /* ============ 2. 底部导航（深色区 + 白色卡片） ============ */
+        .an_nav-zone {
+            flex: none;
+            background: var(--an_dark);
+            padding-bottom: calc(8px + env(safe-area-inset-bottom));
+        }
+        .an_nav-card {
+            position: relative;
+            margin: 12px 12px 0;
+            background: #fff;
+            border-radius: 16px;
+            padding: 10px 4px 8px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, .3);
+        }
+        /* 卡片右上角的小绿点（有新动态） */
+        .an_dot {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--an_green);
+            cursor: pointer;
+        }
+        .an_nav {
+            display: flex;
+            align-items: flex-start;
+        }
+        .an_tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            border: none;
+            background: none;
+            padding: 4px 0 2px;
+            cursor: pointer;
+            color: var(--an_ico_off);
+            font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .an_tab:focus-visible { outline: 2px solid var(--an_green); outline-offset: 2px; border-radius: 8px; }
+        .an_icon-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 30px;
+            border-radius: 999px;
+            transition: background .25s;
+        }
+        .an_tab:not(.an_tab-active):hover .an_icon-box { background: #f0f2f4; }
+        .an_tab-active .an_icon-box { background: var(--an_green_bg); }
+
+        /* SVG 图标：用 CSS mask 引用 picture/ 下的 svg 文件，用 currentColor 上色 */
+        .an_icon {
+            display: block;
+            width: 26px;
+            height: 26px;
+            background-color: currentColor;      /* 颜色跟随文字颜色，随选中态变化 */
+            -webkit-mask-repeat: no-repeat;
+                    mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+                    mask-position: center;
+            -webkit-mask-size: contain;
+                    mask-size: contain;
+            transition: transform .18s;
+        }
+        .an_tab:active .an_icon { transform: scale(.85); }
+        .an_icon-home    { -webkit-mask-image: url("picture/主页.svg");   mask-image: url("picture/主页.svg"); }
+        .an_icon-discover{ -webkit-mask-image: url("picture/发现.svg");   mask-image: url("picture/发现.svg"); }
+        .an_icon-message { -webkit-mask-image: url("picture/消息.svg");   mask-image: url("picture/消息.svg"); }
+        .an_icon-me      { -webkit-mask-image: url("picture/_我的.svg");  mask-image: url("picture/_我的.svg"); }
+
+        .an_label {
+            font-size: 12px;
+            color: var(--an_txt_off);
+            transition: color .25s;
+        }
+        .an_tab-active { color: var(--an_green); }
+        .an_tab-active .an_label {
+            color: var(--an_green);
+            font-weight: 600;
+        }
+
+        /* 未读角标 */
+        .an_badge {
+            position: absolute;
+            top: -4px;
+            right: 4px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            border-radius: 999px;
+            background: var(--an_green_dark);
+            color: #fff;
+            font-size: 11px;
+            font-family: Arial, sans-serif;
+            line-height: 18px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        /* iOS Home Indicator */
+        .an_indicator {
+            width: 134px;
+            height: 5px;
+            border-radius: 3px;
+            background: #0b0c0d;
+            margin: 12px auto 6px;
+        }
+
+        /* 演示操作 */
+        .an_ops {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .an_ops button {
+            padding: 7px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #0366c4;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .an_ops button:hover { background: #02509e; }
+        .an_ops .an_hint {
+            align-self: center;
+            font-size: 13px;
+            color: #888;
+        }
+
+        /* ============ 3. 实现说明 ============ */
+        section {
+            max-width: 960px;
+            margin: 0 auto 24px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px 24px;
+        }
+        h2 {
+            font-size: 20px;
+            border-left: 5px solid #039;
+            padding-left: 10px;
+            margin-bottom: 14px;
+        }
+        p.an_tip {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+        code {
+            background: #eef2f7;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-family: Consolas, monospace;
+            color: #c7254e;
+        }
+        pre.an_code {
+            background: #272c34;
+            color: #d8dee9;
+            border-radius: 8px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+        pre.an_code code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+        .an_footer {
+            max-width: 960px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 13px;
+            color: #999;
+        }
+        /* 窄屏（真实手机）下：去掉机身外框，导航贴底 */
+        @media (max-width: 430px) {
+            .an_phone {
+                width: 100%;
+                height: 82vh;
+                min-height: 520px;
+                border: none;
+                border-radius: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">&larr; 返回首页</a>
+    <h1>移动端底部导航</h1>
+    <p class="an_sub">13-3 · 安家成 · SVG 图标（CSS mask + currentColor）</p>
+
+    <div class="an_stage">
+        <!-- 手机外框 -->
+        <div class="an_phone">
+            <div class="an_statusbar">
+                <span class="an_status_time">9:41</span>
+                <span class="an_status_right">5G ▮▮▮</span>
+            </div>
+
+            <!-- 内容区：随导航切换文案 -->
+            <div class="an_content">
+                <h2 class="an_page_title" id="an_pageTitle">首页</h2>
+                <p class="an_page_desc" id="an_pageDesc">推荐内容与快捷入口（当前：首页）</p>
+                <div class="an_cards">
+                    <div class="an_card"><b>128</b>今日新增内容</div>
+                    <div class="an_card"><b>36°</b>今日气温 · 晴</div>
+                    <div class="an_card"><b>6.5h</b>屏幕使用时间</div>
+                    <div class="an_card"><b>21</b>待办事项</div>
+                </div>
+            </div>
+
+            <!-- 底部导航区（深色背景 + 白色卡片 + Home Indicator） -->
+            <div class="an_nav-zone">
+                <div class="an_nav-card">
+                    <span class="an_dot" id="an_dot" title="有新动态，点击消失"></span>
+                    <nav class="an_nav" role="tablist" aria-label="底部导航">
+                        <button class="an_tab an_tab-active" type="button" role="tab" aria-selected="true" data-an-name="home">
+                            <span class="an_icon-box">
+                                <span class="an_icon an_icon-home"></span>
+                            </span>
+                            <span class="an_label">首页</span>
+                        </button>
+                        <button class="an_tab" type="button" role="tab" aria-selected="false" data-an-name="discover">
+                            <span class="an_icon-box">
+                                <span class="an_icon an_icon-discover"></span>
+                            </span>
+                            <span class="an_label">发现</span>
+                        </button>
+                        <button class="an_tab" type="button" role="tab" aria-selected="false" data-an-name="message">
+                            <span class="an_icon-box">
+                                <span class="an_icon an_icon-message"></span>
+                                <span class="an_badge" id="an_badge">3</span>
+                            </span>
+                            <span class="an_label">消息</span>
+                        </button>
+                        <button class="an_tab" type="button" role="tab" aria-selected="false" data-an-name="me">
+                            <span class="an_icon-box">
+                                <span class="an_icon an_icon-me"></span>
+                            </span>
+                            <span class="an_label">我的</span>
+                        </button>
+                    </nav>
+                </div>
+                <div class="an_indicator"></div>
+            </div>
+        </div>
+
+        <!-- 演示操作 -->
+        <div class="an_ops">
+            <button type="button" id="an_newMsgBtn">模拟新消息 +1</button>
+            <span class="an_hint">点击 tab 切换 · 点击角标清除 · 点击小绿点消失</span>
+        </div>
+    </div>
+
+    <!-- 实现说明 -->
+    <section>
+        <h2>实现说明</h2>
+        <p class="an_tip">
+            四个图标来自 <code>picture/</code> 目录（<code>主页.svg / 发现.svg / 消息.svg / _我的.svg</code>）。
+            由于这些 svg 文件里的 <code>fill</code> 颜色是写死的（紫色、灰色……），
+            用 <code>&lt;img&gt;</code> 引入后<b>无法改色</b>；这里改用 <b>CSS mask（遮罩）</b>：
+            svg 只当“形状模板”，再用 <code>background-color: currentColor</code> 上色，
+            于是图标颜色就能跟随选中态 / 文字颜色变化（延续 13-2 的 currentColor 思路）。
+        </p>
+        <pre class="an_code"><code>/* 图标本体：svg 只提供形状，颜色由 background-color 决定 */
+.an_icon {
+    width: 26px; height: 26px;
+    background-color: currentColor;               /* 跟随文字颜色 */
+    -webkit-mask: url("picture/主页.svg") no-repeat center / contain;
+            mask: url("picture/主页.svg") no-repeat center / contain;
+}
+/* 选中态：胶囊底色 + 图标/文字变绿（颜色全靠 currentColor 继承） */
+.an_tab-active           { color: #0F8F63; }
+.an_tab-active .an_icon-box { background: #DDF3E8; }   /* 浅绿胶囊 */</code></pre>
+        <p class="an_tip">
+            其他细节：<code>border-radius: 999px</code> 做胶囊选中态；角标用绝对定位叠在图标右上角，
+            点击时 <code>stopPropagation()</code> 避免触发 tab 切换；导航卡片外预留
+            <code>env(safe-area-inset-bottom)</code>，在全面屏 iPhone 上不被 Home Indicator 遮挡；
+            最底部的黑色横条即 iOS 的 Home Indicator。
+        </p>
+    </section>
+
+    <p class="an_footer">图标文件：picture/主页.svg、发现.svg、消息.svg、_我的.svg（iconfont 风格，viewBox 1024×1024）</p>
+
+    <script>
+        // ============ tab 切换 ============
+        const an_tabs = document.querySelectorAll('.an_tab');
+        const an_pageTitle = document.getElementById('an_pageTitle');
+        const an_pageDesc = document.getElementById('an_pageDesc');
+        const an_data = {
+            home:     { title: '首页', desc: '推荐内容与快捷入口（当前：首页）' },
+            discover: { title: '发现', desc: '按兴趣探索更多内容（当前：发现）' },
+            message:  { title: '消息', desc: '私信与系统通知（当前：消息）' },
+            me:       { title: '我的', desc: '个人资料与设置（当前：我的）' }
+        };
+
+        function an_activate(an_name) {
+            if (!an_data[an_name]) { return; }
+            an_tabs.forEach(function (an_tab) {
+                const an_on = an_tab.getAttribute('data-an-name') === an_name;
+                an_tab.classList.toggle('an_tab-active', an_on);
+                an_tab.setAttribute('aria-selected', an_on ? 'true' : 'false');
+            });
+            an_pageTitle.textContent = an_data[an_name].title;
+            an_pageDesc.textContent = an_data[an_name].desc;
+        }
+        an_tabs.forEach(function (an_tab) {
+            an_tab.addEventListener('click', function () {
+                an_activate(an_tab.getAttribute('data-an-name'));
+            });
+        });
+
+        // ============ 未读角标 ============
+        const an_badge = document.getElementById('an_badge');
+        const an_newMsgBtn = document.getElementById('an_newMsgBtn');
+        let an_unread = 3;
+
+        an_badge.addEventListener('click', function (an_e) {
+            an_e.stopPropagation();                 // 不触发 tab 切换
+            an_unread = 0;
+            an_badge.style.display = 'none';
+        });
+        an_newMsgBtn.addEventListener('click', function () {
+            an_unread++;
+            an_badge.textContent = an_unread;
+            an_badge.style.display = '';
+        });
+
+        // ============ 卡片小绿点 ============
+        const an_dot = document.getElementById('an_dot');
+        an_dot.addEventListener('click', function () {
+            an_dot.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

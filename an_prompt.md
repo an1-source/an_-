@@ -74,3 +74,16 @@
 - Model: opencode/mimo-v2.6-flash-free
 - Prompt: 提交项目
 
+## 2026-10-19 13:48:59
+- Model: opencode/mimo-v2.6-flash-free
+- Prompt: 做两个html网页13-1.html，13-2.html分别表示fonta wesome图标和lucide图标，前者使用字体图标的方式，后者使用svg的方式，相关的cdn文件下载到本目录下的cdn目录。
+
+## 2026-10-19 14:58:40
+- Model: opencode/mimo-v2.6-flash-free
+- Prompt: 照着这个图片完成移动端下导航创建我的图标在D:\高级网页设计\picture路径下，新建的为13-3.html文件
+
+
+
+## 2026-10-21 10:30 - opencode/mimo-v2.6-flash-free
+
+把13-3.html上传到gitee上
