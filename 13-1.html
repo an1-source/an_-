@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13-1 Font Awesome 字体图标</title>
+    <link rel="stylesheet" href="cdn/font-awesome/css/all.min.css">
+    <style>
+        /* ============ 全局 ============ */
+        /* 约定：所有类名、id、JS 变量均以 an_ 开头（fa-* 为 Font Awesome 库自带类名） */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            padding: 24px;
+            background: #f5f6f8;
+            color: #222;
+            font-family: "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+        }
+        .an_back {
+            display: block;
+            max-width: 960px;
+            margin: 0 auto 12px;
+            font-size: 14px;
+            color: #0366c4;
+            text-decoration: none;
+        }
+        .an_back:hover { text-decoration: underline; }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+        .an_sub {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        section {
+            max-width: 960px;
+            margin: 0 auto 24px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px 24px;
+        }
+        h2 {
+            font-size: 20px;
+            border-left: 5px solid #039;
+            padding-left: 10px;
+            margin-bottom: 14px;
+        }
+        h3 {
+            font-size: 15px;
+            color: #444;
+            margin: 14px 0 8px;
+        }
+        p.an_tip {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+        code {
+            background: #eef2f7;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-family: Consolas, monospace;
+            color: #c7254e;
+        }
+        pre.an_code {
+            background: #272c34;
+            color: #d8dee9;
+            border-radius: 8px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+        pre.an_code code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* ============ 1. 原理演示 ============ */
+        .an_principle {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            background: radial-gradient(circle, #eaf2fb, #fff);
+            border: 1px dashed #9ec3e8;
+            border-radius: 8px;
+            padding: 18px 20px;
+            font-size: 16px;
+        }
+        .an_big-icon {
+            font-size: 56px;             /* 图标 = 文字，font-size 直接生效 */
+            color: #0366c4;              /* color 直接生效（继承文字颜色） */
+        }
+        .an_principle .an_note {
+            flex: 1;
+            min-width: 260px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* ============ 2. 图标网格 + 搜索 ============ */
+        .an_search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            font-size: 14px;
+        }
+        .an_search-bar input {
+            flex: 1;
+            max-width: 320px;
+            padding: 7px 10px 7px 32px;
+            border: 1px solid #ccd3db;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+        .an_search-wrap {
+            position: relative;
+            flex: 1;
+            max-width: 320px;
+        }
+        .an_search-wrap input {
+            width: 100%;
+            max-width: none;
+            padding-left: 32px;
+        }
+        .an_search-wrap i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        .an_count {
+            color: #888;
+            font-size: 13px;
+        }
+        .an_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+            gap: 10px;
+        }
+        .an_item {
+            border: 1px solid #e6e9ee;
+            border-radius: 8px;
+            padding: 12px 6px 8px;
+            text-align: center;
+            background: #fafbfc;
+            transition: all .2s;
+        }
+        .an_item:hover {
+            border-color: #0366c4;
+            box-shadow: 0 4px 10px rgba(3, 102, 204, .15);
+            transform: translateY(-2px);
+        }
+        .an_item i {
+            font-size: 26px;
+            color: #333;
+        }
+        .an_item .an_name {
+            display: block;
+            margin-top: 6px;
+            font-size: 11px;
+            color: #888;
+            word-break: break-all;
+            font-family: Consolas, monospace;
+        }
+        .an_hidden { display: none !important; }
+
+        /* ============ 3. 尺寸 / 旋转 / 动画 ============ */
+        .an_row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-end;
+        }
+        .an_demo-cell {
+            min-width: 92px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            background: #fafbfc;
+            border: 1px solid #e6e9ee;
+            border-radius: 8px;
+            padding: 14px 8px 8px;
+        }
+        .an_demo-cell i {
+            display: block;
+            color: #0366c4;
+            margin-bottom: 6px;
+        }
+        /* 旋转行没有尺寸类，统一给个默认字号（避免覆盖 fa-*x 的 font-size） */
+        .an_rot-row .an_demo-cell i { font-size: 24px; }
+        .an_anim-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            align-items: center;
+            background: radial-gradient(circle, #eaf2fb, #fff);
+            border-radius: 8px;
+            padding: 18px 20px;
+        }
+        .an_anim-box .an_anim-cell {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+        .an_anim-box .an_anim-cell i {
+            display: block;
+            font-size: 34px;
+            color: #d6336c;
+            margin-bottom: 4px;
+        }
+        .an_paused i { animation-play-state: paused !important; }
+        .an_ctrl {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+            margin-top: 14px;
+            font-size: 14px;
+        }
+        .an_ctrl button {
+            padding: 6px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #0366c4;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .an_ctrl button:hover { background: #02509e; }
+
+        /* ============ 4. 像文字一样使用 ============ */
+        .an_color-box {
+            background: #fff3f6;
+            border: 1px solid #ffd6e2;
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: #d6336c;              /* 图标继承这段文字的颜色 */
+            font-size: 22px;
+            margin-bottom: 14px;
+        }
+        .an_color-box .an_label {
+            font-size: 13px;
+            color: #999;
+            margin-left: 8px;
+        }
+        .an_hover-box {
+            display: inline-block;
+            padding: 10px 18px;
+            border: 1px dashed #0366c4;
+            border-radius: 8px;
+            color: #0366c4;
+            font-size: 22px;
+            cursor: pointer;
+            transition: color .25s, background .25s;
+        }
+        .an_hover-box:hover {
+            background: #0366c4;
+            color: #fff;
+        }
+        .an_size-demo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fafbfc;
+            border: 1px solid #e6e9ee;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+        }
+        .an_size-demo .an_size-icon { color: #039; }
+        .an_size-demo input[type="range"] { flex: 1; }
+        .an_size-demo .an_size-value {
+            font-family: Consolas, monospace;
+            color: #0366c4;
+            font-weight: bold;
+            min-width: 56px;
+            text-align: right;
+        }
+        .an_btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #0366c4;
+            color: #fff;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .an_btn:hover { background: #02509e; }
+        .an_btn:disabled { opacity: .7; cursor: not-allowed; }
+        .an-btn-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .an_notify {
+            position: relative;
+            display: inline-block;
+            font-size: 30px;
+            color: #555;
+            cursor: pointer;
+        }
+        .an_notify .an_badge {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background: #dc3545;
+            color: #fff;
+            font-size: 11px;
+            line-height: 1;
+            padding: 3px 5px;
+            border-radius: 10px;
+            font-family: Arial, sans-serif;
+        }
+        .an_input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccd3db;
+            border-radius: 6px;
+            overflow: hidden;
+            max-width: 300px;
+            background: #fff;
+        }
+        .an_input-group i {
+            padding: 0 10px;
+            color: #888;
+            font-size: 14px;
+        }
+        .an_input-group input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 8px 8px 8px 0;
+            font-size: 14px;
+        }
+        .an_list {
+            list-style: none;
+            font-size: 15px;
+            max-width: 340px;
+        }
+        .an_list li {
+            padding: 6px 0;
+            border-bottom: 1px dashed #e3e6ea;
+        }
+        .an_list i {
+            color: #198754;
+            width: 20px;                 /* fa-fw：等宽对齐 */
+            text-align: center;
+        }
+        .an_align-demo {
+            background: #f2f7ff;
+            border: 1px dashed #9ec3e8;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 15px;
+        }
+
+        /* ============ 5. 交互 ============ */
+        .an_theme-card {
+            border-radius: 8px;
+            padding: 18px 20px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            transition: all .3s;
+        }
+        .an_theme-card.an_dark {
+            background: #1d2430;
+            border-color: #1d2430;
+            color: #e8ecf3;
+        }
+        .an_theme-card .an_theme-title {
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+        .an_theme-card .an_theme-text {
+            font-size: 13px;
+            color: inherit;
+            opacity: .75;
+        }
+        .an_theme-card i { font-size: 24px; }
+        .an_star {
+            font-size: 34px;
+            color: #c9ced6;
+            cursor: pointer;
+            margin-right: 4px;
+            transition: color .15s, transform .15s;
+        }
+        .an_star:hover { transform: scale(1.15); }
+        .an_star.an_lit { color: #f5a623; }
+        .an_score {
+            font-size: 14px;
+            color: #666;
+            margin-top: 8px;
+        }
+        .an_score b { color: #f5a623; font-size: 18px; }
+        .an_vote-box {
+            background: #fafbfc;
+            border: 1px solid #e6e9ee;
+            border-radius: 8px;
+            padding: 16px 18px;
+        }
+        .an_footer {
+            max-width: 960px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 13px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">&larr; 返回首页</a>
+    <h1>Font Awesome 字体图标</h1>
+    <p class="an_sub">13-1 · 安家成 · 字体图标（webfont + ::before content）</p>
+
+    <!-- 1. 引入方式与原理 -->
+    <section>
+        <h2>一、引入方式与图标原理</h2>
+        <p class="an_tip">
+            Font Awesome 把图标“画”进了字体文件：CSS 用 <code>@font-face</code> 加载本地
+            <code>cdn/font-awesome/webfonts/</code> 下的 <code>.woff2/.ttf</code>，
+            每个图标类再通过伪元素输出字体里的一个字符（<code>.fa-house{--fa:"\f015"}</code> +
+            <code>.fa-solid:before{content:var(--fa)}</code>）。所以<b>图标就是文字</b>。
+        </p>
+        <pre class="an_code"><code>&lt;link rel="stylesheet" href="cdn/font-awesome/css/all.min.css"&gt;
+&lt;i class="fa-solid fa-house"&gt;&lt;/i&gt;      &lt;!-- 实心 solid --&gt;
+&lt;i class="fa-regular fa-heart"&gt;&lt;/i&gt;    &lt;!-- 线框 regular --&gt;
+&lt;i class="fa-brands fa-github"&gt;&lt;/i&gt;    &lt;!-- 品牌 brands --&gt;</code></pre>
+        <div class="an_principle">
+            <i class="fa-solid fa-house an_big-icon"></i>
+            <span class="an_big-icon">文字</span>
+            <span class="an_note">
+                图标和普通文字一样：可以直接设置 <code>color</code>、<code>font-size</code>、
+                <code>font-weight</code>、<code>text-shadow</code>，能继承父元素样式，
+                和文字排在同一基线上。三个样式前缀：
+                <code>fa-solid / fas</code>（实心）、<code>fa-regular / far</code>（线框）、
+                <code>fa-brands / fab</code>（品牌）。
+            </span>
+        </div>
+    </section>
+
+    <!-- 2. 常用图标 -->
+    <section>
+        <h2>二、常用图标（可搜索）</h2>
+        <p class="an_tip">
+            输入关键字（如 <code>house</code>、<code>heart</code>）过滤下面的图标。
+            每个格子下面是该图标的类名，写 HTML 时直接抄即可。
+        </p>
+        <div class="an_search-bar">
+            <span class="an_search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="an_search" placeholder="搜索图标，例如 house / heart / github">
+            </span>
+            <span class="an_count" id="an_count"></span>
+        </div>
+
+        <h3>实心图标（fa-solid）</h3>
+        <div class="an_grid" id="an_gridSolid">
+            <div class="an_item" data-an-name="house"><i class="fa-solid fa-house"></i><span class="an_name">fa-house</span></div>
+            <div class="an_item" data-an-name="magnifying-glass"><i class="fa-solid fa-magnifying-glass"></i><span class="an_name">fa-magnifying-glass</span></div>
+            <div class="an_item" data-an-name="gear"><i class="fa-solid fa-gear"></i><span class="an_name">fa-gear</span></div>
+            <div class="an_item" data-an-name="user"><i class="fa-solid fa-user"></i><span class="an_name">fa-user</span></div>
+            <div class="an_item" data-an-name="envelope"><i class="fa-solid fa-envelope"></i><span class="an_name">fa-envelope</span></div>
+            <div class="an_item" data-an-name="bell"><i class="fa-solid fa-bell"></i><span class="an_name">fa-bell</span></div>
+            <div class="an_item" data-an-name="calendar"><i class="fa-solid fa-calendar"></i><span class="an_name">fa-calendar</span></div>
+            <div class="an_item" data-an-name="camera"><i class="fa-solid fa-camera"></i><span class="an_name">fa-camera</span></div>
+            <div class="an_item" data-an-name="download"><i class="fa-solid fa-download"></i><span class="an_name">fa-download</span></div>
+            <div class="an_item" data-an-name="upload"><i class="fa-solid fa-upload"></i><span class="an_name">fa-upload</span></div>
+            <div class="an_item" data-an-name="pen"><i class="fa-solid fa-pen"></i><span class="an_name">fa-pen</span></div>
+            <div class="an_item" data-an-name="trash"><i class="fa-solid fa-trash"></i><span class="an_name">fa-trash</span></div>
+            <div class="an_item" data-an-name="check"><i class="fa-solid fa-check"></i><span class="an_name">fa-check</span></div>
+            <div class="an_item" data-an-name="xmark"><i class="fa-solid fa-xmark"></i><span class="an_name">fa-xmark</span></div>
+            <div class="an_item" data-an-name="arrow-right"><i class="fa-solid fa-arrow-right"></i><span class="an_name">fa-arrow-right</span></div>
+            <div class="an_item" data-an-name="bars"><i class="fa-solid fa-bars"></i><span class="an_name">fa-bars</span></div>
+            <div class="an_item" data-an-name="sun"><i class="fa-solid fa-sun"></i><span class="an_name">fa-sun</span></div>
+            <div class="an_item" data-an-name="moon"><i class="fa-solid fa-moon"></i><span class="an_name">fa-moon</span></div>
+            <div class="an_item" data-an-name="cloud"><i class="fa-solid fa-cloud"></i><span class="an_name">fa-cloud</span></div>
+            <div class="an_item" data-an-name="lock"><i class="fa-solid fa-lock"></i><span class="an_name">fa-lock</span></div>
+            <div class="an_item" data-an-name="phone"><i class="fa-solid fa-phone"></i><span class="an_name">fa-phone</span></div>
+            <div class="an_item" data-an-name="location-dot"><i class="fa-solid fa-location-dot"></i><span class="an_name">fa-location-dot</span></div>
+            <div class="an_item" data-an-name="clock"><i class="fa-solid fa-clock"></i><span class="an_name">fa-clock</span></div>
+            <div class="an_item" data-an-name="globe"><i class="fa-solid fa-globe"></i><span class="an_name">fa-globe</span></div>
+            <div class="an_item" data-an-name="bookmark"><i class="fa-solid fa-bookmark"></i><span class="an_name">fa-bookmark</span></div>
+            <div class="an_item" data-an-name="filter"><i class="fa-solid fa-filter"></i><span class="an_name">fa-filter</span></div>
+            <div class="an_item" data-an-name="tag"><i class="fa-solid fa-tag"></i><span class="an_name">fa-tag</span></div>
+            <div class="an_item" data-an-name="bolt"><i class="fa-solid fa-bolt"></i><span class="an_name">fa-bolt</span></div>
+            <div class="an_item" data-an-name="list"><i class="fa-solid fa-list"></i><span class="an_name">fa-list</span></div>
+            <div class="an_item" data-an-name="image"><i class="fa-solid fa-image"></i><span class="an_name">fa-image</span></div>
+            <div class="an_item" data-an-name="code"><i class="fa-solid fa-code"></i><span class="an_name">fa-code</span></div>
+            <div class="an_item" data-an-name="folder"><i class="fa-solid fa-folder"></i><span class="an_name">fa-folder</span></div>
+            <div class="an_item" data-an-name="file-lines"><i class="fa-solid fa-file-lines"></i><span class="an_name">fa-file-lines</span></div>
+            <div class="an_item" data-an-name="info"><i class="fa-solid fa-info"></i><span class="an_name">fa-info</span></div>
+            <div class="an_item" data-an-name="circle-info"><i class="fa-solid fa-circle-info"></i><span class="an_name">fa-circle-info</span></div>
+            <div class="an_item" data-an-name="key"><i class="fa-solid fa-key"></i><span class="an_name">fa-key</span></div>
+            <div class="an_item" data-an-name="link"><i class="fa-solid fa-link"></i><span class="an_name">fa-link</span></div>
+            <div class="an_item" data-an-name="plus"><i class="fa-solid fa-plus"></i><span class="an_name">fa-plus</span></div>
+            <div class="an_item" data-an-name="eye"><i class="fa-solid fa-eye"></i><span class="an_name">fa-eye</span></div>
+            <div class="an_item" data-an-name="chevron-right"><i class="fa-solid fa-chevron-right"></i><span class="an_name">fa-chevron-right</span></div>
+            <div class="an_item" data-an-name="chevron-down"><i class="fa-solid fa-chevron-down"></i><span class="an_name">fa-chevron-down</span></div>
+            <div class="an_item" data-an-name="circle-check"><i class="fa-solid fa-circle-check"></i><span class="an_name">fa-circle-check</span></div>
+            <div class="an_item" data-an-name="play"><i class="fa-solid fa-play"></i><span class="an_name">fa-play</span></div>
+            <div class="an_item" data-an-name="pause"><i class="fa-solid fa-pause"></i><span class="an_name">fa-pause</span></div>
+            <div class="an_item" data-an-name="arrows-rotate"><i class="fa-solid fa-arrows-rotate"></i><span class="an_name">fa-arrows-rotate</span></div>
+            <div class="an_item" data-an-name="share"><i class="fa-solid fa-share"></i><span class="an_name">fa-share</span></div>
+            <div class="an_item" data-an-name="spinner"><i class="fa-solid fa-spinner"></i><span class="an_name">fa-spinner</span></div>
+            <div class="an_item" data-an-name="heart"><i class="fa-solid fa-heart"></i><span class="an_name">fa-heart</span></div>
+            <div class="an_item" data-an-name="star"><i class="fa-solid fa-star"></i><span class="an_name">fa-star</span></div>
+            <div class="an_item" data-an-name="wifi"><i class="fa-solid fa-wifi"></i><span class="an_name">fa-wifi</span></div>
+            <div class="an_item" data-an-name="terminal"><i class="fa-solid fa-terminal"></i><span class="an_name">fa-terminal</span></div>
+            <div class="an_item" data-an-name="server"><i class="fa-solid fa-server"></i><span class="an_name">fa-server</span></div>
+            <div class="an_item" data-an-name="database"><i class="fa-solid fa-database"></i><span class="an_name">fa-database</span></div>
+            <div class="an_item" data-an-name="laptop"><i class="fa-solid fa-laptop"></i><span class="an_name">fa-laptop</span></div>
+            <div class="an_item" data-an-name="shield-halved"><i class="fa-solid fa-shield-halved"></i><span class="an_name">fa-shield-halved</span></div>
+            <div class="an_item" data-an-name="rocket"><i class="fa-solid fa-rocket"></i><span class="an_name">fa-rocket</span></div>
+            <div class="an_item" data-an-name="leaf"><i class="fa-solid fa-leaf"></i><span class="an_name">fa-leaf</span></div>
+            <div class="an_item" data-an-name="gamepad"><i class="fa-solid fa-gamepad"></i><span class="an_name">fa-gamepad</span></div>
+            <div class="an_item" data-an-name="headphones"><i class="fa-solid fa-headphones"></i><span class="an_name">fa-headphones</span></div>
+            <div class="an_item" data-an-name="qrcode"><i class="fa-solid fa-qrcode"></i><span class="an_name">fa-qrcode</span></div>
+            <div class="an_item" data-an-name="bag-shopping"><i class="fa-solid fa-bag-shopping"></i><span class="an_name">fa-bag-shopping</span></div>
+            <div class="an_item" data-an-name="mug-hot"><i class="fa-solid fa-mug-hot"></i><span class="an_name">fa-mug-hot</span></div>
+            <div class="an_item" data-an-name="paper-plane"><i class="fa-solid fa-paper-plane"></i><span class="an_name">fa-paper-plane</span></div>
+            <div class="an_item" data-an-name="thumbs-up"><i class="fa-solid fa-thumbs-up"></i><span class="an_name">fa-thumbs-up</span></div>
+        </div>
+
+        <h3>线框图标（fa-regular，免费版仅部分图标有线框样式）</h3>
+        <div class="an_grid" id="an_gridRegular">
+            <div class="an_item" data-an-name="heart"><i class="fa-regular fa-heart"></i><span class="an_name">fa-regular fa-heart</span></div>
+            <div class="an_item" data-an-name="star"><i class="fa-regular fa-star"></i><span class="an_name">fa-regular fa-star</span></div>
+            <div class="an_item" data-an-name="bell"><i class="fa-regular fa-bell"></i><span class="an_name">fa-regular fa-bell</span></div>
+            <div class="an_item" data-an-name="user"><i class="fa-regular fa-user"></i><span class="an_name">fa-regular fa-user</span></div>
+            <div class="an_item" data-an-name="envelope"><i class="fa-regular fa-envelope"></i><span class="an_name">fa-regular fa-envelope</span></div>
+            <div class="an_item" data-an-name="calendar"><i class="fa-regular fa-calendar"></i><span class="an_name">fa-regular fa-calendar</span></div>
+            <div class="an_item" data-an-name="clock"><i class="fa-regular fa-clock"></i><span class="an_name">fa-regular fa-clock</span></div>
+            <div class="an_item" data-an-name="circle-check"><i class="fa-regular fa-circle-check"></i><span class="an_name">fa-regular fa-circle-check</span></div>
+            <div class="an_item" data-an-name="image"><i class="fa-regular fa-image"></i><span class="an_name">fa-regular fa-image</span></div>
+            <div class="an_item" data-an-name="bookmark"><i class="fa-regular fa-bookmark"></i><span class="an_name">fa-regular fa-bookmark</span></div>
+            <div class="an_item" data-an-name="eye"><i class="fa-regular fa-eye"></i><span class="an_name">fa-regular fa-eye</span></div>
+            <div class="an_item" data-an-name="comment"><i class="fa-regular fa-comment"></i><span class="an_name">fa-regular fa-comment</span></div>
+            <div class="an_item" data-an-name="file"><i class="fa-regular fa-file"></i><span class="an_name">fa-regular fa-file</span></div>
+            <div class="an_item" data-an-name="folder"><i class="fa-regular fa-folder"></i><span class="an_name">fa-regular fa-folder</span></div>
+            <div class="an_item" data-an-name="trash-can"><i class="fa-regular fa-trash-can"></i><span class="an_name">fa-regular fa-trash-can</span></div>
+            <div class="an_item" data-an-name="pen-to-square"><i class="fa-regular fa-pen-to-square"></i><span class="an_name">fa-regular fa-pen-to-square</span></div>
+            <div class="an_item" data-an-name="lightbulb"><i class="fa-regular fa-lightbulb"></i><span class="an_name">fa-regular fa-lightbulb</span></div>
+            <div class="an_item" data-an-name="thumbs-up"><i class="fa-regular fa-thumbs-up"></i><span class="an_name">fa-regular fa-thumbs-up</span></div>
+        </div>
+
+        <h3>品牌图标（fa-brands）</h3>
+        <div class="an_grid" id="an_gridBrands">
+            <div class="an_item" data-an-name="github"><i class="fa-brands fa-github"></i><span class="an_name">fa-github</span></div>
+            <div class="an_item" data-an-name="html5"><i class="fa-brands fa-html5"></i><span class="an_name">fa-html5</span></div>
+            <div class="an_item" data-an-name="css3-alt"><i class="fa-brands fa-css3-alt"></i><span class="an_name">fa-css3-alt</span></div>
+            <div class="an_item" data-an-name="js"><i class="fa-brands fa-js"></i><span class="an_name">fa-js</span></div>
+            <div class="an_item" data-an-name="node-js"><i class="fa-brands fa-node-js"></i><span class="an_name">fa-node-js</span></div>
+            <div class="an_item" data-an-name="npm"><i class="fa-brands fa-npm"></i><span class="an_name">fa-npm</span></div>
+            <div class="an_item" data-an-name="git-alt"><i class="fa-brands fa-git-alt"></i><span class="an_name">fa-git-alt</span></div>
+            <div class="an_item" data-an-name="chrome"><i class="fa-brands fa-chrome"></i><span class="an_name">fa-chrome</span></div>
+            <div class="an_item" data-an-name="firefox"><i class="fa-brands fa-firefox"></i><span class="an_name">fa-firefox</span></div>
+            <div class="an_item" data-an-name="react"><i class="fa-brands fa-react"></i><span class="an_name">fa-react</span></div>
+            <div class="an_item" data-an-name="vuejs"><i class="fa-brands fa-vuejs"></i><span class="an_name">fa-vuejs</span></div>
+            <div class="an_item" data-an-name="stack-overflow"><i class="fa-brands fa-stack-overflow"></i><span class="an_name">fa-stack-overflow</span></div>
+        </div>
+    </section>
+
+    <!-- 3. 尺寸 / 旋转 / 动画 -->
+    <section>
+        <h2>三、尺寸、旋转与动画</h2>
+        <p class="an_tip">
+            尺寸类本质是改 <code>font-size</code>（<code>.fa-2x{font-size:2em}</code>），
+            旋转类本质是改 <code>transform</code>（<code>.fa-rotate-90{transform:rotate(90deg)}</code>），
+            动画类给元素加 <code>animation</code>——都是普通 CSS，可以随意覆盖。
+        </p>
+
+        <h3>1）尺寸</h3>
+        <div class="an_row">
+            <div class="an_demo-cell"><i class="fa-solid fa-camera"></i>fa-lg</div>
+            <div class="an_demo-cell"><i class="fa-solid fa-camera fa-2x"></i>fa-2x</div>
+            <div class="an_demo-cell"><i class="fa-solid fa-camera fa-3x"></i>fa-3x</div>
+            <div class="an_demo-cell"><i class="fa-solid fa-camera fa-4x"></i>fa-4x</div>
+            <div class="an_demo-cell"><i class="fa-solid fa-camera fa-5x"></i>fa-5x</div>
+            <div class="an_demo-cell"><i class="fa-solid fa-camera" style="font-size:64px;"></i>style 覆盖</div>
+        </div>
+
+        <h3>2）旋转与翻转</h3>
+        <div class="an_row an_rot-row">
+            <div class="an_demo-cell"><i class="fa-solid fa-arrow-right"></i>原始</div>
+            <div class="an_demo-cell"><i class="fa-solid fa-arrow-right fa-rotate-90"></i>rotate-90</div>
+            <div class="an_demo-cell"><i class="fa-solid fa-arrow-right fa-rotate-180"></i>rotate-180</div>
+            <div class="an_demo-cell"><i class="fa-solid fa-arrow-right fa-rotate-270"></i>rotate-270</div>
+            <div class="an_demo-cell"><i class="fa-solid fa-arrow-right fa-flip-horizontal"></i>flip-h</div>
+            <div class="an_demo-cell"><i class="fa-solid fa-arrow-right fa-flip-vertical"></i>flip-v</div>
+        </div>
+
+        <h3>3）动画</h3>
+        <div class="an_anim-box" id="an_animBox">
+            <div class="an_anim-cell"><i class="fa-solid fa-spinner fa-spin"></i>fa-spin</div>
+            <div class="an_anim-cell"><i class="fa-solid fa-arrows-rotate fa-pulse"></i>fa-pulse</div>
+            <div class="an_anim-cell"><i class="fa-solid fa-heart fa-beat"></i>fa-beat</div>
+            <div class="an_anim-cell"><i class="fa-solid fa-star fa-fade"></i>fa-fade</div>
+            <div class="an_anim-cell"><i class="fa-solid fa-bell fa-shake"></i>fa-shake</div>
+            <div class="an_anim-cell"><i class="fa-solid fa-circle-info fa-beat-fade"></i>fa-beat-fade</div>
+            <div class="an_anim-cell"><i class="fa-solid fa-rocket fa-bounce"></i>fa-bounce</div>
+            <div class="an_anim-cell"><i class="fa-solid fa-gear fa-spin-pulse"></i>fa-spin-pulse</div>
+        </div>
+        <div class="an_ctrl">
+            <button id="an_animBtn" type="button">暂停全部动画</button>
+            <span class="an_count">动画作用在图标元素上，等价于 <code>animation-play-state: paused</code></span>
+        </div>
+    </section>
+
+    <!-- 4. 像文字一样使用 -->
+    <section>
+        <h2>四、像文字一样使用（颜色、字号、组合）</h2>
+        <p class="an_tip">
+            因为图标是字体字形，颜色就是文字颜色 <code>color</code>，大小就是
+            <code>font-size</code>，并且会<b>继承</b>父元素的样式，可以和文字完美混排。
+        </p>
+
+        <div class="an_color-box">
+            <i class="fa-solid fa-heart"></i> 我和这段文字一样是红色
+            <span class="an_label">父元素 color:#d6336c → 图标继承</span>
+        </div>
+
+        <p style="font-size:14px;color:#666;margin-bottom:6px;">悬停变色（图标跟随父元素 hover 变色）：</p>
+        <div class="an_hover-box">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            悬停我
+        </div>
+
+        <p style="font-size:14px;color:#666;margin:16px 0 6px;">字号滑块（font-size 直接控制图标大小）：</p>
+        <div class="an_size-demo">
+            <i class="fa-solid fa-camera an_size-icon" id="an_sizeIcon" style="font-size:40px;"></i>
+            <input type="range" id="an_fontSize" min="12" max="96" step="2" value="40">
+            <span class="an_size-value" id="an_fontSizeValue">40px</span>
+        </div>
+
+        <p style="font-size:14px;color:#666;margin-bottom:6px;">按钮 / 徽章 / 输入框 / 列表：</p>
+        <div class="an_btn-box">
+            <button class="an_btn" type="button"><i class="fa-solid fa-paper-plane"></i> 发送</button>
+            <span class="an_notify">
+                <i class="fa-solid fa-bell"></i>
+                <span class="an_badge">3</span>
+            </span>
+            <span class="an_input-group">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="带图标的输入框">
+            </span>
+        </div>
+
+        <div class="an_align-demo" style="margin-bottom:14px;">
+            <i class="fa-solid fa-quote-left"></i>
+            图标和文字排在同一基线上：文字 baseline、行高、字号都作用于图标。
+            <i class="fa-solid fa-quote-right"></i>
+        </div>
+
+        <ul class="an_list">
+            <li><i class="fa-solid fa-check fa-fw"></i> fa-fw 固定宽度，多行图标左对齐</li>
+            <li><i class="fa-solid fa-check fa-fw"></i> 第二行同样对齐</li>
+            <li><i class="fa-solid fa-xmark fa-fw"></i> 不同宽度的图标也不会错位</li>
+        </ul>
+    </section>
+
+    <!-- 5. 交互应用 -->
+    <section>
+        <h2>五、交互应用</h2>
+        <p class="an_tip">用 JS 切换类名即可换图标——因为图标只是 CSS 类 + 字体字符。</p>
+
+        <div class="an_theme-card" id="an_themeCard">
+            <p class="an_theme-title">
+                <i class="fa-solid fa-sun" id="an_themeIcon"></i>
+                <span id="an_themeText">浅色模式</span>
+            </p>
+            <p class="an_theme-text">点击下面的按钮，图标会从太阳换成月亮，卡片文字颜色改变时图标颜色也跟着变（继承）。</p>
+        </div>
+        <div class="an_ctrl" style="margin-bottom:18px;">
+            <button id="an_themeBtn" type="button">切换主题</button>
+        </div>
+
+        <div class="an_vote-box">
+            <p style="font-size:14px;color:#666;margin-bottom:10px;">点击星星评分（fa-regular ↔ fa-solid 切换）：</p>
+            <div id="an_starBox">
+                <i class="fa-regular fa-star an_star" data-an-index="1"></i>
+                <i class="fa-regular fa-star an_star" data-an-index="2"></i>
+                <i class="fa-regular fa-star an_star" data-an-index="3"></i>
+                <i class="fa-regular fa-star an_star" data-an-index="4"></i>
+                <i class="fa-regular fa-star an_star" data-an-index="5"></i>
+            </div>
+            <p class="an_score">当前评分：<b id="an_score">0</b> / 5 星</p>
+            <div class="an_ctrl">
+                <button class="an_btn" type="button" id="an_submitBtn">
+                    <i class="fa-solid fa-paper-plane" id="an_submitIcon"></i>
+                    <span id="an_submitText">提交评价</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <p class="an_footer">
+        本地 CDN：cdn/font-awesome/css/all.min.css + cdn/font-awesome/webfonts/*.woff2|ttf ·
+        Font Awesome Free 6.7.2
+    </p>
+
+    <script>
+        // ============ 图标搜索过滤 ============
+        const an_search = document.getElementById('an_search');
+        const an_count = document.getElementById('an_count');
+        const an_items = document.querySelectorAll('.an_item');
+        let an_shown = 0;
+
+        function an_filter() {
+            const an_kw = an_search.value.trim().toLowerCase();
+            an_shown = 0;
+            an_items.forEach(function (an_item) {
+                const an_name = an_item.getAttribute('data-an-name') || '';
+                const an_hit = an_kw === '' || an_name.indexOf(an_kw) >= 0;
+                an_item.classList.toggle('an_hidden', !an_hit);
+                if (an_hit) { an_shown++; }
+            });
+            an_count.textContent = '共 ' + an_shown + ' 个图标';
+        }
+        an_search.addEventListener('input', an_filter);
+        an_filter();
+
+        // ============ 动画暂停 ============
+        const an_animBox = document.getElementById('an_animBox');
+        const an_animBtn = document.getElementById('an_animBtn');
+        let an_animPaused = false;
+        an_animBtn.addEventListener('click', function () {
+            an_animPaused = !an_animPaused;
+            an_animBox.classList.toggle('an_paused', an_animPaused);
+            an_animBtn.textContent = an_animPaused ? '继续全部动画' : '暂停全部动画';
+        });
+
+        // ============ 字号滑块（图标 = 文字） ============
+        const an_fontSize = document.getElementById('an_fontSize');
+        const an_fontSizeValue = document.getElementById('an_fontSizeValue');
+        const an_sizeIcon = document.getElementById('an_sizeIcon');
+        an_fontSize.addEventListener('input', function () {
+            an_sizeIcon.style.fontSize = this.value + 'px';
+            an_fontSizeValue.textContent = this.value + 'px';
+        });
+
+        // ============ 主题切换（换图标类名） ============
+        const an_themeBtn = document.getElementById('an_themeBtn');
+        const an_themeCard = document.getElementById('an_themeCard');
+        const an_themeIcon = document.getElementById('an_themeIcon');
+        const an_themeText = document.getElementById('an_themeText');
+        let an_isDark = false;
+        an_themeBtn.addEventListener('click', function () {
+            an_isDark = !an_isDark;
+            an_themeCard.classList.toggle('an_dark', an_isDark);
+            an_themeIcon.className = an_isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+            an_themeText.textContent = an_isDark ? '暗色模式' : '浅色模式';
+        });
+
+        // ============ 星星评分 ============
+        const an_starBox = document.getElementById('an_starBox');
+        const an_score = document.getElementById('an_score');
+        const an_starIcons = an_starBox.querySelectorAll('.an_star');
+        let an_rating = 0;
+
+        function an_renderStars(an_n) {
+            an_starIcons.forEach(function (an_star) {
+                const an_i = Number(an_star.getAttribute('data-an-index'));
+                const an_lit = an_i <= an_n;
+                an_star.className = 'an_star' + (an_lit ? ' an_lit' : '');
+                an_star.classList.add(an_lit ? 'fa-solid' : 'fa-regular');
+                an_star.classList.add('fa-star');
+            });
+            an_score.textContent = an_n;
+        }
+        an_starIcons.forEach(function (an_star) {
+            an_star.addEventListener('click', function () {
+                an_rating = Number(an_star.getAttribute('data-an-index'));
+                an_renderStars(an_rating);
+            });
+        });
+
+        // ============ 提交按钮（loading 状态换图标） ============
+        const an_submitBtn = document.getElementById('an_submitBtn');
+        const an_submitIcon = document.getElementById('an_submitIcon');
+        const an_submitText = document.getElementById('an_submitText');
+        an_submitBtn.addEventListener('click', function () {
+            if (an_submitBtn.disabled) { return; }
+            if (an_rating === 0) {
+                an_submitText.textContent = '请先点星星评分';
+                setTimeout(function () { an_submitText.textContent = '提交评价'; }, 1200);
+                return;
+            }
+            an_submitBtn.disabled = true;
+            an_submitIcon.className = 'fa-solid fa-spinner fa-spin';
+            an_submitText.textContent = '提交中…';
+            setTimeout(function () {
+                an_submitIcon.className = 'fa-solid fa-circle-check';
+                an_submitText.textContent = '提交成功（' + an_rating + ' 星）';
+                setTimeout(function () {
+                    an_submitBtn.disabled = false;
+                    an_submitIcon.className = 'fa-solid fa-paper-plane';
+                    an_submitText.textContent = '提交评价';
+                }, 1500);
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

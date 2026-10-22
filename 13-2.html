@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13-2 Lucide SVG 图标</title>
+    <style>
+        /* ============ 全局 ============ */
+        /* 约定：所有类名、id、JS 变量均以 an_ 开头（lucide-* 为库自带类名） */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            padding: 24px;
+            background: #f5f6f8;
+            color: #222;
+            font-family: "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+        }
+        .an_back {
+            display: block;
+            max-width: 960px;
+            margin: 0 auto 12px;
+            font-size: 14px;
+            color: #0366c4;
+            text-decoration: none;
+        }
+        .an_back:hover { text-decoration: underline; }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+        .an_sub {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        section {
+            max-width: 960px;
+            margin: 0 auto 24px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px 24px;
+        }
+        h2 {
+            font-size: 20px;
+            border-left: 5px solid #039;
+            padding-left: 10px;
+            margin-bottom: 14px;
+        }
+        h3 {
+            font-size: 15px;
+            color: #444;
+            margin: 14px 0 8px;
+        }
+        p.an_tip {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+        code {
+            background: #eef2f7;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-family: Consolas, monospace;
+            color: #c7254e;
+        }
+        pre.an_code {
+            background: #272c34;
+            color: #d8dee9;
+            border-radius: 8px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+        pre.an_code code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* ============ 1. 原理演示 ============ */
+        .an_principle {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            align-items: center;
+            background: radial-gradient(circle, #eaf2fb, #fff);
+            border: 1px dashed #9ec3e8;
+            border-radius: 8px;
+            padding: 18px 20px;
+        }
+        .an_principle .an_svg-big {
+            width: 72px;
+            height: 72px;
+            color: #0366c4;
+        }
+        .an_principle .an_note {
+            flex: 1;
+            min-width: 280px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* ============ 2. 图标网格 + 搜索 ============ */
+        .an_search-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            font-size: 14px;
+            flex-wrap: wrap;
+        }
+        .an_search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 240px;
+            max-width: 340px;
+        }
+        .an_search-wrap .an_search-ico {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: #999;
+            pointer-events: none;
+        }
+        .an_search-wrap input {
+            width: 100%;
+            padding: 7px 10px 7px 32px;
+            border: 1px solid #ccd3db;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+        .an_search-wrap input:focus { border-color: #0366c4; }
+        .an_count { color: #888; font-size: 13px; }
+        .an_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+            gap: 10px;
+        }
+        .an_item {
+            border: 1px solid #e6e9ee;
+            border-radius: 8px;
+            padding: 12px 6px 8px;
+            text-align: center;
+            background: #fafbfc;
+            transition: all .2s;
+        }
+        .an_item:hover {
+            border-color: #0366c4;
+            box-shadow: 0 4px 10px rgba(3, 102, 204, .15);
+            transform: translateY(-2px);
+        }
+        .an_item svg {
+            width: 26px;
+            height: 26px;
+            color: #333;
+        }
+        .an_item .an_name {
+            display: block;
+            margin-top: 6px;
+            font-size: 11px;
+            color: #888;
+            word-break: break-all;
+            font-family: Consolas, monospace;
+        }
+        .an_hidden { display: none !important; }
+
+        /* ============ 3. 尺寸 / 描边 / 颜色 ============ */
+        .an_ctrl-stage {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            align-items: center;
+            min-height: 120px;
+            background: radial-gradient(circle, #eaf2fb, #fff);
+            border: 1px dashed #9ec3e8;
+            border-radius: 8px;
+            padding: 20px;
+            color: #0366c4;              /* SVG stroke="currentColor" 跟随这里的 color */
+        }
+        .an_ctrl {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 18px;
+            margin-top: 14px;
+            font-size: 14px;
+        }
+        .an_ctrl label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .an_ctrl input[type="range"] { width: 170px; }
+        .an_val {
+            font-family: Consolas, monospace;
+            color: #0366c4;
+            font-weight: bold;
+            min-width: 52px;
+        }
+        .an_chips {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .an_chip {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px #ccd3db;
+            cursor: pointer;
+            padding: 0;
+        }
+        .an_chip.an_active { box-shadow: 0 0 0 2px #039; }
+        .an_ctrl button.an_btn {
+            padding: 6px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #0366c4;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .an_ctrl button.an_btn:hover { background: #02509e; }
+        .an_svgs-note {
+            font-size: 13px;
+            color: #888;
+            margin-top: 8px;
+        }
+        .an_svgs-note code { font-size: 12px; }
+
+        /* ============ 4. 颜色继承 ============ */
+        .an_box {
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .an_box svg { width: 24px; height: 24px; }
+        .an_box-blue { background: #0366c4; color: #fff; }
+        .an_box-red { background: #fff3f6; color: #d6336c; border: 1px solid #ffd6e2; }
+        .an_box-green { background: #e9f7ef; color: #198754; border: 1px solid #c3ebd3; }
+        .an_box .an_small { font-size: 12px; opacity: .8; }
+        .an_hover-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border: 1px dashed #0366c4;
+            border-radius: 8px;
+            color: #0366c4;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all .25s;
+        }
+        .an_hover-box svg { width: 22px; height: 22px; }
+        .an_hover-box:hover {
+            background: #0366c4;
+            color: #fff;
+        }
+
+        /* ============ 5. 三种使用方式 ============ */
+        .an_ways {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+        }
+        .an_way {
+            border: 1px solid #e6e9ee;
+            border-radius: 8px;
+            padding: 14px 16px;
+            background: #fafbfc;
+        }
+        .an_way h4 {
+            font-size: 14px;
+            color: #039;
+            margin-bottom: 8px;
+        }
+        .an_way .an_demo {
+            height: 74px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #fff;
+            border: 1px dashed #d5dbe3;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            color: #d6336c;
+            font-size: 13px;
+        }
+        .an_way .an_demo svg { width: 34px; height: 34px; }
+        .an_way p {
+            font-size: 12px;
+            color: #777;
+            line-height: 1.7;
+        }
+        .an_way code { font-size: 11px; }
+        /* 方式 A：JS 渲染的内联 SVG，CSS 可以直接控制描边 */
+        .an_way-a svg {
+            stroke-width: 1;             /* CSS 直接改 stroke-width */
+            transition: stroke-width .2s;
+        }
+        .an_way-a:hover svg { stroke-width: 3.5; }
+        /* 方式 C：外链 <img>，父元素颜色无法影响它 */
+        .an_way img { width: 34px; height: 34px; }
+        /* 只能用 filter 近似染色 */
+        .an_img-filter { filter: brightness(0) saturate(100%) invert(26%) sepia(88%) saturate(3437%) hue-rotate(325deg) brightness(95%) contrast(97%); }
+
+        /* ============ 6. 交互 ============ */
+        .an_theme-card {
+            border-radius: 8px;
+            padding: 18px 20px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            transition: all .3s;
+        }
+        .an_theme-card.an_dark {
+            background: #1d2430;
+            border-color: #1d2430;
+            color: #e8ecf3;
+        }
+        .an_theme-card .an_theme-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+        .an_theme-card .an_theme-title svg { width: 22px; height: 22px; }
+        .an_theme-card .an_theme-text { font-size: 13px; opacity: .78; }
+        .an_btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #0366c4;
+            color: #fff;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .an_btn:hover { background: #02509e; }
+        .an_btn svg { width: 18px; height: 18px; }
+        .an_ctrl-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            margin: 14px 0;
+        }
+        .an_gen-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            min-height: 56px;
+            background: #fafbfc;
+            border: 1px solid #e6e9ee;
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: #039;
+        }
+        .an_gen-box svg { width: 24px; height: 24px; }
+        .an_footer {
+            max-width: 960px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 13px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">&larr; 返回首页</a>
+    <h1>Lucide SVG 图标</h1>
+    <p class="an_sub">13-2 · 安家成 · SVG 图标（内联 svg + currentColor）</p>
+
+    <!-- 1. 引入方式与原理 -->
+    <section>
+        <h2>一、引入方式与图标原理</h2>
+        <p class="an_tip">
+            Lucide 的每个图标都是一段 <b>SVG 矢量图形</b>。把库文件下载到本地后，
+            页面里写 <code>&lt;i data-lucide="house"&gt;&lt;/i&gt;</code>，
+            调用 <code>lucide.createIcons()</code> 会把它替换成真正的内联
+            <code>&lt;svg&gt;</code> 节点——不是字体，也不是图片文件。
+        </p>
+        <pre class="an_code"><code>&lt;script src="cdn/lucide/lucide.min.js"&gt;&lt;/script&gt;
+&lt;i data-lucide="house"&gt;&lt;/i&gt;          &lt;!-- 占位符 --&gt;
+&lt;script&gt;lucide.createIcons();&lt;/script&gt;  &lt;!-- 替换成内联 &lt;svg&gt; --&gt;
+
+/* 渲染结果（SVG 源码片段） */
+&lt;svg class="lucide lucide-house" xmlns="http://www.w3.org/2000/svg"
+     width="24" height="24" viewBox="0 0 24 24"
+     fill="none" stroke="currentColor" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round"&gt;
+  &lt;path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/&gt;
+  &lt;path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/&gt;
+&lt;/svg&gt;</code></pre>
+        <div class="an_principle">
+            <i data-lucide="house" class="an_svg-big"></i>
+            <span class="an_note">
+                关键点：<b>stroke="currentColor"</b> 让描边颜色等于当前文字 <code>color</code>，
+                所以图标会跟随文字变色；<b>width / height</b> 控制尺寸（任意缩放不失真）；
+                <b>stroke-width</b> 控制线条粗细；<b>viewBox="0 0 24 24"</b> 是图标的设计坐标系。
+                渲染后元素上会带 <code>class="lucide lucide-house"</code>，方便用 CSS 选中。
+            </span>
+        </div>
+    </section>
+
+    <!-- 2. 常用图标 -->
+    <section>
+        <h2>二、常用图标（可搜索）</h2>
+        <p class="an_tip">
+            下面每个格子都是 <code>&lt;i data-lucide="图标名"&gt;</code> 经 JS 渲染出来的内联 SVG，
+            格子下方是它的图标名，可直接用于 <code>data-lucide</code>。
+        </p>
+        <div class="an_search-bar">
+            <span class="an_search-wrap">
+                <i data-lucide="search" class="an_search-ico"></i>
+                <input type="text" id="an_search" placeholder="搜索图标，例如 house / heart / zap">
+            </span>
+            <span class="an_count" id="an_count"></span>
+        </div>
+
+        <div class="an_grid" id="an_grid">
+            <div class="an_item" data-an-name="house"><i data-lucide="house"></i><span class="an_name">house</span></div>
+            <div class="an_item" data-an-name="heart"><i data-lucide="heart"></i><span class="an_name">heart</span></div>
+            <div class="an_item" data-an-name="star"><i data-lucide="star"></i><span class="an_name">star</span></div>
+            <div class="an_item" data-an-name="search"><i data-lucide="search"></i><span class="an_name">search</span></div>
+            <div class="an_item" data-an-name="settings"><i data-lucide="settings"></i><span class="an_name">settings</span></div>
+            <div class="an_item" data-an-name="user"><i data-lucide="user"></i><span class="an_name">user</span></div>
+            <div class="an_item" data-an-name="mail"><i data-lucide="mail"></i><span class="an_name">mail</span></div>
+            <div class="an_item" data-an-name="bell"><i data-lucide="bell"></i><span class="an_name">bell</span></div>
+            <div class="an_item" data-an-name="calendar"><i data-lucide="calendar"></i><span class="an_name">calendar</span></div>
+            <div class="an_item" data-an-name="camera"><i data-lucide="camera"></i><span class="an_name">camera</span></div>
+            <div class="an_item" data-an-name="download"><i data-lucide="download"></i><span class="an_name">download</span></div>
+            <div class="an_item" data-an-name="upload"><i data-lucide="upload"></i><span class="an_name">upload</span></div>
+            <div class="an_item" data-an-name="pen"><i data-lucide="pen"></i><span class="an_name">pen</span></div>
+            <div class="an_item" data-an-name="trash"><i data-lucide="trash"></i><span class="an_name">trash</span></div>
+            <div class="an_item" data-an-name="check"><i data-lucide="check"></i><span class="an_name">check</span></div>
+            <div class="an_item" data-an-name="x"><i data-lucide="x"></i><span class="an_name">x</span></div>
+            <div class="an_item" data-an-name="arrow-right"><i data-lucide="arrow-right"></i><span class="an_name">arrow-right</span></div>
+            <div class="an_item" data-an-name="arrow-left"><i data-lucide="arrow-left"></i><span class="an_name">arrow-left</span></div>
+            <div class="an_item" data-an-name="menu"><i data-lucide="menu"></i><span class="an_name">menu</span></div>
+            <div class="an_item" data-an-name="sun"><i data-lucide="sun"></i><span class="an_name">sun</span></div>
+            <div class="an_item" data-an-name="moon"><i data-lucide="moon"></i><span class="an_name">moon</span></div>
+            <div class="an_item" data-an-name="cloud"><i data-lucide="cloud"></i><span class="an_name">cloud</span></div>
+            <div class="an_item" data-an-name="lock"><i data-lucide="lock"></i><span class="an_name">lock</span></div>
+            <div class="an_item" data-an-name="phone"><i data-lucide="phone"></i><span class="an_name">phone</span></div>
+            <div class="an_item" data-an-name="map-pin"><i data-lucide="map-pin"></i><span class="an_name">map-pin</span></div>
+            <div class="an_item" data-an-name="clock"><i data-lucide="clock"></i><span class="an_name">clock</span></div>
+            <div class="an_item" data-an-name="globe"><i data-lucide="globe"></i><span class="an_name">globe</span></div>
+            <div class="an_item" data-an-name="bookmark"><i data-lucide="bookmark"></i><span class="an_name">bookmark</span></div>
+            <div class="an_item" data-an-name="filter"><i data-lucide="filter"></i><span class="an_name">filter</span></div>
+            <div class="an_item" data-an-name="tag"><i data-lucide="tag"></i><span class="an_name">tag</span></div>
+            <div class="an_item" data-an-name="zap"><i data-lucide="zap"></i><span class="an_name">zap</span></div>
+            <div class="an_item" data-an-name="list"><i data-lucide="list"></i><span class="an_name">list</span></div>
+            <div class="an_item" data-an-name="image"><i data-lucide="image"></i><span class="an_name">image</span></div>
+            <div class="an_item" data-an-name="code"><i data-lucide="code"></i><span class="an_name">code</span></div>
+            <div class="an_item" data-an-name="folder"><i data-lucide="folder"></i><span class="an_name">folder</span></div>
+            <div class="an_item" data-an-name="file-text"><i data-lucide="file-text"></i><span class="an_name">file-text</span></div>
+            <div class="an_item" data-an-name="info"><i data-lucide="info"></i><span class="an_name">info</span></div>
+            <div class="an_item" data-an-name="alert-circle"><i data-lucide="alert-circle"></i><span class="an_name">alert-circle</span></div>
+            <div class="an_item" data-an-name="coffee"><i data-lucide="coffee"></i><span class="an_name">coffee</span></div>
+            <div class="an_item" data-an-name="key"><i data-lucide="key"></i><span class="an_name">key</span></div>
+            <div class="an_item" data-an-name="link"><i data-lucide="link"></i><span class="an_name">link</span></div>
+            <div class="an_item" data-an-name="plus"><i data-lucide="plus"></i><span class="an_name">plus</span></div>
+            <div class="an_item" data-an-name="send"><i data-lucide="send"></i><span class="an_name">send</span></div>
+            <div class="an_item" data-an-name="eye"><i data-lucide="eye"></i><span class="an_name">eye</span></div>
+            <div class="an_item" data-an-name="chevron-right"><i data-lucide="chevron-right"></i><span class="an_name">chevron-right</span></div>
+            <div class="an_item" data-an-name="chevron-down"><i data-lucide="chevron-down"></i><span class="an_name">chevron-down</span></div>
+            <div class="an_item" data-an-name="thumbs-up"><i data-lucide="thumbs-up"></i><span class="an_name">thumbs-up</span></div>
+            <div class="an_item" data-an-name="circle-check"><i data-lucide="circle-check"></i><span class="an_name">circle-check</span></div>
+            <div class="an_item" data-an-name="play"><i data-lucide="play"></i><span class="an_name">play</span></div>
+            <div class="an_item" data-an-name="pause"><i data-lucide="pause"></i><span class="an_name">pause</span></div>
+            <div class="an_item" data-an-name="refresh-cw"><i data-lucide="refresh-cw"></i><span class="an_name">refresh-cw</span></div>
+            <div class="an_item" data-an-name="share-2"><i data-lucide="share-2"></i><span class="an_name">share-2</span></div>
+        </div>
+    </section>
+
+    <!-- 3. 尺寸 / 描边 / 颜色 -->
+    <section>
+        <h2>三、尺寸、描边与颜色（SVG 属性可控）</h2>
+        <p class="an_tip">
+            拖动滑块会<b>实时修改 SVG 的 width / height / stroke-width 属性</b>，
+            点色块修改的是外层的 <code>color</code>——因为描边是
+            <code>stroke="currentColor"</code>，SVG 会自动跟着变色。
+        </p>
+        <div class="an_ctrl-stage" id="an_stage">
+            <i data-lucide="heart"></i>
+            <i data-lucide="star"></i>
+            <i data-lucide="bell"></i>
+            <i data-lucide="user"></i>
+            <i data-lucide="search"></i>
+            <i data-lucide="camera"></i>
+            <i data-lucide="download"></i>
+            <i data-lucide="lock"></i>
+            <i data-lucide="zap"></i>
+            <i data-lucide="map-pin"></i>
+        </div>
+        <div class="an_ctrl">
+            <label>尺寸 <input type="range" id="an_size" min="16" max="96" step="2" value="32"><span class="an_val" id="an_sizeVal">32</span></label>
+            <label>描边 <input type="range" id="an_stroke" min="1" max="4" step="0.5" value="2"><span class="an_val" id="an_strokeVal">2</span></label>
+            <span class="an_chips">
+                颜色：
+                <button type="button" class="an_chip an_active" data-an-color="#0366c4" style="background:#0366c4" aria-label="蓝色"></button>
+                <button type="button" class="an_chip" data-an-color="#d6336c" style="background:#d6336c" aria-label="红色"></button>
+                <button type="button" class="an_chip" data-an-color="#198754" style="background:#198754" aria-label="绿色"></button>
+                <button type="button" class="an_chip" data-an-color="#7a4dd6" style="background:#7a4dd6" aria-label="紫色"></button>
+                <button type="button" class="an_chip" data-an-color="#fd7e14" style="background:#fd7e14" aria-label="橙色"></button>
+                <button type="button" class="an_chip" data-an-color="#1d2430" style="background:#1d2430" aria-label="深色"></button>
+            </span>
+            <button type="button" class="an_btn" id="an_resetBtn">恢复默认</button>
+        </div>
+        <p class="an_svgs-note">
+            代码里的写法：<code>&lt;svg width="32" height="32" stroke-width="2" stroke="currentColor"&gt;</code>
+            ；也可以全用 CSS：<code>svg { width: 32px; height: 32px; stroke-width: 2; }</code>（CSS 优先级更高）。
+        </p>
+    </section>
+
+    <!-- 4. 颜色继承 -->
+    <section>
+        <h2>四、颜色继承（currentColor）</h2>
+        <p class="an_tip">
+            <code>stroke="currentColor"</code> 表示“描边用当前文字颜色”，
+            所以图标<b>继承父元素 color</b>：父级变什么色，图标就变什么色，深色背景也能直接用。
+        </p>
+        <div class="an_box an_box-blue">
+            <i data-lucide="house"></i>
+            <i data-lucide="heart"></i>
+            <i data-lucide="star"></i>
+            蓝底白字：图标自动变白
+            <span class="an_small">（color:#fff → stroke:currentColor）</span>
+        </div>
+        <div class="an_box an_box-red">
+            <i data-lucide="bell"></i>
+            <i data-lucide="mail"></i>
+            <i data-lucide="calendar"></i>
+            红色文字：图标自动变红
+        </div>
+        <div class="an_box an_box-green">
+            <i data-lucide="circle-check"></i>
+            <i data-lucide="thumbs-up"></i>
+            绿色文字：图标自动变绿
+        </div>
+        <div style="margin-top:12px;">
+            <span class="an_hover-box">
+                <i data-lucide="zap"></i>
+                悬停变色（hover 改 color 即可）
+            </span>
+        </div>
+    </section>
+
+    <!-- 5. 三种使用方式 -->
+    <section>
+        <h2>五、三种使用方式对比（同一个 heart 图标）</h2>
+        <p class="an_tip">
+            左：JS 把占位符渲染成<b>内联 SVG</b>；中：直接把 SVG 代码<b>手写进 HTML</b>；
+            右：用 <code>&lt;img&gt;</code> <b>外链</b>本地 svg 文件。三者外观相同，可控程度不同。
+        </p>
+        <div class="an_ways">
+            <div class="an_way an_way-a">
+                <h4>方式 A：data-lucide + JS 渲染（内联 SVG）</h4>
+                <div class="an_demo">
+                    <i data-lucide="heart"></i>
+                    <span>颜色 / 粗细随便改，悬停试试</span>
+                </div>
+                <p>
+                    <code>&lt;i data-lucide="heart"&gt;&lt;/i&gt;</code> +
+                    <code>lucide.createIcons()</code>。<br>
+                    DOM 里是真实 <code>&lt;svg&gt;</code> 节点，CSS 可直接改
+                    <code>color / width / stroke-width</code>，可被 JS 操作。
+                </p>
+            </div>
+            <div class="an_way an_way-b">
+                <h4>方式 B：手写内联 SVG（无需 JS）</h4>
+                <div class="an_demo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/>
+                    </svg>
+                    <span>直接写在 HTML 里</span>
+                </div>
+                <p>
+                    把 svg 源码粘进 HTML（源码在 <code>cdn/lucide/svg/*.svg</code>）。<br>
+                    不依赖任何 JS/CSS 文件，同样能用 <code>color / stroke-width</code> 控制，最“纯正”的 SVG 方式。
+                </p>
+            </div>
+            <div class="an_way an_way-c">
+                <h4>方式 C：&lt;img&gt; 外链本地 svg 文件</h4>
+                <div class="an_demo">
+                    <img src="cdn/lucide/svg/heart.svg" alt="heart">
+                    <img src="cdn/lucide/svg/heart.svg" alt="heart 染色" class="an_img-filter">
+                    <span>左：原色；右：filter 近似染红</span>
+                </div>
+                <p>
+                    <code>&lt;img src="cdn/lucide/svg/heart.svg"&gt;</code>。<br>
+                    写法最简单、可缓存，但 svg 在独立文档里，
+                    <b>父元素的 color 改不动它</b>，只能用 <code>filter</code> 近似染色或换文件。
+                </p>
+            </div>
+        </div>
+        <p class="an_tip" style="margin-top:14px;margin-bottom:0;">
+            小结：<b>内联（A/B）</b>可用 CSS 完全控制、能做动画交互；<b>外链（C）</b>省代码但不可样式化；
+            字体图标（见 13-1）加载快、随文字缩放，但一个字形只能一种颜色、放大会糊（webfont 有分辨率上限）。
+        </p>
+    </section>
+
+    <!-- 6. 交互 -->
+    <section>
+        <h2>六、交互应用</h2>
+        <p class="an_tip">
+            换图标 = 把 <code>data-lucide</code> 换个名字再执行一次
+            <code>lucide.createIcons()</code>；动态生成也是同理：先插入占位符，再渲染。
+        </p>
+
+        <div class="an_theme-card" id="an_themeCard">
+            <p class="an_theme-title">
+                <span id="an_themeSlot"><i data-lucide="sun"></i></span>
+                <span id="an_themeText">浅色模式</span>
+            </p>
+            <p class="an_theme-text">点击按钮，占位符从 sun 换成 moon，再重新渲染一次 createIcons()。</p>
+        </div>
+        <div class="an_ctrl-row">
+            <button class="an_btn" type="button" id="an_themeBtn">切换主题</button>
+            <button class="an_btn" type="button" id="an_playBtn">
+                <span id="an_playSlot"><i data-lucide="play"></i></span>
+                <span id="an_playText">播放</span>
+            </button>
+            <button class="an_btn" type="button" id="an_genBtn">
+                <i data-lucide="sparkles"></i>
+                动态生成 6 个图标
+            </button>
+        </div>
+        <div class="an_gen-box" id="an_genBox">
+            <span style="font-size:13px;color:#888;">点击上面的按钮，这里会用 JS 插入占位符并渲染出 SVG 图标</span>
+        </div>
+    </section>
+
+    <p class="an_footer">
+        本地 CDN：cdn/lucide/lucide.min.js + cdn/lucide/svg/*.svg · Lucide 1.59.0（ISC 许可）
+    </p>
+
+    <script src="cdn/lucide/lucide.min.js"></script>
+    <script>
+        // ============ 首次渲染：把所有占位符替换成内联 SVG ============
+        lucide.createIcons();
+
+        // ============ 1. 图标搜索过滤 ============
+        const an_search = document.getElementById('an_search');
+        const an_count = document.getElementById('an_count');
+        const an_items = document.querySelectorAll('.an_item');
+        let an_shown = 0;
+
+        function an_filter() {
+            const an_kw = an_search.value.trim().toLowerCase();
+            an_shown = 0;
+            an_items.forEach(function (an_item) {
+                const an_name = an_item.getAttribute('data-an-name') || '';
+                const an_hit = an_kw === '' || an_name.indexOf(an_kw) >= 0;
+                an_item.classList.toggle('an_hidden', !an_hit);
+                if (an_hit) { an_shown++; }
+            });
+            an_count.textContent = '共 ' + an_shown + ' 个图标';
+        }
+        an_search.addEventListener('input', an_filter);
+        an_filter();
+
+        // ============ 2. 尺寸 / 描边 / 颜色控制（改 SVG 属性与 color） ============
+        const an_stage = document.getElementById('an_stage');
+        const an_size = document.getElementById('an_size');
+        const an_sizeVal = document.getElementById('an_sizeVal');
+        const an_stroke = document.getElementById('an_stroke');
+        const an_strokeVal = document.getElementById('an_strokeVal');
+        const an_chips = document.querySelectorAll('.an_chip');
+        const an_resetBtn = document.getElementById('an_resetBtn');
+
+        function an_applyStage() {
+            const an_svgs = an_stage.querySelectorAll('svg');
+            an_svgs.forEach(function (an_svg) {
+                an_svg.setAttribute('width', an_size.value);
+                an_svg.setAttribute('height', an_size.value);
+                an_svg.setAttribute('stroke-width', an_stroke.value);
+            });
+            an_sizeVal.textContent = an_size.value;
+            an_strokeVal.textContent = an_stroke.value;
+        }
+        an_size.addEventListener('input', an_applyStage);
+        an_stroke.addEventListener('input', an_applyStage);
+
+        an_chips.forEach(function (an_chip) {
+            an_chip.addEventListener('click', function () {
+                an_stage.style.color = an_chip.getAttribute('data-an-color');
+                an_chips.forEach(function (an_c) { an_c.classList.remove('an_active'); });
+                an_chip.classList.add('an_active');
+            });
+        });
+
+        an_resetBtn.addEventListener('click', function () {
+            an_size.value = 32;
+            an_stroke.value = 2;
+            an_stage.style.color = '#0366c4';
+            an_chips.forEach(function (an_c) {
+                an_c.classList.toggle('an_active', an_c.getAttribute('data-an-color') === '#0366c4');
+            });
+            an_applyStage();
+        });
+        an_applyStage();
+
+        // ============ 3. 主题切换（换 data-lucide 后重新渲染） ============
+        const an_themeBtn = document.getElementById('an_themeBtn');
+        const an_themeCard = document.getElementById('an_themeCard');
+        const an_themeSlot = document.getElementById('an_themeSlot');
+        const an_themeText = document.getElementById('an_themeText');
+        let an_isDark = false;
+        an_themeBtn.addEventListener('click', function () {
+            an_isDark = !an_isDark;
+            an_themeCard.classList.toggle('an_dark', an_isDark);
+            an_themeSlot.innerHTML = '<i data-lucide="' + (an_isDark ? 'moon' : 'sun') + '"></i>';
+            an_themeText.textContent = an_isDark ? '暗色模式' : '浅色模式';
+            lucide.createIcons({ root: an_themeSlot });
+        });
+
+        // ============ 4. 播放 / 暂停 ============
+        const an_playBtn = document.getElementById('an_playBtn');
+        const an_playSlot = document.getElementById('an_playSlot');
+        const an_playText = document.getElementById('an_playText');
+        let an_playing = false;
+        an_playBtn.addEventListener('click', function () {
+            an_playing = !an_playing;
+            an_playSlot.innerHTML = '<i data-lucide="' + (an_playing ? 'pause' : 'play') + '"></i>';
+            an_playText.textContent = an_playing ? '暂停' : '播放';
+            lucide.createIcons({ root: an_playSlot });
+        });
+
+        // ============ 5. 动态生成图标 ============
+        const an_genBtn = document.getElementById('an_genBtn');
+        const an_genBox = document.getElementById('an_genBox');
+        const an_genPool = ['heart', 'star', 'zap', 'cloud', 'coffee', 'bell', 'sun', 'moon', 'anchor', 'diamond', 'rocket', 'sparkles'];
+        let an_genStep = 0;
+
+        an_genBtn.addEventListener('click', function () {
+            // 每次点击生成 6 个图标：插入占位符 → createIcons() 渲染成 SVG
+            const an_pick = [];
+            for (let an_i = 0; an_i < 6; an_i++) {
+                an_pick.push(an_genPool[(an_genStep + an_i) % an_genPool.length]);
+            }
+            an_genStep = (an_genStep + 6) % an_genPool.length;
+
+            an_genBox.innerHTML = '';
+            an_pick.forEach(function (an_name) {
+                const an_el = document.createElement('i');
+                an_el.setAttribute('data-lucide', an_name);
+                an_genBox.appendChild(an_el);
+            });
+            lucide.createIcons({ root: an_genBox });
+        });
+    </script>
+</body>
+</html>
