@@ -1,0 +1,264 @@
+<!-- 姓名：安家成 | 日期：2026-10-22 | 功能：JavaScript 基本数据类型演示 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>14-2 JavaScript 基本数据类型</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .an_back {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.35); }
+        .an_container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .an_header {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        .an_header h1 { font-size: 32px; margin-bottom: 10px; }
+        .an_header p { opacity: 0.85; font-size: 15px; }
+        .an_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .an_card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transition: transform 0.25s;
+        }
+        .an_card:hover { transform: translateY(-4px); }
+        .an_card h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .an_badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: normal;
+        }
+        .an_type_string .an_badge { background: #f093fb; }
+        .an_type_number .an_badge { background: #4facfe; }
+        .an_type_boolean .an_badge { background: #43e97b; }
+        .an_type_null .an_badge { background: #fa709a; }
+        .an_type_undefined .an_badge { background: #fee140; color: #333; }
+        .an_type_symbol .an_badge { background: #a18cd1; }
+        .an_desc { font-size: 13px; color: #888; margin-bottom: 14px; }
+        .an_code {
+            background: #f6f8fa;
+            border-left: 3px solid #667eea;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 13px;
+            color: #24292f;
+            margin-bottom: 14px;
+            white-space: pre-wrap;
+        }
+        .an_btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: opacity 0.2s;
+        }
+        .an_btn:hover { opacity: 0.85; }
+        .an_result {
+            margin-top: 12px;
+            padding: 12px;
+            background: #eef2ff;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: Consolas, Monaco, monospace;
+            color: #1a1a2e;
+            min-height: 20px;
+            white-space: pre-wrap;
+        }
+        .an_footer {
+            text-align: center;
+            color: #fff;
+            margin-top: 30px;
+            opacity: 0.7;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="an_container">
+        <a class="an_back" href="index.html">← 返回首页</a>
+        <div class="an_header">
+            <h1>JavaScript 六种基本数据类型</h1>
+            <p>点击每张卡片的"运行示例"按钮，查看对应数据类型的输出结果</p>
+        </div>
+
+        <div class="an_grid">
+            <!-- 1. String -->
+            <div class="an_card an_type_string">
+                <h2>String <span class="an_badge">字符串</span></h2>
+                <p class="an_desc">用引号包裹的文本，可以用单引号、双引号或反引号。</p>
+                <pre class="an_code">var an_msg = "Hello World";
+var an_name = '安家成';
+var an_greet = `你好, ${an_name}`;</pre>
+                <button class="an_btn" onclick="an_runString()">运行示例</button>
+                <div id="an_res_string" class="an_result">（点击按钮查看结果）</div>
+            </div>
+
+            <!-- 2. Number -->
+            <div class="an_card an_type_number">
+                <h2>Number <span class="an_badge">数字</span></h2>
+                <p class="an_desc">整数和浮点数共用 Number 类型，还有特殊值 Infinity、NaN。</p>
+                <pre class="an_code">var an_int = 42;
+var an_float = 3.14;
+var an_sqrt = Math.sqrt(-1);  // NaN
+var an_divZero = 1 / 0;       // Infinity</pre>
+                <button class="an_btn" onclick="an_runNumber()">运行示例</button>
+                <div id="an_res_number" class="an_result">（点击按钮查看结果）</div>
+            </div>
+
+            <!-- 3. Boolean -->
+            <div class="an_card an_type_boolean">
+                <h2>Boolean <span class="an_badge">布尔</span></h2>
+                <p class="an_desc">只有两个值：true（真）和 false（假），常用于条件判断。</p>
+                <pre class="an_code">var an_isStudent = true;
+var an_isOldEnough = 18 >= 18;   // true
+var an_isEmpty = "" === "hello"; // false</pre>
+                <button class="an_btn" onclick="an_runBoolean()">运行示例</button>
+                <div id="an_res_boolean" class="an_result">（点击按钮查看结果）</div>
+            </div>
+
+            <!-- 4. Null -->
+            <div class="an_card an_type_null">
+                <h2>Null <span class="an_badge">空值</span></h2>
+                <p class="an_desc">表示"故意没有值"的空引用。typeof null 返回 "object" 是历史遗留 Bug。</p>
+                <pre class="an_code">var an_empty = null;
+console.log(an_empty);         // null
+console.log(typeof an_empty);  // "object"（历史 Bug）</pre>
+                <button class="an_btn" onclick="an_runNull()">运行示例</button>
+                <div id="an_res_null" class="an_result">（点击按钮查看结果）</div>
+            </div>
+
+            <!-- 5. Undefined -->
+            <div class="an_card an_type_undefined">
+                <h2>Undefined <span class="an_badge">未定义</span></h2>
+                <p class="an_desc">声明了变量但未赋值时的默认值；访问不存在的属性也会得到 undefined。</p>
+                <pre class="an_code">var an_x;
+var an_obj = { a: 1 };
+console.log(an_x);           // undefined
+console.log(an_obj.b);       // undefined</pre>
+                <button class="an_btn" onclick="an_runUndefined()">运行示例</button>
+                <div id="an_res_undefined" class="an_result">（点击按钮查看结果）</div>
+            </div>
+
+            <!-- 6. Symbol -->
+            <div class="an_card an_type_symbol">
+                <h2>Symbol <span class="an_badge">符号 (ES6)</span></h2>
+                <p class="an_desc">一种唯一且不可变的值，常用于对象的"私有"属性键。</p>
+                <pre class="an_code">var an_sym1 = Symbol("id");
+var an_sym2 = Symbol("id");
+console.log(an_sym1 === an_sym2); // false
+console.log(typeof an_sym1);       // "symbol"</pre>
+                <button class="an_btn" onclick="an_runSymbol()">运行示例</button>
+                <div id="an_res_symbol" class="an_result">（点击按钮查看结果）</div>
+            </div>
+        </div>
+
+        <div class="an_footer">
+            — JavaScript 六种基本数据类型 Demo · 安家成 —
+        </div>
+    </div>
+
+    <script>
+        function an_show(id, text) {
+            document.getElementById(id).textContent = text;
+        }
+
+        function an_runString() {
+            var an_msg = "Hello World";
+            var an_name = "安家成";
+            var an_greet = "你好, " + an_name;
+            an_show("an_res_string",
+                'an_msg = "' + an_msg + '"\n' +
+                'typeof an_msg → ' + typeof an_msg + '\n' +
+                'an_greet → ' + an_greet);
+        }
+
+        function an_runNumber() {
+            var an_int = 42;
+            var an_float = 3.14;
+            var an_sqrt = Math.sqrt(-1);
+            var an_divZero = 1 / 0;
+            an_show("an_res_number",
+                'an_int = ' + an_int + '  typeof → ' + typeof an_int + '\n' +
+                'an_float = ' + an_float + '\n' +
+                'Math.sqrt(-1) = ' + an_sqrt + '  (NaN)\n' +
+                '1 / 0 = ' + an_divZero + '  (Infinity)');
+        }
+
+        function an_runBoolean() {
+            var an_isStudent = true;
+            var an_isOldEnough = 18 >= 18;
+            var an_isEmpty = "" === "hello";
+            an_show("an_res_boolean",
+                'an_isStudent = ' + an_isStudent + '  typeof → ' + typeof an_isStudent + '\n' +
+                '18 >= 18 → ' + an_isOldEnough + '\n' +
+                '"" === "hello" → ' + an_isEmpty);
+        }
+
+        function an_runNull() {
+            var an_empty = null;
+            an_show("an_res_null",
+                'an_empty = ' + an_empty + '\n' +
+                'typeof an_empty → "' + typeof an_empty + '"  ← 历史 Bug');
+        }
+
+        function an_runUndefined() {
+            var an_x;
+            var an_obj = { a: 1 };
+            an_show("an_res_undefined",
+                'var an_x; → ' + an_x + '\n' +
+                'typeof an_x → "' + typeof an_x + '"\n' +
+                'an_obj.b → ' + an_obj.b);
+        }
+
+        function an_runSymbol() {
+            var an_sym1 = Symbol("id");
+            var an_sym2 = Symbol("id");
+            an_show("an_res_symbol",
+                'an_sym1 = Symbol("id")\n' +
+                'an_sym2 = Symbol("id")\n' +
+                'an_sym1 === an_sym2 → ' + (an_sym1 === an_sym2) + '  (每次都是唯一的)\n' +
+                'typeof an_sym1 → "' + typeof an_sym1 + '"');
+        }
+    </script>
+</body>
+</html>

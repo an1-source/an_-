@@ -99,3 +99,27 @@
 **提示词**: 
 
 根据给定文件创建trae的skill：d:\高级网页设计/.opencode/skills/submit-project/SKILL.md
+
+---
+
+**时间**: 2026-10-22
+**模型**: opencode/mimo-v2.6-flash-free
+**提示词**: 
+
+设置项目规则，所有变量名称、css类、id名称都以an_开始，所有html页面中都包括注释：姓名：安家成，日期，功能名称
+
+---
+
+**时间**: 2026-10-22
+**模型**: opencode/mimo-v2.6-flash-free
+**提示词**: 
+
+完成网页14-2.html，演示javascript基本的6种数据类型。
+
+---
+
+**时间**: 2026-10-22
+**模型**: opencode/mimo-v2.6-flash-free
+**提示词**: 
+
+设置项目规则，使用原生的html、css和javascript实现，图标使用font目录下的iconfont图标，不适用第三方库和cdn
