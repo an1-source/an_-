@@ -155,3 +155,11 @@ index.html要包括之前所有做的网页，新建的也要保存到里面
 **提示词**: 
 
 创建技能skill：提交到github，提交commit和push整个项目到 https://github.com/an1-source/an_-.git 公钥已设置ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIER5JjfczlSXOTVZpZvCiOR7v8JaKAo7x6yDPN6LIPzV 安家成@安
+
+---
+
+**时间**: 2026-10-26
+**模型**: Seed-Code
+**提示词**: 
+
+完成15-2.html,展示javascript程序结构：循环，条件。然后提交github

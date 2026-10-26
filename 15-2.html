@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-10-26 | 模型：Seed-Code | 功能：JavaScript 程序结构演示 — 循环与条件 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15-2 JS 循环与条件</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+        .an_back {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.35); }
+        .an_container { max-width: 960px; margin: 0 auto; }
+        .an_header {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 28px;
+        }
+        .an_header h1 { font-size: 28px; margin-bottom: 8px; }
+        .an_header p { font-size: 14px; opacity: 0.85; }
+
+        .an_section-title {
+            color: #fff;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 20px 0 14px;
+            padding-left: 12px;
+            border-left: 4px solid #ffecd2;
+        }
+
+        .an_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 18px;
+        }
+        .an_card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        .an_card h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .an_badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: normal;
+        }
+        .an_loop .an_badge { background: #4facfe; }
+        .an_cond .an_badge { background: #43e97b; }
+        .an_desc { font-size: 13px; color: #888; margin-bottom: 12px; }
+        .an_code {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            padding: 14px;
+            border-radius: 8px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12.5px;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin-bottom: 14px;
+            white-space: pre;
+            tab-size: 2;
+        }
+        .an_btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: opacity 0.2s;
+        }
+        .an_btn:hover { opacity: 0.85; }
+        .an_result {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f8f9ff;
+            border-left: 3px solid #667eea;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: Consolas, Monaco, monospace;
+            color: #2d2d5f;
+            min-height: 24px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .an_footer {
+            text-align: center;
+            color: #fff;
+            margin-top: 28px;
+            opacity: 0.7;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="an_container">
+        <a class="an_back" href="index.html">← 返回首页</a>
+        <div class="an_header">
+            <h1>JavaScript 程序结构</h1>
+            <p>循环（for / for-in / for-of / while / do-while）与 条件（if / if-else / switch / 三元）</p>
+        </div>
+
+        <div class="an_section-title">🔁 循环结构</div>
+        <div class="an_grid">
+            <!-- 1. for 循环 -->
+            <div class="an_card an_loop">
+                <h3>for 循环 <span class="an_badge">经典计数</span></h3>
+                <p class="an_desc">计算 1 ~ 100 的累加和</p>
+<pre class="an_code">let sum = 0;
+for (let i = 1; i <= 100; i++) {
+    sum += i;
+}
+console.log(sum);</pre>
+                <button class="an_btn" onclick="an_runFor()">运行示例</button>
+                <div id="an_res_for" class="an_result">（点击按钮）</div>
+            </div>
+
+            <!-- 2. for...of 遍历数组 -->
+            <div class="an_card an_loop">
+                <h3>for...of <span class="an_badge">遍历可迭代对象</span></h3>
+                <p class="an_desc">遍历数组，只输出奇数</p>
+<pre class="an_code">let nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+let odds = "";
+for (let n of nums) {
+    if (n % 2 !== 0) odds += n + " ";
+}
+console.log(odds);</pre>
+                <button class="an_btn" onclick="an_runForOf()">运行示例</button>
+                <div id="an_res_forof" class="an_result">（点击按钮）</div>
+            </div>
+
+            <!-- 3. for...in 遍历对象 -->
+            <div class="an_card an_loop">
+                <h3>for...in <span class="an_badge">遍历对象键名</span></h3>
+                <p class="an_desc">遍历学生信息对象</p>
+<pre class="an_code">let stu = { name: "安家成", age: 20, major: "软工" };
+let info = "";
+for (let key in stu) {
+    info += key + " → " + stu[key] + "\n";
+}
+console.log(info);</pre>
+                <button class="an_btn" onclick="an_runForIn()">运行示例</button>
+                <div id="an_res_forin" class="an_result">（点击按钮）</div>
+            </div>
+
+            <!-- 4. while 循环 -->
+            <div class="an_card an_loop">
+                <h3>while 循环 <span class="an_badge">条件满足就继续</span></h3>
+                <p class="an_desc">计算 2 的前 10 次幂</p>
+<pre class="an_code">let n = 1, p = 0, out = "";
+while (p < 10) {
+    n *= 2;
+    p++;
+    out += "2^" + p + " = " + n + "\n";
+}
+console.log(out);</pre>
+                <button class="an_btn" onclick="an_runWhile()">运行示例</button>
+                <div id="an_res_while" class="an_result">（点击按钮）</div>
+            </div>
+
+            <!-- 5. break / continue -->
+            <div class="an_card an_loop">
+                <h3>break &amp; continue <span class="an_badge">跳出 / 跳过</span></h3>
+                <p class="an_desc">找出第一个能被 3 和 5 同时整除的数</p>
+<pre class="an_code">let found = 0, log = "";
+for (let i = 1; i < 100; i++) {
+    if (i % 3 !== 0) continue;  // 跳过
+    if (i % 5 !== 0) continue;  // 跳过
+    found = i;
+    log += "找到: " + found + " → break\n";
+    break;
+}
+console.log(log);</pre>
+                <button class="an_btn" onclick="an_runBreakCont()">运行示例</button>
+                <div id="an_res_break" class="an_result">（点击按钮）</div>
+            </div>
+
+            <!-- 6. 九九乘法表 -->
+            <div class="an_card an_loop">
+                <h3>双层 for 循环 <span class="an_badge">嵌套</span></h3>
+                <p class="an_desc">九九乘法表（上三角）</p>
+<pre class="an_code">let table = "";
+for (let i = 1; i <= 9; i++) {
+    for (let j = 1; j <= i; j++) {
+        table += j + "×" + i + "=" + (j*i) + "\t";
+    }
+    table += "\n";
+}
+console.log(table);</pre>
+                <button class="an_btn" onclick="an_runTable()">运行示例</button>
+                <div id="an_res_table" class="an_result">（点击按钮）</div>
+            </div>
+        </div>
+
+        <div class="an_section-title">⚡ 条件结构</div>
+        <div class="an_grid">
+            <!-- 7. if / if-else -->
+            <div class="an_card an_cond">
+                <h3>if / if-else <span class="an_badge">双分支</span></h3>
+                <p class="an_desc">判断一个数的奇偶性（随机数）</p>
+<pre class="an_code">let num = Math.floor(Math.random() * 100) + 1;
+let result;
+if (num % 2 === 0) {
+    result = num + " 是 偶数";
+} else {
+    result = num + " 是 奇数";
+}
+console.log(result);</pre>
+                <button class="an_btn" onclick="an_runIfElse()">运行示例</button>
+                <div id="an_res_ifelse" class="an_result">（点击按钮）</div>
+            </div>
+
+            <!-- 8. if-else-if -->
+            <div class="an_card an_cond">
+                <h3>if-else-if <span class="an_badge">多分支</span></h3>
+                <p class="an_desc">随机分数 → 等级（90/A, 80/B, 60/C, 其他/D）</p>
+<pre class="an_code">let score = Math.floor(Math.random() * 100) + 1;
+let grade;
+if (score >= 90)      grade = "A";
+else if (score >= 80) grade = "B";
+else if (score >= 60) grade = "C";
+else                  grade = "D";
+console.log(score + " 分 → " + grade);</pre>
+                <button class="an_btn" onclick="an_runElseIf()">运行示例</button>
+                <div id="an_res_elseif" class="an_result">（点击按钮）</div>
+            </div>
+
+            <!-- 9. switch -->
+            <div class="an_card an_cond">
+                <h3>switch <span class="an_badge">等值多分支</span></h3>
+                <p class="an_desc">随机星期数 → 中文星期</p>
+<pre class="an_code">let d = Math.floor(Math.random() * 7) + 1;
+let week;
+switch (d) {
+    case 1: week = "星期一"; break;
+    case 2: week = "星期二"; break;
+    case 3: week = "星期三"; break;
+    case 4: week = "星期四"; break;
+    case 5: week = "星期五"; break;
+    case 6: week = "星期六"; break;
+    case 7: week = "星期日"; break;
+    default: week = "无效";
+}
+console.log(week);</pre>
+                <button class="an_btn" onclick="an_runSwitch()">运行示例</button>
+                <div id="an_res_switch" class="an_result">（点击按钮）</div>
+            </div>
+
+            <!-- 10. 三元运算符 -->
+            <div class="an_card an_cond">
+                <h3>三元运算符 <span class="an_badge">简洁版 if-else</span></h3>
+                <p class="an_desc">判断是否成年（age ≥ 18）</p>
+<pre class="an_code">let age = Math.floor(Math.random() * 30) + 1;
+let tag = age >= 18 ? "成年人" : "未成年";
+console.log(age + " 岁 → " + tag);</pre>
+                <button class="an_btn" onclick="an_runTernary()">运行示例</button>
+                <div id="an_res_ternary" class="an_result">（点击按钮）</div>
+            </div>
+
+            <!-- 11. 逻辑 && / || -->
+            <div class="an_card an_cond">
+                <h3>&amp;&amp; / || <span class="an_badge">短路逻辑</span></h3>
+                <p class="an_desc">模拟登录：账号密码都正确 → 登录成功</p>
+<pre class="an_code">let okUser = "admin", okPass = "123";
+let u = "admin", p = "wrong";
+let msg;
+if (u === okUser && p === okPass) {
+    msg = "登录成功 ✅";
+} else {
+    msg = "登录失败 ❌（账号或密码错误）";
+}
+console.log(msg);</pre>
+                <button class="an_btn" onclick="an_runLogic()">运行示例</button>
+                <div id="an_res_logic" class="an_result">（点击按钮）</div>
+            </div>
+
+            <!-- 12. 嵌套条件 -->
+            <div class="an_card an_cond">
+                <h3>嵌套条件 <span class="an_badge">if 里套 if</span></h3>
+                <p class="an_desc">随机年份 + 月份 → 判断是否闰年 → 输出天数</p>
+<pre class="an_code">let year = 2024, month = Math.floor(Math.random()*12)+1;
+let days;
+if (month === 2) {
+    if ((year%4===0 && year%100!==0) || year%400===0) days = 29;
+    else days = 28;
+} else if ([4,6,9,11].includes(month)) days = 30;
+else days = 31;
+console.log(year + "年" + month + "月: " + days + "天");</pre>
+                <button class="an_btn" onclick="an_runLeapYear()">运行示例</button>
+                <div id="an_res_leap" class="an_result">（点击按钮）</div>
+            </div>
+        </div>
+
+        <div class="an_footer">
+            — JavaScript 循环与条件 Demo · 安家成 —
+        </div>
+    </div>
+
+    <script>
+        function an_show(id, text) {
+            document.getElementById(id).textContent = text;
+        }
+
+        function an_runFor() {
+            let sum = 0;
+            for (let i = 1; i <= 100; i++) {
+                sum += i;
+            }
+            an_show("an_res_for", "1 + 2 + ... + 100 = " + sum + "\n（公式 n*(n+1)/2 = 5050）");
+        }
+
+        function an_runForOf() {
+            let nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            let odds = "";
+            for (let n of nums) {
+                if (n % 2 !== 0) odds += n + " ";
+            }
+            an_show("an_res_forof", "奇数: " + odds.trim());
+        }
+
+        function an_runForIn() {
+            let stu = { name: "安家成", age: 20, major: "软工" };
+            let info = "";
+            for (let key in stu) {
+                info += key + " → " + stu[key] + "\n";
+            }
+            an_show("an_res_forin", info);
+        }
+
+        function an_runWhile() {
+            let n = 1, p = 0, out = "";
+            while (p < 10) {
+                n *= 2;
+                p++;
+                out += "2^" + p + " = " + n + "\n";
+            }
+            an_show("an_res_while", out);
+        }
+
+        function an_runBreakCont() {
+            let found = 0, log = "";
+            for (let i = 1; i < 100; i++) {
+                if (i % 3 !== 0) continue;
+                if (i % 5 !== 0) continue;
+                found = i;
+                log += "找到: " + found + " → break\n";
+                break;
+            }
+            an_show("an_res_break", log + "（第一个能被 3 和 5 同时整除的数是 15）");
+        }
+
+        function an_runTable() {
+            let table = "";
+            for (let i = 1; i <= 9; i++) {
+                for (let j = 1; j <= i; j++) {
+                    table += j + "×" + i + "=" + (j * i) + "\t";
+                }
+                table += "\n";
+            }
+            an_show("an_res_table", table);
+        }
+
+        function an_runIfElse() {
+            let num = Math.floor(Math.random() * 100) + 1;
+            let result;
+            if (num % 2 === 0) {
+                result = num + " 是 偶数";
+            } else {
+                result = num + " 是 奇数";
+            }
+            an_show("an_res_ifelse", result);
+        }
+
+        function an_runElseIf() {
+            let score = Math.floor(Math.random() * 100) + 1;
+            let grade;
+            if (score >= 90)      grade = "A";
+            else if (score >= 80) grade = "B";
+            else if (score >= 60) grade = "C";
+            else                  grade = "D";
+            an_show("an_res_elseif", score + " 分 → " + grade);
+        }
+
+        function an_runSwitch() {
+            let d = Math.floor(Math.random() * 7) + 1;
+            let week;
+            switch (d) {
+                case 1: week = "星期一"; break;
+                case 2: week = "星期二"; break;
+                case 3: week = "星期三"; break;
+                case 4: week = "星期四"; break;
+                case 5: week = "星期五"; break;
+                case 6: week = "星期六"; break;
+                case 7: week = "星期日"; break;
+                default: week = "无效";
+            }
+            an_show("an_res_switch", "数字 " + d + " → " + week);
+        }
+
+        function an_runTernary() {
+            let age = Math.floor(Math.random() * 30) + 1;
+            let tag = age >= 18 ? "成年人" : "未成年";
+            an_show("an_res_ternary", age + " 岁 → " + tag);
+        }
+
+        function an_runLogic() {
+            let okUser = "admin", okPass = "123";
+            let u = "admin", p = "wrong";
+            let msg;
+            if (u === okUser && p === okPass) {
+                msg = "登录成功 ✅";
+            } else {
+                msg = "登录失败 ❌（账号或密码错误）";
+            }
+            an_show("an_res_logic", "账号: " + u + " | 密码: " + p + "\n" + msg);
+        }
+
+        function an_runLeapYear() {
+            let year = 2024;
+            let month = Math.floor(Math.random() * 12) + 1;
+            let days;
+            if (month === 2) {
+                if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) days = 29;
+                else days = 28;
+            } else if ([4, 6, 9, 11].includes(month)) days = 30;
+            else days = 31;
+            an_show("an_res_leap", year + "年" + month + "月: " + days + "天\n"
+                + "（" + year + " 是" + (((year%4===0&&year%100!==0)||year%400===0)?"闰年":"平年") + "）");
+        }
+    </script>
+</body>
+</html>
