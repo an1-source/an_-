@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-10-26 | 模型：Seed-Code | 功能：数7游戏 — 100 个盒子按规则显示/隐藏数字 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15-1 数7游戏</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+        .an_back {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            background: rgba(102, 126, 234, 0.85);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+        .an_back:hover { background: rgba(118, 75, 162, 0.9); }
+        .an_container {
+            max-width: 760px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        .an_header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .an_header h1 {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .an_header p {
+            font-size: 14px;
+            color: #888;
+            line-height: 1.8;
+        }
+        .an_header .an_hint {
+            color: #764ba2;
+            font-weight: bold;
+        }
+        .an_grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .an_box {
+            width: 62px;
+            height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            background: #fafbff;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: default;
+        }
+        .an_box:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .an_box.an_hidden {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-color: #fcb69f;
+            color: transparent;
+            cursor: help;
+        }
+        .an_box.an_hidden:hover {
+            box-shadow: 0 4px 12px rgba(252, 182, 159, 0.5);
+        }
+        .an_info {
+            text-align: center;
+            font-size: 13px;
+            color: #aaa;
+            border-top: 1px dashed #e0e0e0;
+            padding-top: 14px;
+        }
+        .an_info span {
+            color: #764ba2;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="an_container">
+        <a class="an_back" href="index.html">← 返回首页</a>
+        <div class="an_header">
+            <h1>🔢 数7 游戏</h1>
+            <p>
+                1 ~ 100 的盒子中，凡是<br>
+                <span class="an_hint">7 的倍数</span>（如 7, 14, 21…）<br>
+                或 <span class="an_hint">个位数为 7</span>（如 7, 17, 27…）<br>
+                全部变为空盒子 🟧
+            </p>
+        </div>
+
+        <div id="an_grid" class="an_grid"></div>
+
+        <div class="an_info">
+            共 100 个盒子，隐藏 <span id="an_hiddenCount">0</span> 个
+        </div>
+    </div>
+
+    <script>
+        function an_isHidden(n) {
+            // 7 的倍数 或 个位数为 7
+            return n % 7 === 0 || n % 10 === 7;
+        }
+
+        function an_render() {
+            var an_grid = document.getElementById("an_grid");
+            var an_hiddenCount = 0;
+            var i;
+
+            for (i = 1; i <= 100; i++) {
+                var an_box = document.createElement("div");
+                an_box.className = "an_box";
+                an_box.textContent = i;
+                an_box.title = "数字 " + i;
+
+                if (an_isHidden(i)) {
+                    an_box.classList.add("an_hidden");
+                    an_box.title = "数字 " + i + "（被数7规则隐藏）";
+                    an_hiddenCount++;
+                }
+
+                an_grid.appendChild(an_box);
+            }
+
+            document.getElementById("an_hiddenCount").textContent = an_hiddenCount;
+        }
+
+        an_render();
+    </script>
+</body>
+</html>

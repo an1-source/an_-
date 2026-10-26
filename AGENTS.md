@@ -7,7 +7,7 @@ Coursework repo for 《高级网页设计》 with two independent parts. Not a g
 - **技术栈约束**：练习页只用原生 HTML、CSS 和 JavaScript（ES6+ 语法可以），不引入任何第三方库、框架（如 Vue/React/Bootstrap）或外部 CDN（如 unpkg、jsDelivr、BootstrapCDN）。
 - **图标**：统一使用项目 `font/` 目录下的 iconfont（本地字体文件 + CSS），通过 `<i class="iconfont icon-xxx"></i>` 引用，不使用 Font Awesome、Lucide 或其他在线图标。
 - Prefix **every** CSS class name, id, and JS variable with `an_` (e.g. `.an_bar`, `#an_rootSize`, `const an_slider`) in newly written/edited exercise pages.
-- Every newly created or edited HTML exercise page must include an HTML comment near the top with the student's name, the creation date, and the page's functional purpose — e.g. `<!-- 姓名：安家成 | 日期：2026-10-22 | 功能：XXX 练习 -->`. Update the date when substantially editing an existing page.
+- Every newly created HTML file must include an HTML comment near the top (right after `<!DOCTYPE html>`) with **four fields**: student name (`安家成`), creation date (`YYYY-MM-DD`), model used (当前会话模型名，如 `Seed-Code` 或 `opencode/mimo-v2.6-flash-free`), and page's functional purpose — e.g. `<!-- 安家成 | 日期：2026-10-26 | 模型：Seed-Code | 功能：XXX 练习 -->`. Also update the model/date when substantially editing an existing HTML page.
 - **Before** executing a task, append the prompt to `an_prompt.md` (append only, never overwrite) with: timestamp, model used (`opencode/mimo-v2.6-flash-free`), and the verbatim prompt.
 - Every newly created root-level HTML exercise page must include a back-link to the homepage `index.html` (e.g. `<a class="an_back" href="index.html">← 返回首页</a>` at the top, class prefixed `an_`).
 

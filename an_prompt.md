@@ -123,3 +123,35 @@
 **提示词**: 
 
 设置项目规则，使用原生的html、css和javascript实现，图标使用font目录下的iconfont图标，不适用第三方库和cdn
+
+---
+
+**时间**: 2026-10-26
+**模型**: opencode/mimo-v2.6-flash-free
+**提示词**: 
+
+编写15-1.html，一百个盒子，里面有数字，按照数7的规则（7的倍数，个位数为7的数字等），不满足要求的显示数字，满足要求的显示空盒子
+
+---
+
+**时间**: 2026-10-26
+**模型**: opencode/mimo-v2.6-flash-free
+**提示词**: 
+
+修改规则agents.md 在新建一个html文件时都要加入注释，注释包括：安家成，建立时间，使用大模型，功能名称
+
+---
+
+**时间**: 2026-10-26
+**模型**: Seed-Code
+**提示词**: 
+
+index.html要包括之前所有做的网页，新建的也要保存到里面
+
+---
+
+**时间**: 2026-10-26
+**模型**: Seed-Code
+**提示词**: 
+
+创建技能skill：提交到github，提交commit和push整个项目到 https://github.com/an1-source/an_-.git 公钥已设置ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIER5JjfczlSXOTVZpZvCiOR7v8JaKAo7x6yDPN6LIPzV 安家成@安
