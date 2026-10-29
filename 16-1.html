@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-10-29 | 模型：DeepSeek-V4.1-Flash | 功能：16-1 JavaScript 数组主要方法可视化演示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-1 数组方法实验室</title>
+    <style>
+        :root {
+            --an_ink: #2b3350;
+            --an_sub: #7a83a1;
+            --an_line: #e4e8f5;
+            --an_blue: #4f6ef7;
+            --an_purple: #8b5cf6;
+            --an_green: #17b978;
+            --an_orange: #f59e0b;
+            --an_red: #ef4a5a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+            color: var(--an_ink);
+            min-height: 100vh;
+            padding: 28px 18px 46px;
+            background:
+                radial-gradient(circle at 10% 4%, #e7ecff 0%, transparent 52%),
+                radial-gradient(circle at 92% 96%, #e4fbf3 0%, transparent 48%),
+                #f6f7fc;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .an_back {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(135deg, #667eea, #8b5cf6);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            letter-spacing: .5px;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 16px rgba(102, 126, 234, .28);
+            transition: transform .25s, box-shadow .25s;
+        }
+        .an_back:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgba(102, 126, 234, .38); }
+
+        .an_wrap {
+            max-width: 940px;
+            margin: 0 auto;
+        }
+
+        .an_card {
+            background: #fff;
+            border-radius: 22px;
+            padding: 26px 28px 30px;
+            box-shadow: 0 18px 50px rgba(43, 51, 80, .10), 0 2px 6px rgba(43, 51, 80, .04);
+        }
+
+        /* ---------- 头部 ---------- */
+        .an_head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding-bottom: 18px;
+            border-bottom: 1px dashed var(--an_line);
+        }
+        .an_head h1 {
+            font-size: 23px;
+            letter-spacing: .5px;
+            margin-bottom: 7px;
+        }
+        .an_head h1 span {
+            background: linear-gradient(120deg, #4f6ef7, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .an_head p {
+            font-size: 13px;
+            color: var(--an_sub);
+            line-height: 1.75;
+        }
+        .an_reset {
+            flex: 0 0 auto;
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--an_purple);
+            background: #f4f1ff;
+            border: 1.5px solid #e0d8ff;
+            padding: 8px 14px;
+            border-radius: 11px;
+            cursor: pointer;
+            transition: all .22s;
+        }
+        .an_reset:hover { background: #ebe4ff; border-color: #c9bbff; }
+
+        /* ---------- 数组舞台 ---------- */
+        .an_stage_box {
+            margin-top: 22px;
+            background: linear-gradient(180deg, #fbfcff, #f5f7ff);
+            border: 1.5px solid #edf0fb;
+            border-radius: 18px;
+            padding: 34px 18px 18px;
+            position: relative;
+        }
+        .an_stage_row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .an_edge {
+            flex: 0 0 auto;
+            font-size: 11px;
+            color: #a6aec8;
+            writing-mode: vertical-rl;
+            letter-spacing: 3px;
+            padding: 4px 0;
+        }
+        .an_stage {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 30px 12px;
+            min-height: 96px;
+            padding-top: 26px;
+        }
+
+        .an_cell {
+            position: relative;
+            flex: 0 0 auto;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            background: #fff;
+            border: 2px solid #d9dff2;
+            box-shadow: 0 5px 12px rgba(93, 107, 160, .10);
+            transition: background .28s, border-color .28s, box-shadow .28s,
+                        opacity .35s, filter .35s, transform .35s, color .28s;
+        }
+        .an_cell .an_idx {
+            position: absolute;
+            top: -21px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #a6aec8;
+            font-family: Consolas, "Courier New", monospace;
+        }
+        .an_cell .an_val {
+            font-size: 21px;
+            font-weight: 700;
+            color: #3b4470;
+            font-family: Consolas, "Courier New", monospace;
+            letter-spacing: .5px;
+        }
+
+        .an_cell.an_enter { animation: an_pop .42s cubic-bezier(.2, 1.5, .4, 1); }
+        @keyframes an_pop {
+            from { transform: scale(.35); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+
+        .an_cell.an_leave {
+            animation: an_drop .34s ease-in forwards;
+            border-color: #ffc9cf;
+        }
+        @keyframes an_drop {
+            0%   { transform: translateY(0) scale(1); opacity: 1; background: #fff0f2; }
+            40%  { transform: translateY(-16px) scale(1.08); opacity: 1; background: #ffdfe4; }
+            100% { transform: translateY(30px) scale(.45); opacity: 0; background: #ffdfe4; }
+        }
+
+        .an_cell.an_new {
+            background: linear-gradient(135deg, #d8fbec, #a9f0d3);
+            border-color: #6fdcae;
+        }
+        .an_cell.an_new .an_val { color: #0b7a4f; }
+
+        .an_cell.an_hit {
+            background: linear-gradient(135deg, #fff5d6, #ffe2a3);
+            border-color: #f6c343;
+            box-shadow: 0 0 0 6px rgba(246, 195, 67, .18);
+        }
+        .an_cell.an_hit .an_val { color: #a76a00; }
+
+        .an_cell.an_scan {
+            border-color: #a9bcff;
+            background: #eef2ff;
+            transform: translateY(-6px);
+        }
+
+        .an_cell.an_flash {
+            background: linear-gradient(135deg, #ffe9c9, #ffd08a);
+            border-color: #f5a623;
+            transform: translateY(-7px);
+            box-shadow: 0 8px 18px rgba(245, 166, 35, .28);
+        }
+        .an_cell.an_flash .an_val { color: #8a4b00; }
+
+        .an_cell.an_dim {
+            opacity: .26;
+            filter: grayscale(1);
+            transform: scale(.9);
+        }
+
+        .an_meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed #e6eaf7;
+            font-size: 12px;
+            color: var(--an_sub);
+        }
+        .an_meta b {
+            color: var(--an_blue);
+            font-size: 15px;
+            font-family: Consolas, monospace;
+        }
+
+        /* ---------- 返回值 ---------- */
+        .an_result {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 14px;
+            padding: 11px 16px;
+            border-radius: 13px;
+            background: #f8f9ff;
+            border: 1.5px dashed #dfe4f7;
+            min-height: 52px;
+        }
+        .an_result_label {
+            flex: 0 0 auto;
+            font-size: 11px;
+            color: #9aa3bd;
+            letter-spacing: 1px;
+            padding-right: 12px;
+            border-right: 1px solid #e6eaf7;
+        }
+        .an_result_body {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 7px;
+            font-size: 13px;
+            color: var(--an_sub);
+        }
+        .an_chip {
+            padding: 3px 11px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: Consolas, monospace;
+            animation: an_chipIn .3s ease both;
+        }
+        @keyframes an_chipIn { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .an_chip.an_k_copy { background: #e8edff; color: #3550d6; border: 1.5px solid #c9d5ff; }
+        .an_chip.an_k_map  { background: #fff0da; color: #a86200; border: 1.5px solid #ffd8a1; }
+        .an_chip.an_k_text { background: #e8f8f1; color: #0b7a4f; border: 1.5px solid #b6ecd6; }
+        .an_result_body .an_dash { color: #c3c9dd; }
+
+        /* ---------- 控制台 ---------- */
+        .an_console {
+            margin-top: 18px;
+            background: #1b2030;
+            border-radius: 15px;
+            padding: 14px 18px 15px;
+            font-family: Consolas, "Courier New", monospace;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+        }
+        .an_bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .an_bar i {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #3a4257;
+        }
+        .an_bar i:nth-child(1) { background: #ff5f57; }
+        .an_bar i:nth-child(2) { background: #febc2e; }
+        .an_bar i:nth-child(3) { background: #28c840; }
+        .an_line {
+            display: flex;
+            gap: 9px;
+            font-size: 13px;
+            line-height: 1.95;
+            word-break: break-word;
+        }
+        .an_line .an_p {
+            flex: 0 0 auto;
+            color: #5b6482;
+        }
+        .an_line.an_cmd .an_p { color: #7f8cff; }
+        .an_line.an_cmd code { color: #e7ebff; }
+        .an_line.an_res .an_p { color: #28c840; }
+        .an_line.an_res span { color: #7ee6a0; }
+        .an_line.an_tip {
+            margin-top: 4px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, .07);
+        }
+        .an_line.an_tip .an_p { color: #febc2e; }
+        .an_line.an_tip span { color: #9aa4c0; }
+
+        /* ---------- 按钮 ---------- */
+        .an_panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 26px;
+            margin-top: 24px;
+        }
+        .an_group_name {
+            font-size: 11px;
+            font-weight: 600;
+            color: #9aa3bd;
+            letter-spacing: 3px;
+            margin-bottom: 9px;
+        }
+        .an_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .an_btn {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1px;
+            padding: 8px 14px;
+            border-radius: 12px;
+            border: 1.5px solid var(--an_line);
+            background: #fff;
+            cursor: pointer;
+            font-family: inherit;
+            text-align: left;
+            transition: all .2s;
+        }
+        .an_btn b {
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            color: var(--an_ink);
+            letter-spacing: .2px;
+        }
+        .an_btn small { font-size: 11px; color: var(--an_sub); }
+        .an_btn:hover {
+            border-color: #b9c6ff;
+            background: #f7f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 16px rgba(79, 110, 247, .16);
+        }
+        .an_btn:active { transform: translateY(0); }
+        .an_btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .an_foot {
+            margin-top: 22px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--an_line);
+            font-size: 12px;
+            color: #a6aec8;
+            text-align: center;
+            line-height: 1.9;
+        }
+
+        @media (max-width: 760px) {
+            .an_card { padding: 20px 16px 24px; border-radius: 18px; }
+            .an_head { flex-direction: column; }
+            .an_head h1 { font-size: 19px; }
+            .an_panel { grid-template-columns: 1fr; }
+            .an_cell { width: 52px; height: 52px; border-radius: 12px; }
+            .an_cell .an_val { font-size: 17px; }
+            .an_edge { display: none; }
+            .an_stage { gap: 26px 9px; }
+            .an_result { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .an_result_label { border-right: 0; padding-right: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="an_wrap">
+        <a class="an_back" href="index.html">← 返回首页</a>
+
+        <div class="an_card">
+            <div class="an_head">
+                <div>
+                    <h1>🧪 JavaScript <span>数组方法</span> 实验室</h1>
+                    <p>点一个方法按钮，看数组"身体力行"地变给你看 —— 谁进来了、谁被删了、谁被加工了。</p>
+                </div>
+                <button class="an_reset" id="an_reset" type="button">↺ 重置数组</button>
+            </div>
+
+            <!-- 数组舞台 -->
+            <div class="an_stage_box">
+                <div class="an_stage_row">
+                    <span class="an_edge">头部</span>
+                    <div class="an_stage" id="an_stage"></div>
+                    <span class="an_edge">尾部</span>
+                </div>
+                <div class="an_meta">
+                    <span>长度 <b id="an_len">0</b></span>
+                    <span>索引从 0 开始，到 length - 1 结束</span>
+                </div>
+            </div>
+
+            <!-- 返回值 -->
+            <div class="an_result">
+                <span class="an_result_label">返回值</span>
+                <div class="an_result_body" id="an_result">
+                    <span class="an_dash">—</span>
+                </div>
+            </div>
+
+            <!-- 控制台 -->
+            <div class="an_console">
+                <div class="an_bar"><i></i><i></i><i></i></div>
+                <div class="an_line an_cmd">
+                    <span class="an_p">›</span>
+                    <code id="an_cmd">点击下方任意方法开始演示</code>
+                </div>
+                <div class="an_line an_res">
+                    <span class="an_p">←</span>
+                    <span id="an_res">—</span>
+                </div>
+                <div class="an_line an_tip">
+                    <span class="an_p">💡</span>
+                    <span id="an_tip">每个方法配一句生活比喻，看一遍就记住了</span>
+                </div>
+            </div>
+
+            <!-- 方法按钮 -->
+            <div class="an_panel" id="an_panel"></div>
+
+            <div class="an_foot">
+                绿色 = 新加入 · 黄色 = 被找到 · 橙色 = 正在被加工 · 灰掉 = 被筛掉<br>
+                原生 HTML + CSS + JavaScript 实现，无任何第三方库
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ============ 数据 ============ */
+        var an_stage   = document.getElementById('an_stage');
+        var an_result  = document.getElementById('an_result');
+        var an_lenEl   = document.getElementById('an_len');
+        var an_cmdEl   = document.getElementById('an_cmd');
+        var an_resEl   = document.getElementById('an_res');
+        var an_tipEl   = document.getElementById('an_tip');
+        var an_panel   = document.getElementById('an_panel');
+
+        var an_seed = [12, 7, 25, 3, 18, 41, 9];
+        var an_uid = 0;
+        var an_items = [];
+        var an_busy = false;
+
+        function an_sleep(ms) {
+            return new Promise(function (resolve) { setTimeout(resolve, ms); });
+        }
+
+        function an_make(val) {
+            an_uid += 1;
+            return { id: an_uid, val: val };
+        }
+
+        function an_randVal() {
+            return 10 + Math.floor(Math.random() * 90);
+        }
+
+        function an_cellOf(id) {
+            return an_stage.querySelector('[data-id="' + id + '"]');
+        }
+
+        /* ============ 渲染 + FLIP 位移动画 ============ */
+        function an_sync() {
+            var an_ids = {};
+            an_items.forEach(function (it) { an_ids[it.id] = true; });
+
+            Array.prototype.slice.call(an_stage.children).forEach(function (n) {
+                if (!an_ids[n.dataset.id]) { n.remove(); }
+            });
+
+            // 记录旧位置
+            var an_first = {};
+            Array.prototype.slice.call(an_stage.children).forEach(function (n) {
+                an_first[n.dataset.id] = n.getBoundingClientRect();
+            });
+
+            an_items.forEach(function (it, i) {
+                var n = an_cellOf(it.id);
+                if (!n) {
+                    n = document.createElement('div');
+                    n.className = 'an_cell an_enter';
+                    n.dataset.id = it.id;
+                    n.innerHTML = '<span class="an_idx"></span><span class="an_val"></span>';
+                    n.addEventListener('animationend', function () {
+                        n.classList.remove('an_enter');
+                    });
+                }
+                n.querySelector('.an_idx').textContent = i;
+                n.querySelector('.an_val').textContent = it.val;
+                an_stage.appendChild(n);
+            });
+
+            an_lenEl.textContent = an_items.length;
+
+            // FLIP：从旧位置滑到新位置
+            requestAnimationFrame(function () {
+                Array.prototype.slice.call(an_stage.children).forEach(function (n) {
+                    var f = an_first[n.dataset.id];
+                    if (!f) { return; }
+                    var l = n.getBoundingClientRect();
+                    var dx = f.left - l.left;
+                    var dy = f.top - l.top;
+                    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) { return; }
+                    n.style.transition = 'none';
+                    n.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+                    void n.offsetWidth;
+                    n.style.transition = 'transform .45s cubic-bezier(.2,.85,.25,1)';
+                    n.style.transform = '';
+                    n.addEventListener('transitionend', function () {
+                        n.style.transition = '';
+                    }, { once: true });
+                });
+            });
+        }
+
+        /* ============ 输出 ============ */
+        function an_clearResult() {
+            an_result.innerHTML = '<span class="an_dash">—</span>';
+        }
+
+        function an_showResult(data, kind) {
+            an_result.innerHTML = '';
+            if (Array.isArray(data)) {
+                if (!data.length) {
+                    an_result.innerHTML = '<span class="an_dash">空数组 [ ]</span>';
+                    return;
+                }
+                data.forEach(function (v, i) {
+                    var chip = document.createElement('span');
+                    chip.className = 'an_chip an_k_' + (kind || 'copy');
+                    chip.textContent = v;
+                    chip.style.animationDelay = (i * 45) + 'ms';
+                    an_result.appendChild(chip);
+                });
+            } else {
+                var chip2 = document.createElement('span');
+                chip2.className = 'an_chip an_k_' + (kind || 'text');
+                chip2.textContent = data;
+                an_result.appendChild(chip2);
+            }
+        }
+
+        function an_say(tip, code, res) {
+            an_tipEl.textContent = tip;
+            an_cmdEl.textContent = code;
+            an_resEl.textContent = res;
+        }
+
+        function an_fadeHit(id) {
+            setTimeout(function () {
+                var n = an_cellOf(id);
+                if (n) { n.classList.remove('an_hit'); }
+            }, 1500);
+        }
+
+        function an_lock(state) {
+            an_busy = state;
+            Array.prototype.slice.call(an_panel.querySelectorAll('.an_btn')).forEach(function (b) {
+                b.disabled = state;
+            });
+        }
+
+        async function an_run(key) {
+            if (an_busy) { return; }
+            an_lock(true);
+            an_clearResult();
+            try {
+                await an_methods[key].run();
+            } catch (err) {
+                an_say('演示出错了：' + err.message, '—', 'error');
+            }
+            an_lock(false);
+        }
+
+        /* ============ 15 个方法 ============ */
+        var an_methods = {
+
+            /* ---- 增删 ---- */
+            push: {
+                label: 'push', sub: '队尾挤进一个',
+                async run() {
+                    var an_v = an_randVal();
+                    an_items.push(an_make(an_v));
+                    an_sync();
+                    var an_last = an_items[an_items.length - 1];
+                    var n = an_cellOf(an_last.id);
+                    if (n) {
+                        n.classList.add('an_new');
+                        setTimeout(function () { n.classList.remove('an_new'); }, 1100);
+                    }
+                    an_say('从队尾挤进一个 ' + an_v + '，队伍变长了一格',
+                        'arr.push(' + an_v + ')', '返回新长度 ' + an_items.length);
+                }
+            },
+
+            pop: {
+                label: 'pop', sub: '队尾走一个',
+                async run() {
+                    if (!an_items.length) {
+                        an_say('队伍已经空了，没东西可弹', 'arr.pop()', '返回 undefined');
+                        return;
+                    }
+                    var an_last = an_items[an_items.length - 1];
+                    var n = an_cellOf(an_last.id);
+                    if (n) { n.classList.add('an_leave'); }
+                    await an_sleep(340);
+                    an_items.pop();
+                    an_sync();
+                    an_say('队尾的 ' + an_last.val + ' 办完事走了，队伍缩短一格',
+                        'arr.pop()', '返回被弹出的值 ' + an_last.val);
+                }
+            },
+
+            unshift: {
+                label: 'unshift', sub: '插队到最前',
+                async run() {
+                    var an_v = an_randVal();
+                    an_items.unshift(an_make(an_v));
+                    an_sync();
+                    var n = an_cellOf(an_items[0].id);
+                    if (n) {
+                        n.classList.add('an_new');
+                        setTimeout(function () { n.classList.remove('an_new'); }, 1100);
+                    }
+                    an_say('一个 ' + an_v + ' 直接插到最前面，后面所有人往后挪一格',
+                        'arr.unshift(' + an_v + ')', '返回新长度 ' + an_items.length);
+                }
+            },
+
+            shift: {
+                label: 'shift', sub: '队首先离开',
+                async run() {
+                    if (!an_items.length) {
+                        an_say('队伍已经空了，没人可走', 'arr.shift()', '返回 undefined');
+                        return;
+                    }
+                    var an_firstItem = an_items[0];
+                    var n = an_cellOf(an_firstItem.id);
+                    if (n) { n.classList.add('an_leave'); }
+                    await an_sleep(340);
+                    an_items.shift();
+                    an_sync();
+                    an_say('队首的 ' + an_firstItem.val + ' 离开，后面所有人往前补一格',
+                        'arr.shift()', '返回被移走的值 ' + an_firstItem.val);
+                }
+            },
+
+            splice: {
+                label: 'splice', sub: '剪刀剪中间',
+                async run() {
+                    if (an_items.length < 3) {
+                        an_say('队伍太短了，先 push 几个元素再来剪',
+                            'arr.splice(2, 2, 77, 88)', '—');
+                        return;
+                    }
+                    var an_rm = an_items.slice(2, 4);
+                    an_rm.forEach(function (it) {
+                        var n = an_cellOf(it.id);
+                        if (n) { n.classList.add('an_leave'); }
+                    });
+                    await an_sleep(340);
+                    an_items.splice(2, 2, an_make(77), an_make(88));
+                    an_sync();
+                    an_say('剪刀在索引 2 处剪掉 2 个，再往缺口塞进 77 和 88',
+                        'arr.splice(2, 2, 77, 88)',
+                        '返回被删掉的 [' + an_rm.map(function (i) { return i.val; }).join(', ') + ']');
+                }
+            },
+
+            /* ---- 截取与查找 ---- */
+            slice: {
+                label: 'slice', sub: '复印一段',
+                async run() {
+                    if (an_items.length < 4) {
+                        an_say('元素太少，至少 4 个才看得出效果',
+                            'arr.slice(1, 4)', '—');
+                        return;
+                    }
+                    var an_part = an_items.slice(1, 4);
+                    an_part.forEach(function (it) {
+                        var n = an_cellOf(it.id);
+                        if (n) { n.classList.add('an_hit'); }
+                    });
+                    await an_sleep(420);
+                    an_showResult(an_part.map(function (i) { return i.val; }), 'copy');
+                    an_say('复印机复印了索引 1~3 这三格，原件一格都没动（含头不含尾）',
+                        'arr.slice(1, 4)',
+                        '返回新数组 [' + an_part.map(function (i) { return i.val; }).join(', ') + ']');
+                    setTimeout(function () {
+                        an_part.forEach(function (it) {
+                            var n = an_cellOf(it.id);
+                            if (n) { n.classList.remove('an_hit'); }
+                        });
+                    }, 1300);
+                }
+            },
+
+            indexOf: {
+                label: 'indexOf', sub: '它坐在第几号',
+                async run() {
+                    if (!an_items.length) {
+                        an_say('空数组里谁也找不到', 'arr.indexOf(?)', '返回 -1');
+                        return;
+                    }
+                    var an_target = an_items[Math.floor(Math.random() * an_items.length)];
+                    var an_found = -1;
+                    var an_hitId = null;
+                    for (var i = 0; i < an_items.length; i++) {
+                        var n = an_cellOf(an_items[i].id);
+                        if (n) { n.classList.add('an_scan'); }
+                        await an_sleep(170);
+                        if (n) { n.classList.remove('an_scan'); }
+                        if (an_items[i].val === an_target.val) {
+                            an_found = i;
+                            an_hitId = an_items[i].id;
+                            if (n) { n.classList.add('an_hit'); }
+                            break;
+                        }
+                    }
+                    an_showResult('索引 ' + an_found, 'text');
+                    an_say('从左往右一个个看过去，找到 ' + an_target.val + ' 就立刻停下',
+                        'arr.indexOf(' + an_target.val + ')', '返回下标 ' + an_found);
+                    an_fadeHit(an_hitId);
+                }
+            },
+
+            includes: {
+                label: 'includes', sub: '点名有没有',
+                async run() {
+                    if (!an_items.length) {
+                        an_say('空数组里当然没有', 'arr.includes(?)', '返回 false');
+                        return;
+                    }
+                    var an_target = an_items[Math.floor(Math.random() * an_items.length)];
+                    var an_hit = false;
+                    var an_hitId2 = null;
+                    for (var i = 0; i < an_items.length; i++) {
+                        var n = an_cellOf(an_items[i].id);
+                        if (n) { n.classList.add('an_scan'); }
+                        await an_sleep(160);
+                        if (n) { n.classList.remove('an_scan'); }
+                        if (an_items[i].val === an_target.val) {
+                            an_hit = true;
+                            an_hitId2 = an_items[i].id;
+                            if (n) { n.classList.add('an_hit'); }
+                            break;
+                        }
+                    }
+                    an_showResult(an_hit ? 'true' : 'false', 'text');
+                    an_say('点名喊"' + an_target.val + ' 在不在？"—— 在就答 true，不在就 false',
+                        'arr.includes(' + an_target.val + ')', '返回 ' + an_hit);
+                    if (an_hitId2) { an_fadeHit(an_hitId2); }
+                }
+            },
+
+            find: {
+                label: 'find', sub: '第一个合格的',
+                async run() {
+                    if (!an_items.length) {
+                        an_say('空数组里找不到任何人', 'arr.find(n => n > 20)', '返回 undefined');
+                        return;
+                    }
+                    var an_res = 'undefined';
+                    var an_hitId3 = null;
+                    for (var i = 0; i < an_items.length; i++) {
+                        var n = an_cellOf(an_items[i].id);
+                        if (n) { n.classList.add('an_scan'); }
+                        await an_sleep(180);
+                        if (n) { n.classList.remove('an_scan'); }
+                        if (an_items[i].val > 20) {
+                            if (n) { n.classList.add('an_hit'); }
+                            an_res = an_items[i].val;
+                            an_hitId3 = an_items[i].id;
+                            break;
+                        }
+                    }
+                    an_showResult(an_res, 'text');
+                    an_say('挨个问"你大于 20 吗"，第一个点头的人被带走，后面的人看都不用看',
+                        'arr.find(n => n > 20)', '返回 ' + an_res);
+                    if (an_hitId3) { an_fadeHit(an_hitId3); }
+                }
+            },
+
+            filter: {
+                label: 'filter', sub: '安检门筛选',
+                async run() {
+                    var an_keep = an_items.filter(function (i) { return i.val % 2 === 0; });
+                    var an_drop = an_items.filter(function (i) { return i.val % 2 !== 0; });
+
+                    an_drop.forEach(function (it, k) {
+                        setTimeout(function () {
+                            var n = an_cellOf(it.id);
+                            if (n) { n.classList.add('an_dim'); }
+                        }, k * 90);
+                    });
+                    await an_sleep(an_drop.length * 90 + 420);
+
+                    an_showResult(an_keep.map(function (i) { return i.val; }), 'copy');
+                    an_say('安检门只放偶数通过，奇数被原地变灰（原数组其实没被改动，这里只是示意）',
+                        'arr.filter(n => n % 2 === 0)',
+                        '返回新数组 [' + an_keep.map(function (i) { return i.val; }).join(', ') + ']');
+                    setTimeout(function () {
+                        Array.prototype.slice.call(an_stage.querySelectorAll('.an_dim')).forEach(function (n) {
+                            n.classList.remove('an_dim');
+                        });
+                    }, 1600);
+                }
+            },
+
+            /* ---- 变换 ---- */
+            map: {
+                label: 'map', sub: '每个都加工',
+                async run() {
+                    if (!an_items.length) {
+                        an_say('空数组加工完还是空数组', 'arr.map(n => n * 2)', '返回 []');
+                        return;
+                    }
+                    an_items.forEach(function (it, k) {
+                        setTimeout(function () {
+                            var n = an_cellOf(it.id);
+                            if (n) {
+                                n.classList.add('an_flash');
+                                setTimeout(function () { n.classList.remove('an_flash'); }, 700);
+                            }
+                        }, k * 95);
+                    });
+                    await an_sleep(an_items.length * 95 + 520);
+                    var an_new = an_items.map(function (i) { return i.val * 2; });
+                    an_showResult(an_new, 'map');
+                    an_say('流水线上每个格子都被"乘 2"机器过了一遍，产出一条全新的数组',
+                        'arr.map(n => n * 2)',
+                        '返回新数组 [' + an_new.join(', ') + ']');
+                }
+            },
+
+            reduce: {
+                label: 'reduce', sub: '倒进存钱罐',
+                async run() {
+                    if (!an_items.length) {
+                        an_say('没有钱可以存', 'arr.reduce((s, n) => s + n, 0)', '返回 0');
+                        return;
+                    }
+                    var an_sum = 0;
+                    for (var i = 0; i < an_items.length; i++) {
+                        var n = an_cellOf(an_items[i].id);
+                        if (n) { n.classList.add('an_hit'); }
+                        an_sum += an_items[i].val;
+                        an_resEl.textContent = '累加中… ' + an_sum;
+                        await an_sleep(280);
+                        if (n) { n.classList.remove('an_hit'); }
+                    }
+                    an_showResult(an_sum, 'map');
+                    an_say('把所有格子一个个倒进存钱罐，最后只剩一个总数',
+                        'arr.reduce((s, n) => s + n, 0)', '返回 ' + an_sum);
+                }
+            },
+
+            join: {
+                label: 'join', sub: '串成一串',
+                async run() {
+                    if (!an_items.length) {
+                        an_say('空数组串起来是空字符串', 'arr.join(" · ")', '返回 ""');
+                        return;
+                    }
+                    an_items.forEach(function (it, k) {
+                        setTimeout(function () {
+                            var n = an_cellOf(it.id);
+                            if (n) {
+                                n.classList.add('an_flash');
+                                setTimeout(function () { n.classList.remove('an_flash'); }, 600);
+                            }
+                        }, k * 70);
+                    });
+                    await an_sleep(an_items.length * 70 + 380);
+                    var an_str = an_items.map(function (i) { return i.val; }).join(' · ');
+                    an_showResult('"' + an_str + '"', 'text');
+                    an_say('用" · "当胶水，把每个格子粘成一整条字符串',
+                        'arr.join(" · ")', '返回 "' + an_str + '"');
+                }
+            },
+
+            /* ---- 排序 ---- */
+            sort: {
+                label: 'sort', sub: '按大小排队',
+                async run() {
+                    if (an_items.length < 2) {
+                        an_say('少于两个元素，排了也看不出变化', 'arr.sort((a, b) => a - b)', '—');
+                        return;
+                    }
+                    an_items.sort(function (a, b) { return a.val - b.val; });
+                    an_sync();
+                    await an_sleep(560);
+                    an_say('全体按身高从矮到高重新站队（注意：sort 会直接改动原数组）',
+                        'arr.sort((a, b) => a - b)',
+                        '返回排好序的原数组 [' + an_items.map(function (i) { return i.val; }).join(', ') + ']');
+                }
+            },
+
+            reverse: {
+                label: 'reverse', sub: '全体向后转',
+                async run() {
+                    if (an_items.length < 2) {
+                        an_say('只有一个元素，转不转都一样', 'arr.reverse()', '—');
+                        return;
+                    }
+                    an_items.reverse();
+                    an_sync();
+                    await an_sleep(560);
+                    an_say('喊一声"向后转"，队首变队尾，队尾变队首',
+                        'arr.reverse()',
+                        '返回反转后的原数组 [' + an_items.map(function (i) { return i.val; }).join(', ') + ']');
+                }
+            }
+        };
+
+        /* ============ 按钮分组 ============ */
+        var an_groups = [
+            { name: '增 · 删', keys: ['push', 'pop', 'unshift', 'shift', 'splice'] },
+            { name: '截 · 查', keys: ['slice', 'indexOf', 'includes', 'find', 'filter'] },
+            { name: '变 · 算', keys: ['map', 'reduce', 'join'] },
+            { name: '排 · 序', keys: ['sort', 'reverse'] }
+        ];
+
+        function an_buildPanel() {
+            an_groups.forEach(function (g) {
+                var box = document.createElement('div');
+                var h = document.createElement('h3');
+                h.className = 'an_group_name';
+                h.textContent = g.name;
+                box.appendChild(h);
+
+                var btns = document.createElement('div');
+                btns.className = 'an_btns';
+                g.keys.forEach(function (k) {
+                    var m = an_methods[k];
+                    var b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'an_btn';
+                    b.dataset.key = k;
+                    b.innerHTML = '<b>' + m.label + '</b><small>' + m.sub + '</small>';
+                    b.addEventListener('click', function () { an_run(k); });
+                    btns.appendChild(b);
+                });
+                box.appendChild(btns);
+                an_panel.appendChild(box);
+            });
+        }
+
+        /* ============ 初始化 ============ */
+        function an_init() {
+            an_uid = 0;
+            an_items = an_seed.map(function (v) { return an_make(v); });
+            an_stage.innerHTML = '';
+            an_sync();
+            an_clearResult();
+            an_cmdEl.textContent = '点击下方任意方法开始演示';
+            an_resEl.textContent = '—';
+            an_tipEl.textContent = '每个方法配一句生活比喻，看一遍就记住了';
+        }
+
+        document.getElementById('an_reset').addEventListener('click', function () {
+            if (an_busy) { return; }
+            an_init();
+        });
+
+        an_buildPanel();
+        an_init();
+    </script>
+</body>
+</html>

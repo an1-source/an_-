@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-10-29 | 模型：DeepSeek-V4.1-Flash | 功能：16-3 影视剧排行榜 —— 每日/每周/每月/全部四个 tab 切换，两列 1~10 名排行，前三名红色序号 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-3 影视剧排行榜</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+            background: #f4f4f4;
+            min-height: 100vh;
+            padding: 26px 14px 50px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .an_back {
+            display: block;
+            width: 550px;
+            max-width: 100%;
+            margin: 0 auto 10px;
+            color: #8a8a8a;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color .2s;
+        }
+        .an_back:hover { color: #d32f2f; }
+
+        /* ---------- 卡片 ---------- */
+        .an_page {
+            width: 550px;
+            max-width: 100%;
+            margin: 0 auto;
+            background: #fff;
+            padding: 0 10px 18px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, .07);
+        }
+
+        /* 顶部红色装饰线 */
+        .an_topline {
+            height: 4px;
+            width: 47%;
+            background: #c62828;
+            margin-bottom: 20px;
+        }
+
+        /* ---------- 导航 tab ---------- */
+        .an_tabs {
+            display: flex;
+            gap: 2px;
+            background: #fff;
+            border-bottom: 3px solid #6d6d6d;
+        }
+        .an_tab {
+            flex: 1;
+            height: 46px;
+            border: 0;
+            background: #e9e9e9;
+            color: #333;
+            font-family: inherit;
+            font-size: 20px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background .2s, color .2s;
+        }
+        .an_tab:hover { background: #dedede; }
+        .an_tab.an_on {
+            background: #6d6d6d;
+            color: #fff;
+        }
+
+        /* ---------- 排行列表 ---------- */
+        .an_body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 20px;
+            padding: 0 2px;
+        }
+        .an_col.an_fade { animation: an_fadeIn .32s ease; }
+        @keyframes an_fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .an_item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 0;
+        }
+        .an_rank {
+            flex: 0 0 auto;
+            width: 30px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            background: #b8b8b8;
+            color: #fff;
+            font-family: Arial, "Helvetica Neue", sans-serif;
+            font-size: 17px;
+            line-height: 1;
+            letter-spacing: -.5px;
+        }
+        .an_rank.an_top { background: #cf2e2e; }
+
+        .an_name {
+            flex: 1;
+            min-width: 0;
+            font-size: 22px;
+            color: #1f1f1f;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .an_name.an_dim { color: #8a8a8a; }
+
+        @media (max-width: 580px) {
+            .an_page { padding: 0 8px 14px; }
+            .an_tab { height: 38px; font-size: 16px; }
+            .an_topline { margin-bottom: 14px; }
+            .an_body { column-gap: 12px; }
+            .an_item { gap: 8px; padding: 11px 0; }
+            .an_rank { width: 24px; height: 21px; font-size: 14px; }
+            .an_name { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">← 返回首页</a>
+
+    <div class="an_page">
+        <div class="an_topline"></div>
+
+        <div class="an_tabs" id="an_tabs">
+            <button class="an_tab an_on" type="button" data-tab="daily">每日</button>
+            <button class="an_tab" type="button" data-tab="weekly">每周</button>
+            <button class="an_tab" type="button" data-tab="monthly">每月</button>
+            <button class="an_tab" type="button" data-tab="all">全部</button>
+        </div>
+
+        <div class="an_body">
+            <div class="an_col" id="an_col1"></div>
+            <div class="an_col" id="an_col2"></div>
+        </div>
+    </div>
+
+    <script>
+        /* ============ 四个榜单的数据 ============ */
+        var an_data = {
+            daily: [
+                '最美的时光', '咱们结婚吧', '渗透', '继承者们', '烽火佳人',
+                '极品女士第2季', '爱闪亮', '狼烟（2013）', '钱多多炼爱记', '苍狼'
+            ],
+            weekly: [
+                '咱们结婚吧', '继承者们', '最美的时光', '爱闪亮', '渗透',
+                '狼烟（2013）', '三十岁，你好', '钱多多炼爱记', '特种兵之火凤凰', '极品女士第2季'
+            ],
+            monthly: [
+                '特种兵之火凤凰', '咱们结婚吧', '继承者们', '金玉满堂', '王的女人',
+                '爱闪亮', '爱情面前谁怕谁', '英雄联盟', '小爸爸', '我们这拨人'
+            ],
+            all: [
+                '永不磨灭的番号', '特种兵之火凤凰', '新还珠格格', '咱们结婚吧', '小爸爸',
+                '心术', '乡村爱情5', '天天有喜', '一不小心爱上你', '夏日甜心'
+            ]
+        };
+
+        var an_col1 = document.getElementById('an_col1');
+        var an_col2 = document.getElementById('an_col2');
+        var an_tabs = document.getElementById('an_tabs');
+
+        /* ============ 生成单条 ============ */
+        function an_row(index, name) {
+            var an_isTop = index < 3;
+            return '<div class="an_item">' +
+                '<span class="an_rank' + (an_isTop ? ' an_top' : '') + '">' + (index + 1) + '</span>' +
+                '<span class="an_name' + (an_isTop ? '' : ' an_dim') + '">' + name + '</span>' +
+            '</div>';
+        }
+
+        /* ============ 渲染某个榜单 ============ */
+        function an_render(key) {
+            var an_list = an_data[key] || an_data.daily;
+            var an_html1 = '';
+            var an_html2 = '';
+
+            for (var i = 0; i < an_list.length; i++) {
+                if (i < 5) {
+                    an_html1 += an_row(i, an_list[i]);
+                } else {
+                    an_html2 += an_row(i, an_list[i]);
+                }
+            }
+
+            an_col1.innerHTML = an_html1;
+            an_col2.innerHTML = an_html2;
+
+            // 重新触发淡入动画
+            an_col1.classList.remove('an_fade');
+            an_col2.classList.remove('an_fade');
+            void an_col1.offsetWidth;
+            an_col1.classList.add('an_fade');
+            an_col2.classList.add('an_fade');
+        }
+
+        /* ============ 切换 tab ============ */
+        function an_switch(key) {
+            var an_allTabs = an_tabs.querySelectorAll('.an_tab');
+            for (var i = 0; i < an_allTabs.length; i++) {
+                var an_btn = an_allTabs[i];
+                if (an_btn.dataset.tab === key) {
+                    an_btn.classList.add('an_on');
+                } else {
+                    an_btn.classList.remove('an_on');
+                }
+            }
+            an_render(key);
+        }
+
+        an_tabs.addEventListener('click', function (e) {
+            var an_target = e.target.closest('.an_tab');
+            if (!an_target) { return; }
+            an_switch(an_target.dataset.tab);
+        });
+
+        an_render('daily');
+    </script>
+</body>
+</html>

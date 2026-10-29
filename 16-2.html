@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-10-29 | 模型：DeepSeek-V4.1-Flash | 功能：16-2 JavaScript 对象 — 结构、增删改查、遍历、this、引用与拷贝可视化演示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-2 对象解剖室</title>
+    <style>
+        :root {
+            --an_ink: #22304a;
+            --an_sub: #7b88a1;
+            --an_line: #e3eaf4;
+            --an_teal: #0ea5a5;
+            --an_blue: #3b82f6;
+            --an_amber: #f59e0b;
+            --an_rose: #f43f5e;
+            --an_green: #10b981;
+            --an_purple: #8b5cf6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+            color: var(--an_ink);
+            min-height: 100vh;
+            padding: 28px 18px 60px;
+            background:
+                repeating-linear-gradient(0deg, rgba(59, 130, 246, .035) 0 1px, transparent 1px 26px),
+                repeating-linear-gradient(90deg, rgba(59, 130, 246, .035) 0 1px, transparent 1px 26px),
+                linear-gradient(170deg, #f3f8ff 0%, #f8fbfd 45%, #f2fbf8 100%);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .an_wrap { max-width: 1000px; margin: 0 auto; }
+
+        .an_back {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(135deg, #0ea5a5, #3b82f6);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            letter-spacing: .5px;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 16px rgba(14, 165, 165, .28);
+            transition: transform .25s, box-shadow .25s;
+        }
+        .an_back:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgba(14, 165, 165, .4); }
+
+        /* ---------- 顶部标题 ---------- */
+        .an_top {
+            background: #fff;
+            border-radius: 22px;
+            padding: 24px 28px;
+            box-shadow: 0 16px 44px rgba(34, 48, 74, .09);
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+        .an_top::after {
+            content: "{ }";
+            position: absolute;
+            right: 22px;
+            top: -18px;
+            font-size: 96px;
+            font-family: Consolas, monospace;
+            color: rgba(59, 130, 246, .07);
+            font-weight: 700;
+        }
+        .an_top h1 { font-size: 24px; letter-spacing: .5px; margin-bottom: 8px; }
+        .an_top h1 span {
+            background: linear-gradient(120deg, #0ea5a5, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .an_top p { font-size: 13px; color: var(--an_sub); line-height: 1.8; max-width: 640px; }
+        .an_top p b { color: var(--an_teal); }
+
+        /* ---------- 章节 ---------- */
+        .an_sec {
+            background: #fff;
+            border-radius: 20px;
+            padding: 22px 24px 24px;
+            box-shadow: 0 12px 34px rgba(34, 48, 74, .07);
+            margin-bottom: 20px;
+        }
+        .an_sec_head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+            border-bottom: 1px dashed var(--an_line);
+        }
+        .an_no {
+            flex: 0 0 auto;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #e6f7f7, #e8f0ff);
+            color: var(--an_teal);
+            font-family: Consolas, monospace;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .an_sec_head h2 { font-size: 17px; letter-spacing: .3px; }
+        .an_sec_head p {
+            font-size: 12.5px;
+            color: var(--an_sub);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .an_split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        .an_split.an_wide_l { grid-template-columns: 1.05fr .95fr; }
+
+        /* ---------- 对象卡片 ---------- */
+        .an_obj {
+            border: 2px solid #dbe6f5;
+            border-radius: 16px;
+            background: #fff;
+            overflow: hidden;
+            font-family: Consolas, "Courier New", monospace;
+            box-shadow: 0 10px 26px rgba(34, 48, 74, .08);
+        }
+        .an_obj_head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 15px;
+            background: linear-gradient(135deg, #eff7ff, #eafbf7);
+            border-bottom: 1px solid #e3eaf4;
+            font-size: 12px;
+            color: #5b6b85;
+        }
+        .an_obj_head b { color: var(--an_blue); }
+        .an_obj_body { padding: 5px 0; }
+
+        .an_prop {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 15px;
+            font-size: 13.5px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: background .22s, border-color .22s;
+            position: relative;
+        }
+        .an_prop:hover { background: #f6faff; }
+        .an_prop.an_active { background: #eaf4ff; border-left-color: var(--an_blue); }
+        .an_key { color: #7c3aed; font-weight: 600; }
+        .an_colon { color: #b6c2d4; }
+        .an_val { color: #0f766e; word-break: break-all; }
+        .an_val.an_str { color: #0f766e; }
+        .an_val.an_num { color: #c2410c; }
+        .an_val.an_bool { color: #a21caf; }
+        .an_val.an_fn { color: #2563eb; font-style: italic; }
+        .an_val.an_objv { color: #64748b; }
+        .an_type {
+            margin-left: auto;
+            flex: 0 0 auto;
+            font-size: 10.5px;
+            color: #8b98ad;
+            background: #f1f5f9;
+            padding: 1px 8px;
+            border-radius: 8px;
+            letter-spacing: .3px;
+        }
+
+        .an_prop.an_add { animation: an_slideIn .45s cubic-bezier(.2, 1.3, .4, 1); background: #e8fbf1; }
+        @keyframes an_slideIn {
+            from { opacity: 0; transform: translateX(-18px); background: #c9f5df; }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .an_prop.an_edit { animation: an_editFlash .6s ease; }
+        @keyframes an_editFlash {
+            0%   { background: #fff4dc; }
+            60%  { background: #ffe7b8; }
+            100% { background: transparent; }
+        }
+        .an_prop.an_del { animation: an_collapse .38s ease forwards; }
+        @keyframes an_collapse {
+            0%   { opacity: 1; transform: translateX(0); background: #ffe4e8; }
+            100% { opacity: 0; transform: translateX(26px); background: #ffe4e8; }
+        }
+        .an_prop.an_scan { background: #fff8e6; border-left-color: var(--an_amber); }
+
+        .an_empty {
+            padding: 18px 15px;
+            font-size: 12.5px;
+            color: #9aa6ba;
+            text-align: center;
+        }
+
+        /* ---------- 放大镜面板 ---------- */
+        .an_lens {
+            border: 1.5px dashed #d8e3f2;
+            border-radius: 14px;
+            padding: 14px 16px;
+            background: #fbfdff;
+            min-height: 100%;
+        }
+        .an_lens_title {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #9aa6ba;
+            margin-bottom: 10px;
+        }
+        .an_line {
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 2.05;
+            color: #46536b;
+            word-break: break-all;
+        }
+        .an_line em { font-style: normal; color: #b6c2d4; }
+        .an_line b { color: #7c3aed; font-weight: 600; }
+        .an_line i { font-style: normal; color: #0f766e; }
+        .an_lens .an_hint {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--an_line);
+            font-size: 12px;
+            color: var(--an_sub);
+            line-height: 1.85;
+        }
+
+        /* ---------- 控制条 ---------- */
+        .an_bar_row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .an_input {
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            padding: 8px 11px;
+            border: 1.5px solid var(--an_line);
+            border-radius: 10px;
+            outline: none;
+            color: var(--an_ink);
+            background: #fff;
+            transition: border-color .2s, box-shadow .2s;
+            width: 130px;
+        }
+        .an_input:focus { border-color: #a9c8ff; box-shadow: 0 0 0 3px rgba(59, 130, 246, .12); }
+        .an_prefix {
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            color: #8b98ad;
+        }
+
+        .an_btn {
+            font-family: inherit;
+            font-size: 12.5px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1.5px solid var(--an_line);
+            background: #fff;
+            color: #46536b;
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+        .an_btn:hover { border-color: #a9c8ff; background: #f6faff; transform: translateY(-1px); }
+        .an_btn:disabled { opacity: .42; cursor: not-allowed; transform: none; }
+        .an_btn.an_primary {
+            background: linear-gradient(135deg, #0ea5a5, #3b82f6);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 6px 14px rgba(59, 130, 246, .24);
+        }
+        .an_btn.an_primary:hover { filter: brightness(1.06); }
+        .an_btn.an_danger { color: var(--an_rose); border-color: #ffd3da; background: #fff6f7; }
+        .an_btn.an_danger:hover { background: #ffe9ec; border-color: #ffb8c2; }
+        .an_btn code { font-family: Consolas, monospace; }
+
+        /* ---------- 控制台 ---------- */
+        .an_console {
+            background: #1b2030;
+            border-radius: 14px;
+            padding: 12px 16px 13px;
+            font-family: Consolas, "Courier New", monospace;
+            margin-top: 14px;
+        }
+        .an_dots { display: flex; gap: 6px; margin-bottom: 8px; }
+        .an_dots i { width: 8px; height: 8px; border-radius: 50%; }
+        .an_dots i:nth-child(1) { background: #ff5f57; }
+        .an_dots i:nth-child(2) { background: #febc2e; }
+        .an_dots i:nth-child(3) { background: #28c840; }
+        .an_cline {
+            display: flex;
+            gap: 8px;
+            font-size: 12.5px;
+            line-height: 1.95;
+            word-break: break-all;
+        }
+        .an_cline .an_p { flex: 0 0 auto; }
+        .an_cline.an_c .an_p { color: #7f8cff; }
+        .an_cline.an_c span { color: #e7ebff; }
+        .an_cline.an_r .an_p { color: #28c840; }
+        .an_cline.an_r span { color: #7ee6a0; }
+        .an_cline.an_t .an_p { color: #febc2e; }
+        .an_cline.an_t span { color: #9aa4c0; }
+        .an_cline.an_t { margin-top: 3px; padding-top: 7px; border-top: 1px solid rgba(255, 255, 255, .07); }
+
+        /* ---------- 输出 chips ---------- */
+        .an_out {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            min-height: 34px;
+            padding: 8px 12px;
+            border-radius: 11px;
+            background: #f7faff;
+            border: 1.5px dashed #dde7f5;
+            font-size: 12.5px;
+            color: #8b98ad;
+        }
+        .an_chip {
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-family: Consolas, monospace;
+            font-size: 12.5px;
+            font-weight: 600;
+            animation: an_chipIn .28s ease both;
+        }
+        @keyframes an_chipIn { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .an_chip.an_k_key { background: #f2ecff; color: #6d28d9; border: 1.5px solid #ddd0ff; }
+        .an_chip.an_k_val { background: #e6f8f6; color: #0f766e; border: 1.5px solid #b8ece6; }
+        .an_chip.an_k_pair { background: #eaf2ff; color: #1d4ed8; border: 1.5px solid #c7dbff; }
+
+        /* ---------- this 演示 ---------- */
+        .an_this_stage {
+            display: grid;
+            grid-template-columns: 1fr 120px 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+        .an_person {
+            border: 2px solid #dbe6f5;
+            border-radius: 14px;
+            padding: 12px 14px;
+            background: #fff;
+            font-family: Consolas, monospace;
+            font-size: 12.5px;
+            transition: all .3s;
+            position: relative;
+        }
+        .an_person b { display: block; color: #3b4a63; margin-bottom: 6px; font-size: 12px; }
+        .an_person div { color: #64748b; line-height: 1.85; }
+        .an_person.an_this_on {
+            border-color: var(--an_amber);
+            background: #fffaf0;
+            box-shadow: 0 0 0 5px rgba(245, 158, 11, .14);
+            transform: translateY(-3px);
+        }
+        .an_person.an_this_on b { color: #b45309; }
+
+        .an_fnbox {
+            text-align: center;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            color: #5b6b85;
+            border: 2px dashed #cfdcee;
+            border-radius: 12px;
+            padding: 10px 6px;
+            background: #fbfdff;
+            transition: all .3s;
+        }
+        .an_fnbox.an_live { border-color: var(--an_amber); background: #fffdf6; color: #b45309; }
+        .an_fnbox em {
+            display: block;
+            font-style: normal;
+            font-size: 10.5px;
+            color: #9aa6ba;
+            margin-top: 3px;
+        }
+
+        /* ---------- 内存图 ---------- */
+        .an_mem {
+            display: grid;
+            grid-template-columns: 190px 1fr;
+            gap: 22px;
+            align-items: start;
+        }
+        .an_vars { display: flex; flex-direction: column; gap: 10px; }
+        .an_var {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1.5px solid var(--an_line);
+            border-radius: 11px;
+            padding: 9px 12px;
+            background: #fff;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            transition: all .3s;
+        }
+        .an_var b { color: #7c3aed; }
+        .an_var .an_to { color: #c3cddd; }
+        .an_var .an_ref {
+            margin-left: auto;
+            font-size: 11.5px;
+            padding: 1px 9px;
+            border-radius: 7px;
+            background: #eef4ff;
+            color: #2563eb;
+        }
+        .an_var .an_ref.an_none { background: #f4f6fa; color: #a9b4c6; }
+        .an_var.an_var_hi { border-color: #a9c8ff; box-shadow: 0 0 0 4px rgba(59, 130, 246, .1); }
+
+        .an_heaps { display: flex; flex-direction: column; gap: 10px; }
+        .an_heap {
+            border: 2px solid #dbe6f5;
+            border-radius: 13px;
+            padding: 11px 14px;
+            background: #fff;
+            font-family: Consolas, monospace;
+            font-size: 12.5px;
+            color: #0f766e;
+            transition: all .3s;
+            position: relative;
+        }
+        .an_heap .an_heap_id {
+            position: absolute;
+            top: -10px;
+            left: 12px;
+            font-size: 10.5px;
+            background: #eef4ff;
+            color: #2563eb;
+            padding: 1px 8px;
+            border-radius: 7px;
+            border: 1px solid #cfe0ff;
+        }
+        .an_heap.an_shared {
+            border-color: var(--an_amber);
+            background: #fffdf6;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, .12);
+        }
+        .an_heap.an_heap_new { animation: an_slideIn .45s cubic-bezier(.2, 1.3, .4, 1); }
+        .an_heap .an_tag {
+            position: absolute;
+            top: -10px;
+            right: 12px;
+            font-size: 10.5px;
+            background: #fff4dc;
+            color: #b45309;
+            padding: 1px 8px;
+            border-radius: 7px;
+            border: 1px solid #ffdfa1;
+        }
+
+        /* ---------- 结语 ---------- */
+        .an_summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 4px;
+        }
+        .an_sum {
+            border: 1.5px solid var(--an_line);
+            border-radius: 13px;
+            padding: 13px 15px;
+            background: #fbfdff;
+        }
+        .an_sum b {
+            display: block;
+            font-size: 12.5px;
+            color: var(--an_teal);
+            margin-bottom: 5px;
+            font-family: Consolas, monospace;
+        }
+        .an_sum p { font-size: 12px; color: var(--an_sub); line-height: 1.8; }
+
+        .an_foot {
+            text-align: center;
+            font-size: 12px;
+            color: #a6b2c6;
+            line-height: 2;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 820px) {
+            .an_split, .an_split.an_wide_l { grid-template-columns: 1fr; }
+            .an_this_stage { grid-template-columns: 1fr; }
+            .an_mem { grid-template-columns: 1fr; }
+            .an_sec_head { flex-wrap: wrap; }
+            .an_sec_head p { margin-left: 0; text-align: left; width: 100%; }
+            .an_top::after { display: none; }
+            .an_input { width: 110px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="an_wrap">
+        <a class="an_back" href="index.html">← 返回首页</a>
+
+        <div class="an_top">
+            <h1>🗄️ JavaScript <span>对象</span> 解剖室</h1>
+            <p>
+                对象就是一排<b>贴了标签的抽屉</b>：标签叫"键"，抽屉里放的东西叫"值"。
+                下面把它拆开、装上、遍历、调用、再复制一遍 —— 五台手术，看懂 <code>object</code>。
+            </p>
+        </div>
+
+        <!-- ========== 01 结构 ========== -->
+        <section class="an_sec">
+            <div class="an_sec_head">
+                <span class="an_no">01</span>
+                <h2>对象长什么样</h2>
+                <p>点任意一行，看它怎么被"取"出来</p>
+            </div>
+
+            <div class="an_split an_wide_l">
+                <div class="an_obj">
+                    <div class="an_obj_head">
+                        <span>const <b>student</b> = { … }</span>
+                        <span>6 个属性</span>
+                    </div>
+                    <div class="an_obj_body" id="an_studentCard"></div>
+                </div>
+
+                <div class="an_lens">
+                    <div class="an_lens_title">放 大 镜</div>
+                    <div id="an_lensBody">
+                        <div class="an_line" style="color:#a9b4c6">点击左边的属性行…</div>
+                    </div>
+                    <div class="an_hint">
+                        两种取值方式完全等价：<br>
+                        点号 <code>obj.name</code> 只能接固定的键名；<br>
+                        方括号 <code>obj["name"]</code> 里面可以放变量，所以 <code>obj[key]</code> 才通用。
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 02 增删改查 ========== -->
+        <section class="an_sec">
+            <div class="an_sec_head">
+                <span class="an_no">02</span>
+                <h2>增 · 删 · 改 · 查</h2>
+                <p>抽屉可以随时加、换、拆</p>
+            </div>
+
+            <div class="an_bar_row">
+                <span class="an_prefix">user.</span>
+                <input class="an_input" id="an_keyIn" placeholder="键名，如 email" value="email">
+                <span class="an_prefix">=</span>
+                <input class="an_input" id="an_valIn" placeholder="值，如 abc@qq.com" value="an@qq.com">
+            </div>
+            <div class="an_bar_row">
+                <button class="an_btn an_primary" id="an_btnSet" type="button">赋值 / 新增</button>
+                <button class="an_btn" id="an_btnGet" type="button">读取</button>
+                <button class="an_btn an_danger" id="an_btnDel" type="button">删除 delete</button>
+                <button class="an_btn" id="an_btnReset" type="button">↺ 重置对象</button>
+            </div>
+
+            <div class="an_split an_wide_l">
+                <div class="an_obj">
+                    <div class="an_obj_head">
+                        <span>const <b>user</b> = { … }</span>
+                        <span id="an_userCount">4 个属性</span>
+                    </div>
+                    <div class="an_obj_body" id="an_userCard"></div>
+                </div>
+
+                <div class="an_console">
+                    <div class="an_dots"><i></i><i></i><i></i></div>
+                    <div class="an_cline an_c"><span class="an_p">›</span><span id="an_c2cmd">等待操作…</span></div>
+                    <div class="an_cline an_r"><span class="an_p">←</span><span id="an_c2res">—</span></div>
+                    <div class="an_cline an_t"><span class="an_p">💡</span><span id="an_c2tip">用点号取值时，键名必须是合法的标识符；带空格或中文的键，只能用方括号</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 03 遍历 ========== -->
+        <section class="an_sec">
+            <div class="an_sec_head">
+                <span class="an_no">03</span>
+                <h2>遍历对象</h2>
+                <p>把抽屉一个个拉开看</p>
+            </div>
+
+            <div class="an_bar_row">
+                <button class="an_btn an_primary" data-loop="forin" type="button"><code>for…in</code></button>
+                <button class="an_btn" data-loop="keys" type="button"><code>Object.keys()</code></button>
+                <button class="an_btn" data-loop="values" type="button"><code>Object.values()</code></button>
+                <button class="an_btn" data-loop="entries" type="button"><code>Object.entries()</code></button>
+            </div>
+
+            <div class="an_split an_wide_l">
+                <div class="an_obj">
+                    <div class="an_obj_head">
+                        <span>const <b>student</b> = { … }</span>
+                        <span id="an_loopState">待遍历</span>
+                    </div>
+                    <div class="an_obj_body" id="an_loopCard"></div>
+                </div>
+
+                <div>
+                    <div class="an_out" id="an_loopOut">点击上方按钮，结果会出现在这里</div>
+                    <div class="an_console">
+                        <div class="an_dots"><i></i><i></i><i></i></div>
+                        <div class="an_cline an_c"><span class="an_p">›</span><span id="an_c3cmd">—</span></div>
+                        <div class="an_cline an_t"><span class="an_p">💡</span><span id="an_c3tip">for…in 拿到的是"键"，Object.entries() 一次拿到"键和值"的成对数组，最适合配合解构使用</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 04 方法与 this ========== -->
+        <section class="an_sec">
+            <div class="an_sec_head">
+                <span class="an_no">04</span>
+                <h2>对象里的函数：方法与 this</h2>
+                <p>this 指向"谁在调用我"</p>
+            </div>
+
+            <div class="an_this_stage">
+                <div class="an_person" id="an_p1">
+                    <b>const p1</b>
+                    <div>name: "安家成"</div>
+                    <div>age: 20</div>
+                </div>
+                <div class="an_fnbox" id="an_fnbox">
+                    intro()
+                    <em>this → ?</em>
+                </div>
+                <div class="an_person" id="an_p2">
+                    <b>const p2</b>
+                    <div>name: "李小明"</div>
+                    <div>age: 22</div>
+                </div>
+            </div>
+
+            <div class="an_bar_row" style="margin-top:16px">
+                <button class="an_btn an_primary" data-this="p1" type="button"><code>p1.intro()</code></button>
+                <button class="an_btn" data-this="call" type="button"><code>p1.intro.call(p2)</code></button>
+                <button class="an_btn" data-this="bind" type="button"><code>p1.intro.bind(p2)()</code></button>
+            </div>
+
+            <div class="an_console">
+                <div class="an_dots"><i></i><i></i><i></i></div>
+                <div class="an_cline an_c"><span class="an_p">›</span><span id="an_c4cmd">—</span></div>
+                <div class="an_cline an_r"><span class="an_p">←</span><span id="an_c4res">—</span></div>
+                <div class="an_cline an_t"><span class="an_p">💡</span><span id="an_c4tip">同一个函数，换个"调用者"，this 就跟着换 —— 这就是 call / apply / bind 的用处</span></div>
+            </div>
+        </section>
+
+        <!-- ========== 05 引用与拷贝 ========== -->
+        <section class="an_sec">
+            <div class="an_sec_head">
+                <span class="an_no">05</span>
+                <h2>变量里存的不是对象，是"门牌号"</h2>
+                <p>引用类型最容易踩的坑</p>
+            </div>
+
+            <div class="an_bar_row">
+                <button class="an_btn an_primary" data-ref="assign" type="button"><code>let b = a</code> 直接赋值</button>
+                <button class="an_btn" data-ref="copy" type="button"><code>let b = { ...a }</code> 浅拷贝</button>
+                <button class="an_btn" data-ref="edit" type="button"><code>a.name = "小安"</code> 改 a</button>
+                <button class="an_btn" data-ref="reset" type="button">↺ 重置</button>
+            </div>
+
+            <div class="an_mem">
+                <div class="an_vars" id="an_vars"></div>
+                <div class="an_heaps" id="an_heaps"></div>
+            </div>
+
+            <div class="an_console" style="margin-top:16px">
+                <div class="an_dots"><i></i><i></i><i></i></div>
+                <div class="an_cline an_c"><span class="an_p">›</span><span id="an_c5cmd">—</span></div>
+                <div class="an_cline an_r"><span class="an_p">←</span><span id="an_c5res">—</span></div>
+                <div class="an_cline an_t"><span class="an_p">💡</span><span id="an_c5tip">先点"直接赋值"，再点"改 a"，看看 b 有没有跟着变；重置后再试一次"浅拷贝"</span></div>
+            </div>
+        </section>
+
+        <!-- ========== 速记 ========== -->
+        <section class="an_sec">
+            <div class="an_sec_head">
+                <span class="an_no">✓</span>
+                <h2>四句话记住对象</h2>
+            </div>
+            <div class="an_summary">
+                <div class="an_sum">
+                    <b>{ key: value }</b>
+                    <p>对象是"键值对"的无序集合，键一定是字符串（或 Symbol），值可以是任意类型。</p>
+                </div>
+                <div class="an_sum">
+                    <b>obj[key]</b>
+                    <p>点号取值要求键名合法；方括号能接变量，<code>obj["my key"]</code> 这种带空格的键必须用方括号。</p>
+                </div>
+                <div class="an_sum">
+                    <b>this</b>
+                    <p>方法里的 this 由"谁调用"决定，不由"写在哪"决定；箭头函数没有自己的 this。</p>
+                </div>
+                <div class="an_sum">
+                    <b>引用</b>
+                    <p><code>b = a</code> 只是复制门牌号，两人住同一间房；<code>{ ...a }</code> 才是新盖一间房。</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="an_foot">
+            原生 HTML + CSS + JavaScript 实现，无任何第三方库<br>
+            安家成 ·《高级网页设计》· 16-2
+        </div>
+    </div>
+
+    <script>
+        /* ==================== 工具 ==================== */
+        function an_sleep(ms) {
+            return new Promise(function (r) { setTimeout(r, ms); });
+        }
+
+        function an_typeOf(v) {
+            if (v === null) { return 'null'; }
+            if (Array.isArray(v)) { return 'array'; }
+            return typeof v;
+        }
+
+        function an_valClass(v) {
+            var t = an_typeOf(v);
+            if (t === 'string') { return 'an_str'; }
+            if (t === 'number') { return 'an_num'; }
+            if (t === 'boolean') { return 'an_bool'; }
+            if (t === 'function') { return 'an_fn'; }
+            return 'an_objv';
+        }
+
+        function an_valText(v) {
+            var t = an_typeOf(v);
+            if (t === 'string') { return '"' + v + '"'; }
+            if (t === 'function') { return 'ƒ ' + (v.name || 'anonymous') + '()'; }
+            if (t === 'array') { return '[' + v.length + ' 项]'; }
+            if (t === 'object') { return '{ … }'; }
+            return String(v);
+        }
+
+        /* ==================== 01 结构解剖 ==================== */
+        var an_student = {
+            name: '安家成',
+            age: 20,
+            major: '数字媒体技术',
+            isStudent: true,
+            hobbies: ['摄影', '羽毛球', '写代码'],
+            address: { city: '成都', district: '武侯区' }
+        };
+
+        var an_lensBody = document.getElementById('an_lensBody');
+        var an_studentCard = document.getElementById('an_studentCard');
+        var an_loopCard = document.getElementById('an_loopCard');
+
+        function an_buildCard(container, obj, activeKey) {
+            container.innerHTML = '';
+            var an_keys = Object.keys(obj);
+            if (!an_keys.length) {
+                container.innerHTML = '<div class="an_empty">空对象 { } —— 一个抽屉都没有</div>';
+                return;
+            }
+            an_keys.forEach(function (k) {
+                var v = obj[k];
+                var row = document.createElement('div');
+                row.className = 'an_prop' + (k === activeKey ? ' an_active' : '');
+                row.dataset.key = k;
+                row.innerHTML =
+                    '<span class="an_key">' + k + '</span>' +
+                    '<span class="an_colon">:</span>' +
+                    '<span class="an_val ' + an_valClass(v) + '">' + an_escape(an_valText(v)) + '</span>' +
+                    '<span class="an_type">' + an_typeOf(v) + '</span>';
+                container.appendChild(row);
+            });
+        }
+
+        function an_escape(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function an_showLens(key) {
+            var v = an_student[key];
+            var an_dot = /^[A-Za-z_$][\w$]*$/.test(key);
+            an_lensBody.innerHTML =
+                '<div class="an_line"><em>student.</em><b>' + key + '</b>  <em>=&gt;</em>  <i>' + an_escape(an_valText(v)) + '</i></div>' +
+                '<div class="an_line"><em>student[</em>"' + key + '"<em>]</em>  <em>=&gt;</em>  <i>' + an_escape(an_valText(v)) + '</i></div>' +
+                '<div class="an_line"><em>typeof</em> student.' + key + '  <em>=&gt;</em>  <i>"' + an_typeOf(v) + '"</i></div>' +
+                '<div class="an_line" style="color:' + (an_dot ? '#10b981' : '#f43f5e') + ';font-size:12px;margin-top:6px">' +
+                    (an_dot ? '✔ 键名合法，点号写法可用' : '✘ 键名不合法，只能用方括号') +
+                '</div>';
+        }
+
+        an_buildCard(an_studentCard, an_student);
+        an_buildCard(an_loopCard, an_student);
+
+        an_studentCard.addEventListener('click', function (e) {
+            var row = e.target.closest('.an_prop');
+            if (!row) { return; }
+            Array.prototype.slice.call(an_studentCard.children).forEach(function (n) {
+                n.classList.remove('an_active');
+            });
+            row.classList.add('an_active');
+            an_showLens(row.dataset.key);
+        });
+
+        /* ==================== 02 增删改查 ==================== */
+        var an_userSeed = {
+            name: '安家成',
+            age: 20,
+            major: '数字媒体技术',
+            city: '成都'
+        };
+        var an_user = Object.assign({}, an_userSeed);
+
+        var an_userCard = document.getElementById('an_userCard');
+        var an_userCount = document.getElementById('an_userCount');
+        var an_keyIn = document.getElementById('an_keyIn');
+        var an_valIn = document.getElementById('an_valIn');
+        var an_c2cmd = document.getElementById('an_c2cmd');
+        var an_c2res = document.getElementById('an_c2res');
+        var an_c2tip = document.getElementById('an_c2tip');
+
+        function an_renderUser(markKey, markKind) {
+            an_buildCard(an_userCard, an_user);
+            an_userCount.textContent = Object.keys(an_user).length + ' 个属性';
+            if (markKey) {
+                var row = an_userCard.querySelector('[data-key="' + markKey + '"]');
+                if (row) { row.classList.add(markKind); }
+            }
+        }
+
+        function an_say2(cmd, res, tip) {
+            an_c2cmd.textContent = cmd;
+            an_c2res.textContent = res;
+            if (tip) { an_c2tip.textContent = tip; }
+        }
+
+        function an_readInputs() {
+            var k = an_keyIn.value.trim();
+            var v = an_valIn.value.trim();
+            return { k: k, v: v };
+        }
+
+        an_renderUser();
+
+        document.getElementById('an_btnSet').addEventListener('click', function () {
+            var d = an_readInputs();
+            if (!d.k) {
+                an_say2('user[ ] = ' + d.v, '键名不能为空', '先在上面的输入框里写一个键名');
+                return;
+            }
+            var an_isNew = !(d.k in an_user);
+            an_user[d.k] = d.v;
+            an_renderUser(d.k, an_isNew ? 'an_add' : 'an_edit');
+            an_say2('user["' + d.k + '"] = "' + d.v + '"',
+                an_isNew ? '新增成功，对象现在有 ' + Object.keys(an_user).length + ' 个属性'
+                         : '已覆盖原值，对象属性数量不变',
+                an_isNew
+                    ? '抽屉原本不存在，赋值就相当于"凭空多出一个抽屉"'
+                    : '抽屉本来就在，赋值就是"把里面的东西换掉"');
+        });
+
+        document.getElementById('an_btnGet').addEventListener('click', function () {
+            var d = an_readInputs();
+            if (!d.k) {
+                an_say2('user[ ]', '键名不能为空');
+                return;
+            }
+            var an_has = d.k in an_user;
+            var an_v = an_user[d.k];
+            an_renderUser(an_has ? d.k : null, 'an_edit');
+            an_say2('user["' + d.k + '"]',
+                an_has ? an_escape(an_valText(an_v)) + '（类型 ' + an_typeOf(an_v) + '）' : 'undefined',
+                an_has ? '这个抽屉存在，拿到了里面的东西'
+                       : '没有这个抽屉 —— 注意：读不存在的属性不会报错，只会得到 undefined');
+        });
+
+        document.getElementById('an_btnDel').addEventListener('click', async function () {
+            var d = an_readInputs();
+            if (!d.k) {
+                an_say2('delete user[ ]', '键名不能为空');
+                return;
+            }
+            if (!(d.k in an_user)) {
+                an_say2('delete user["' + d.k + '"]', 'false（本来就没有这个属性）',
+                    '删除不存在的属性不会报错，但也没什么可删的');
+                return;
+            }
+            var row = an_userCard.querySelector('[data-key="' + d.k + '"]');
+            if (row) { row.classList.add('an_del'); }
+            await an_sleep(380);
+            delete an_user[d.k];
+            an_renderUser();
+            an_say2('delete user["' + d.k + '"]', 'true —— 抽屉被整个拆掉了',
+                'delete 只能删属性，删不掉变量本身；删完再读就是 undefined');
+        });
+
+        document.getElementById('an_btnReset').addEventListener('click', function () {
+            an_user = Object.assign({}, an_userSeed);
+            an_renderUser();
+            an_say2('user = { … }', '已恢复成最初的 4 个属性', '重置完成，可以重新试一遍');
+        });
+
+        /* ==================== 03 遍历 ==================== */
+        var an_loopOut = document.getElementById('an_loopOut');
+        var an_loopState = document.getElementById('an_loopState');
+        var an_c3cmd = document.getElementById('an_c3cmd');
+        var an_c3tip = document.getElementById('an_c3tip');
+
+        function an_chips(items, kind) {
+            an_loopOut.innerHTML = '';
+            if (!items.length) {
+                an_loopOut.innerHTML = '空对象，什么都没遍历到';
+                return;
+            }
+            items.forEach(function (t, i) {
+                var c = document.createElement('span');
+                c.className = 'an_chip an_k_' + kind;
+                c.textContent = t;
+                c.style.animationDelay = (i * 50) + 'ms';
+                an_loopOut.appendChild(c);
+            });
+        }
+
+        function an_clearLoopMark() {
+            Array.prototype.slice.call(an_loopCard.children).forEach(function (n) {
+                n.classList.remove('an_scan');
+            });
+        }
+
+        async function an_doLoop(kind) {
+            var an_keys = Object.keys(an_student);
+            an_loopOut.innerHTML = '遍历中…';
+
+            if (kind === 'forin') {
+                an_c3cmd.textContent = 'for (const k in student) { … }';
+                an_c3tip.textContent = 'for…in 每次给你一个"键"，要拿值还得自己 student[k] 一次';
+                for (var i = 0; i < an_keys.length; i++) {
+                    var row = an_loopCard.querySelector('[data-key="' + an_keys[i] + '"]');
+                    if (row) { row.classList.add('an_scan'); }
+                    an_loopState.textContent = '第 ' + (i + 1) + ' 个：' + an_keys[i];
+                    await an_sleep(300);
+                    if (row) { row.classList.remove('an_scan'); }
+                }
+                an_chips(an_keys, 'key');
+                an_loopState.textContent = '遍历完成，共 ' + an_keys.length + ' 个键';
+            } else if (kind === 'keys') {
+                an_c3cmd.textContent = 'Object.keys(student)';
+                an_c3tip.textContent = 'keys 一把抓出所有"键"，直接得到一个数组，可以继续用 map / forEach';
+                an_chips(an_keys, 'key');
+                an_keys.forEach(function (k, i) {
+                    setTimeout(function () {
+                        var row = an_loopCard.querySelector('[data-key="' + k + '"]');
+                        if (row) { row.classList.add('an_scan'); }
+                        setTimeout(function () {
+                            if (row) { row.classList.remove('an_scan'); }
+                        }, 420);
+                    }, i * 70);
+                });
+                an_loopState.textContent = '拿到 ' + an_keys.length + ' 个键';
+            } else if (kind === 'values') {
+                an_c3cmd.textContent = 'Object.values(student)';
+                an_c3tip.textContent = 'values 只要"抽屉里的东西"，不要标签';
+                var an_vals = Object.values(an_student);
+                an_chips(an_vals.map(function (v) { return an_valText(v); }), 'val');
+                an_loopState.textContent = '拿到 ' + an_vals.length + ' 个值';
+            } else {
+                an_c3cmd.textContent = 'Object.entries(student)';
+                an_c3tip.textContent = 'entries 把每个抽屉打包成 [键, 值]，配合 const [k, v] 解构最好用';
+                var an_ents = Object.entries(an_student);
+                an_chips(an_ents.map(function (p) { return p[0] + ': ' + an_valText(p[1]); }), 'pair');
+                an_loopState.textContent = '拿到 ' + an_ents.length + ' 组键值对';
+            }
+        }
+
+        Array.prototype.slice.call(document.querySelectorAll('[data-loop]')).forEach(function (b) {
+            b.addEventListener('click', function () {
+                an_doLoop(b.dataset.loop);
+            });
+        });
+
+        /* ==================== 04 方法与 this ==================== */
+        var an_p1 = {
+            name: '安家成',
+            age: 20,
+            intro: function () {
+                return '我是 ' + this.name + '，今年 ' + this.age + ' 岁';
+            }
+        };
+        var an_p2 = { name: '李小明', age: 22 };
+
+        var an_p1El = document.getElementById('an_p1');
+        var an_p2El = document.getElementById('an_p2');
+        var an_fnbox = document.getElementById('an_fnbox');
+        var an_c4cmd = document.getElementById('an_c4cmd');
+        var an_c4res = document.getElementById('an_c4res');
+        var an_c4tip = document.getElementById('an_c4tip');
+
+        function an_lightThis(target) {
+            an_p1El.classList.remove('an_this_on');
+            an_p2El.classList.remove('an_this_on');
+            an_fnbox.classList.add('an_live');
+            if (target === 'p1') { an_p1El.classList.add('an_this_on'); }
+            if (target === 'p2') { an_p2El.classList.add('an_this_on'); }
+            an_fnbox.innerHTML = 'intro()<em>this → ' + (target === 'p1' ? 'p1' : 'p2') + '</em>';
+        }
+
+        function an_runThis(kind) {
+            var an_out = '';
+            var an_cmd = '';
+            var an_tip = '';
+
+            if (kind === 'p1') {
+                an_out = an_p1.intro();
+                an_cmd = 'p1.intro()';
+                an_tip = '函数被 p1 调用，所以 this 就是 p1';
+                an_lightThis('p1');
+            } else if (kind === 'call') {
+                an_out = an_p1.intro.call(an_p2);
+                an_cmd = 'p1.intro.call(p2)';
+                an_tip = 'call 的第一个参数就是 this —— 函数还是那个函数，房东换成了 p2';
+                an_lightThis('p2');
+            } else {
+                var an_bound = an_p1.intro.bind(an_p2);
+                an_out = an_bound();
+                an_cmd = 'p1.intro.bind(p2)()';
+                an_tip = 'bind 不立刻执行，而是先"焊死" this，之后怎么调用都改不回来';
+                an_lightThis('p2');
+            }
+
+            an_c4cmd.textContent = an_cmd;
+            an_c4res.textContent = '"' + an_out + '"';
+            an_c4tip.textContent = an_tip;
+        }
+
+        Array.prototype.slice.call(document.querySelectorAll('[data-this]')).forEach(function (b) {
+            b.addEventListener('click', function () { an_runThis(b.dataset.this); });
+        });
+
+        /* ==================== 05 引用与拷贝 ==================== */
+        var an_refState = null;
+        var an_varsEl = document.getElementById('an_vars');
+        var an_heapsEl = document.getElementById('an_heaps');
+        var an_c5cmd = document.getElementById('an_c5cmd');
+        var an_c5res = document.getElementById('an_c5res');
+        var an_c5tip = document.getElementById('an_c5tip');
+
+        function an_initRef() {
+            an_refState = {
+                heap1: { name: '安家成', age: 20 },
+                heap2: null,
+                a: 1,
+                b: null
+            };
+            an_renderRef();
+            an_c5cmd.textContent = 'let a = { name: "安家成", age: 20 }';
+            an_c5res.textContent = 'a 拿到了 1 号门牌，b 还没出生';
+            an_c5tip.textContent = '先点"直接赋值"，再点"改 a"，看看 b 有没有跟着变';
+        }
+
+        function an_heapHtml(id, data, shared, isNew) {
+            var an_pairs = Object.keys(data).map(function (k) {
+                return k + ': "' + data[k] + '"';
+            }).join(', ');
+            return '<div class="an_heap ' + (shared ? 'an_shared ' : '') + (isNew ? 'an_heap_new' : '') + '">' +
+                '<span class="an_heap_id">#' + id + '</span>' +
+                (shared ? '<span class="an_tag">两个变量指向它</span>' : '') +
+                '{ ' + an_pairs + ' }' +
+                '</div>';
+        }
+
+        function an_renderRef(opt) {
+            opt = opt || {};
+            var an_s = an_refState;
+
+            var an_bRef = an_s.b === null ? '未定义' : '#' + an_s.b;
+            var an_aRef = '#' + an_s.a;
+
+            an_varsEl.innerHTML =
+                '<div class="an_var ' + (opt.hiA ? 'an_var_hi' : '') + '">' +
+                    '<b>a</b><span class="an_to">→</span>' +
+                    '<span class="an_ref">' + an_aRef + '</span>' +
+                '</div>' +
+                '<div class="an_var ' + (opt.hiB ? 'an_var_hi' : '') + '">' +
+                    '<b>b</b><span class="an_to">→</span>' +
+                    '<span class="an_ref ' + (an_s.b === null ? 'an_none' : '') + '">' + an_bRef + '</span>' +
+                '</div>';
+
+            var an_shared1 = (an_s.a === 1 && an_s.b === 1);
+            var an_shared2 = (an_s.a === 2 && an_s.b === 2);
+            var an_html = '';
+            an_html += an_heapHtml(1, an_s.heap1, an_shared1, false);
+            if (an_s.heap2) {
+                an_html += an_heapHtml(2, an_s.heap2, an_shared2, opt.newHeap);
+            }
+            an_heapsEl.innerHTML = an_html;
+        }
+
+        function an_say5(cmd, res, tip) {
+            an_c5cmd.textContent = cmd;
+            an_c5res.textContent = res;
+            if (tip) { an_c5tip.textContent = tip; }
+        }
+
+        Array.prototype.slice.call(document.querySelectorAll('[data-ref]')).forEach(function (b) {
+            b.addEventListener('click', function () {
+                var an_k = b.dataset.ref;
+
+                if (an_k === 'reset') {
+                    an_initRef();
+                    return;
+                }
+
+                if (an_k === 'assign') {
+                    an_refState.b = an_refState.a;
+                    an_renderRef({ hiA: true, hiB: true });
+                    an_say5('let b = a',
+                        'b 复制到的只是门牌号 #1，不是新对象',
+                        '现在 a 和 b 是同一个房间的两把钥匙 —— 下一步点"改 a"试试');
+                    return;
+                }
+
+                if (an_k === 'copy') {
+                    an_refState.heap2 = Object.assign({}, an_refState.heap1);
+                    an_refState.b = 2;
+                    an_renderRef({ newHeap: true, hiB: true });
+                    an_say5('let b = { ...a }',
+                        'b 指向新盖的 2 号房间 #2，内容和 #1 一样',
+                        '展开运算符把属性抄了一份，从此两人各住各的');
+                    return;
+                }
+
+                // edit
+                var an_heapKey = an_refState.a;
+                var an_target = an_heapKey === 1 ? an_refState.heap1 : an_refState.heap2;
+                if (!an_target) { return; }
+                an_target.name = '小安';
+                an_renderRef({ hiA: true, hiB: true });
+
+                var an_bName = an_refState.b === null ? '（b 还不存在）' :
+                    (an_refState.b === 1 ? an_refState.heap1.name : an_refState.heap2.name);
+                an_say5('a.name = "小安"',
+                    'a.name = ' + an_target.name + ' ，b.name = ' + an_bName,
+                    an_refState.b === 1
+                        ? '⚠️ b 也跟着变了！因为它俩本来就是同一个对象'
+                        : '✅ b 没有变，说明它是独立的一份拷贝');
+            });
+        });
+
+        an_initRef();
+    </script>
+</body>
+</html>
