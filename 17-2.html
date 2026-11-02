@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-02 | 模型：Seed-Code | 功能：fetch 跨域接口获取数据并展示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-2 跨域接口获取</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+            color: #eee;
+        }
+        .an_back {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.3); }
+        .an_container { max-width: 1000px; margin: 0 auto; }
+        .an_header { text-align: center; margin-bottom: 24px; }
+        .an_header h1 { font-size: 26px; margin-bottom: 6px; color: #fff; }
+        .an_header p { font-size: 13px; opacity: 0.75; }
+
+        .an_section {
+            background: #1b2a35;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            border: 1px solid #2c5364;
+        }
+        .an_section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #89d4cf;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .an_section-title::before {
+            content: "";
+            width: 4px;
+            height: 18px;
+            background: #89d4cf;
+            border-radius: 2px;
+        }
+
+        .an_controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+            align-items: center;
+        }
+        .an_api-label {
+            font-size: 12px;
+            color: #89d4cf;
+            background: #2c5364;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+        }
+        .an_btn {
+            background: linear-gradient(135deg, #89d4cf 0%, #74b9b5 100%);
+            color: #0f2027;
+            border: none;
+            padding: 9px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: transform 0.15s, opacity 0.2s;
+        }
+        .an_btn:hover { transform: translateY(-1px); }
+        .an_btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .an_btn.secondary {
+            background: #2c5364;
+            color: #cdd6f4;
+        }
+        .an_status {
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 16px;
+            background: #313244;
+            color: #f9e2af;
+        }
+        .an_status.ok { background: #45a049; color: #fff; }
+        .an_status.err { background: #c0392b; color: #fff; }
+        .an_status.loading { background: #3498db; color: #fff; }
+
+        .an_post-card {
+            background: #253745;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border-left: 4px solid #89d4cf;
+        }
+        .an_post-card h4 {
+            color: #f9e2af;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        .an_post-card p {
+            color: #cdd6f4;
+            font-size: 13px;
+            line-height: 1.6;
+            opacity: 0.85;
+        }
+        .an_post-meta {
+            font-size: 11px;
+            color: #89b4fa;
+            margin-top: 8px;
+        }
+
+        .an_code-block {
+            background: #0f1419;
+            color: #cdd6f4;
+            padding: 14px;
+            border-radius: 8px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 280px;
+            overflow-y: auto;
+            border: 1px solid #2c5364;
+        }
+        .an_info {
+            font-size: 12px;
+            color: #89b4fa;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: #253745;
+            border-radius: 6px;
+            border-left: 3px solid #89b4fa;
+        }
+        .an_footer { text-align: center; opacity: 0.5; font-size: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="an_container">
+        <a class="an_back" href="index.html">← 返回首页</a>
+        <div class="an_header">
+            <h1>fetch 跨域接口获取数据</h1>
+            <p>演示使用原生 fetch 请求开放 CORS 的公开接口并渲染</p>
+        </div>
+
+        <!-- 接口 A：JSONPlaceholder Posts -->
+        <div class="an_section">
+            <div class="an_section-title">接口 A：JSONPlaceholder Posts</div>
+            <div class="an_info">
+                接口：<code>https://jsonplaceholder.typicode.com/posts?_limit=5</code><br>
+                这是一个完全开放 CORS 的假数据接口，返回博客帖子数组。
+            </div>
+            <div class="an_controls">
+                <span class="an_api-label">GET /posts?_limit=5</span>
+                <button class="an_btn" id="an_btn_a" onclick="an_fetchPosts()">获取数据</button>
+                <button class="an_btn secondary" onclick="an_clear('an_res_a', 'an_list_a')">清空</button>
+                <span class="an_status" id="an_status_a">待请求</span>
+            </div>
+            <div id="an_list_a"></div>
+            <details style="margin-top:12px;">
+                <summary style="cursor:pointer; font-size:12px; color:#89b4fa;">查看原始 JSON 响应</summary>
+                <pre id="an_res_a" class="an_code-block" style="margin-top:8px;">（点击"获取数据"后显示）</pre>
+            </details>
+        </div>
+
+        <!-- 接口 B：JSONPlaceholder Todos -->
+        <div class="an_section">
+            <div class="an_section-title">接口 B：JSONPlaceholder Todos</div>
+            <div class="an_info">
+                接口：<code>https://jsonplaceholder.typicode.com/todos?_limit=8</code><br>
+                返回待办事项列表，含 id、title、completed 字段。
+            </div>
+            <div class="an_controls">
+                <span class="an_api-label">GET /todos?_limit=8</span>
+                <button class="an_btn" id="an_btn_b" onclick="an_fetchTodos()">获取数据</button>
+                <button class="an_btn secondary" onclick="an_clear('an_res_b', 'an_list_b')">清空</button>
+                <span class="an_status" id="an_status_b">待请求</span>
+            </div>
+            <div id="an_list_b"></div>
+            <details style="margin-top:12px;">
+                <summary style="cursor:pointer; font-size:12px; color:#89b4fa;">查看原始 JSON 响应</summary>
+                <pre id="an_res_b" class="an_code-block" style="margin-top:8px;">（点击"获取数据"后显示）</pre>
+            </details>
+        </div>
+
+        <!-- 接口 C：REST Countries（国家数据） -->
+        <div class="an_section">
+            <div class="an_section-title">接口 C：REST Countries</div>
+            <div class="an_info">
+                接口：<code>https://restcountries.com/v3.1/name/china</code><br>
+                开放 CORS 的国家信息接口，返回国家名称、首都、人口、货币等。
+            </div>
+            <div class="an_controls">
+                <span class="an_api-label">GET /v3.1/name/china</span>
+                <button class="an_btn" id="an_btn_c" onclick="an_fetchCountry()">获取数据</button>
+                <button class="an_btn secondary" onclick="an_clear('an_res_c', 'an_list_c')">清空</button>
+                <span class="an_status" id="an_status_c">待请求</span>
+            </div>
+            <div id="an_list_c"></div>
+            <details style="margin-top:12px;">
+                <summary style="cursor:pointer; font-size:12px; color:#89b4fa;">查看原始 JSON 响应</summary>
+                <pre id="an_res_c" class="an_code-block" style="margin-top:8px;">（点击"获取数据"后显示）</pre>
+            </details>
+        </div>
+
+        <div class="an_footer">— fetch 跨域接口 Demo · 安家成 —</div>
+    </div>
+
+    <script>
+        function an_setStatus(id, text, cls) {
+            const el = document.getElementById(id);
+            el.textContent = text;
+            el.className = "an_status" + (cls ? " " + cls : "");
+        }
+
+        function an_showJson(id, data) {
+            document.getElementById(id).textContent = JSON.stringify(data, null, 2);
+        }
+
+        function an_clear(jsonId, listId) {
+            document.getElementById(jsonId).textContent = "（点击\"获取数据\"后显示）";
+            document.getElementById(listId).innerHTML = "";
+        }
+
+        // ====== 接口 A：Posts ======
+        async function an_fetchPosts() {
+            an_setStatus("an_status_a", "请求中…", "loading");
+            document.getElementById("an_btn_a").disabled = true;
+            try {
+                const res = await fetch("https://jsonplaceholder.typicode.com/posts?_limit=5");
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const data = await res.json();
+                an_setStatus("an_status_a", "✅ 成功，" + data.length + " 条", "ok");
+                an_showJson("an_res_a", data);
+                const html = data.map(p => `
+                    <div class="an_post-card">
+                        <h4>#${p.id} ${p.title}</h4>
+                        <p>${p.body}</p>
+                        <div class="an_post-meta">userId: ${p.userId}</div>
+                    </div>`).join("");
+                document.getElementById("an_list_a").innerHTML = html;
+            } catch (e) {
+                an_setStatus("an_status_a", "❌ 失败：" + e.message, "err");
+                document.getElementById("an_list_a").innerHTML =
+                    '<div class="an_post-card" style="border-left-color:#c0392b;">' +
+                    '<h4 style="color:#f38ba8;">请求失败</h4>' +
+                    '<p>' + e.message + '</p>' +
+                    '<p style="opacity:0.6;font-size:12px;margin-top:6px;">可能原因：网络断开、DNS 解析失败、目标站点临时不可用。请检查网络后重试。</p>' +
+                    '</div>';
+            } finally {
+                document.getElementById("an_btn_a").disabled = false;
+            }
+        }
+
+        // ====== 接口 B：Todos ======
+        async function an_fetchTodos() {
+            an_setStatus("an_status_b", "请求中…", "loading");
+            document.getElementById("an_btn_b").disabled = true;
+            try {
+                const res = await fetch("https://jsonplaceholder.typicode.com/todos?_limit=8");
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const data = await res.json();
+                an_setStatus("an_status_b", "✅ 成功，" + data.length + " 条", "ok");
+                an_showJson("an_res_b", data);
+                let done = 0;
+                const html = data.map(t => {
+                    if (t.completed) done++;
+                    return `
+                    <div class="an_post-card" style="${t.completed ? "opacity:0.7; border-left-color:#45a049;" : ""}">
+                        <h4>
+                            <input type="checkbox" ${t.completed ? "checked" : ""} disabled>
+                            #${t.id} ${t.title}
+                        </h4>
+                        <div class="an_post-meta">userId: ${t.userId} · ${t.completed ? "✅ 已完成" : "⏳ 未完成"}</div>
+                    </div>`;
+                }).join("");
+                document.getElementById("an_list_b").innerHTML =
+                    '<div class="an_post-meta" style="margin-bottom:10px;">合计 ' + data.length + ' 项，已完成 ' + done + ' 项</div>' + html;
+            } catch (e) {
+                an_setStatus("an_status_b", "❌ 失败：" + e.message, "err");
+                document.getElementById("an_list_b").innerHTML = '<p style="color:#f38ba8;">' + e.message + '</p>';
+            } finally {
+                document.getElementById("an_btn_b").disabled = false;
+            }
+        }
+
+        // ====== 接口 C：REST Countries ======
+        async function an_fetchCountry() {
+            an_setStatus("an_status_c", "请求中…", "loading");
+            document.getElementById("an_btn_c").disabled = true;
+            try {
+                const res = await fetch("https://restcountries.com/v3.1/name/china");
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const data = await res.json();
+                an_setStatus("an_status_c", "✅ 成功", "ok");
+                an_showJson("an_res_c", data);
+                const c = data[0];
+                const name = c.name?.common || "?";
+                const official = c.name?.official || "?";
+                const capital = c.capital ? c.capital[0] : "?";
+                const region = (c.continents && c.continents[0]) || c.region || "?";
+                const population = c.population ? c.population.toLocaleString() : "?";
+                const flag = c.flag || "";
+                const currencies = c.currencies ? Object.values(c.currencies).map(x => x.name).join(", ") : "?";
+                const languages = c.languages ? Object.values(c.languages).join(", ") : "?";
+                const html = `
+                    <div class="an_post-card">
+                        <h4 style="font-size:18px;">${flag} ${name}</h4>
+                        <p style="opacity:0.7; font-size:12px; margin-bottom:8px;">全称：${official}</p>
+                        <table class="an_info" style="border:none; background:transparent; padding:0; margin:0;">
+                            <tr><td style="color:#89b4fa;">首都：</td><td>${capital}</td></tr>
+                            <tr><td style="color:#89b4fa;">所在大洲：</td><td>${region}</td></tr>
+                            <tr><td style="color:#89b4fa;">人口：</td><td>${population}</td></tr>
+                            <tr><td style="color:#89b4fa;">货币：</td><td>${currencies}</td></tr>
+                            <tr><td style="color:#89b4fa;">语言：</td><td>${languages}</td></tr>
+                        </table>
+                    </div>`;
+                document.getElementById("an_list_c").innerHTML = html;
+            } catch (e) {
+                an_setStatus("an_status_c", "❌ 失败：" + e.message, "err");
+                document.getElementById("an_list_c").innerHTML = '<p style="color:#f38ba8;">' + e.message + '</p>';
+            } finally {
+                document.getElementById("an_btn_c").disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-02 | 模型：Seed-Code | 功能：JSON 数据格式解析与展示 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-1 JSON 展示</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #434343 0%, #000000 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+            color: #eee;
+        }
+        .an_back {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.3); }
+        .an_container { max-width: 1000px; margin: 0 auto; }
+        .an_header { text-align: center; margin-bottom: 26px; }
+        .an_header h1 { font-size: 26px; margin-bottom: 6px; color: #fff; }
+        .an_header p { font-size: 13px; opacity: 0.7; }
+
+        .an_section {
+            background: #1e1e2e;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 22px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+        }
+        .an_section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #f9e2af;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .an_section-title::before {
+            content: "";
+            width: 4px;
+            height: 18px;
+            background: #f9e2af;
+            border-radius: 2px;
+        }
+        .an_code-block {
+            background: #11111b;
+            color: #cdd6f4;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12.5px;
+            line-height: 1.65;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-bottom: 14px;
+            border: 1px solid #313244;
+        }
+        .an_btn {
+            background: linear-gradient(135deg, #89b4fa 0%, #74c7ec 100%);
+            color: #11111b;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: transform 0.15s, opacity 0.2s;
+            margin-right: 8px;
+        }
+        .an_btn:hover { transform: translateY(-1px); }
+        .an_btn.secondary {
+            background: #45475a;
+            color: #cdd6f4;
+        }
+        .an_table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        .an_table th, .an_table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #313244;
+        }
+        .an_table th {
+            background: #313244;
+            color: #f9e2af;
+            font-weight: bold;
+        }
+        .an_table td { color: #cdd6f4; }
+        .an_table tr:hover td { background: #313244; }
+
+        /* JSON 语法高亮 */
+        .an_json-key { color: #89b4fa; }
+        .an_json-str { color: #a6e3a1; }
+        .an_json-num { color: #fab387; }
+        .an_json-bool { color: #f38ba8; }
+        .an_json-null { color: #6c7086; }
+
+        .an_footer { text-align: center; opacity: 0.6; font-size: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="an_container">
+        <a class="an_back" href="index.html">← 返回首页</a>
+        <div class="an_header">
+            <h1>JSON 数据格式展示</h1>
+            <p>JSON (JavaScript Object Notation) — 轻量级数据交换格式</p>
+        </div>
+
+        <!-- 1. JSON 字符串与对象互转 -->
+        <div class="an_section">
+            <div class="an_section-title">① JSON 字符串 ↔ JS 对象</div>
+            <p style="font-size:13px; opacity:0.8; margin-bottom:10px;">
+                <code>JSON.parse()</code> 把 JSON 字符串转成 JS 对象 &nbsp;|&nbsp;
+                <code>JSON.stringify()</code> 把 JS 对象转成 JSON 字符串
+            </p>
+            <button class="an_btn" onclick="an_runParse()">运行 parse / stringify 示例</button>
+            <pre id="an_res_parse" class="an_code-block" style="margin-top:12px;">（点击按钮）</pre>
+        </div>
+
+        <!-- 2. 美化缩进展示 -->
+        <div class="an_section">
+            <div class="an_section-title">② 美化缩进展示 (stringify 第二参数)</div>
+            <p style="font-size:13px; opacity:0.8; margin-bottom:10px;">
+                <code>JSON.stringify(obj, null, 2)</code> 第三个参数是缩进空格数
+            </p>
+            <button class="an_btn" onclick="an_runPretty()">美化展示</button>
+            <pre id="an_res_pretty" class="an_code-block" style="margin-top:12px;">（点击按钮）</pre>
+        </div>
+
+        <!-- 3. 语法高亮展示 -->
+        <div class="an_section">
+            <div class="an_section-title">③ 语法高亮渲染</div>
+            <p style="font-size:13px; opacity:0.8; margin-bottom:10px;">
+                对 JSON 做语法着色，区分 key、string、number、boolean、null
+            </p>
+            <button class="an_btn" onclick="an_runHighlight()">语法高亮</button>
+            <pre id="an_res_highlight" class="an_code-block" style="margin-top:12px;">（点击按钮）</pre>
+        </div>
+
+        <!-- 4. 表格形式展示数组数据 -->
+        <div class="an_section">
+            <div class="an_section-title">④ 数组 → 表格展示</div>
+            <p style="font-size:13px; opacity:0.8; margin-bottom:10px;">
+                把 JSON 数组中每个对象渲染成表格行
+            </p>
+            <button class="an_btn" onclick="an_runTable()">渲染为表格</button>
+            <div id="an_res_table"></div>
+        </div>
+
+        <!-- 5. 遍历 JSON 对象 -->
+        <div class="an_section">
+            <div class="an_section-title">⑤ 遍历 JSON 对象的字段</div>
+            <p style="font-size:13px; opacity:0.8; margin-bottom:10px;">
+                使用 <code>for...in</code> 或 <code>Object.keys()</code> 遍历
+            </p>
+            <button class="an_btn" onclick="an_runTraverse()">遍历字段</button>
+            <pre id="an_res_traverse" class="an_code-block" style="margin-top:12px;">（点击按钮）</pre>
+        </div>
+
+        <div class="an_footer">— JSON 演示 Demo · 安家成 —</div>
+    </div>
+
+    <script>
+        // 示例 JSON 数据（来自一个学生信息+成绩的假数据）
+        const an_jsonStr = `{
+            "class": "计科2301",
+            "count": 3,
+            "students": [
+                { "name": "安家成", "age": 20, "score": 92.5, "isVip": true, "hobby": null },
+                { "name": "张三",   "age": 19, "score": 78.0, "isVip": false, "hobby": "篮球" },
+                { "name": "李四",   "age": 21, "score": 85.5, "isVip": true,  "hobby": "吉他" }
+            ],
+            "teacher": { "name": "王老师", "title": "副教授" },
+            "semester": "2026-秋"
+        }`;
+
+        function an_show(id, text) {
+            document.getElementById(id).textContent = text;
+        }
+
+        function an_runParse() {
+            // parse: 字符串 → 对象
+            const obj = JSON.parse(an_jsonStr);
+            // stringify: 对象 → 字符串
+            const back = JSON.stringify(obj);
+            let out = "";
+            out += "=== JSON.parse: 字符串 → 对象 ===\n";
+            out += "obj.class   = " + obj.class + "\n";
+            out += "obj.count   = " + obj.count + "\n";
+            out += "obj.students[0].name = " + obj.students[0].name + "\n";
+            out += "obj.students[0].score = " + obj.students[0].score + "\n\n";
+            out += "=== JSON.stringify: 对象 → 字符串 ===\n";
+            out += "长度: " + back.length + " 字符\n";
+            out += "前 120 字: " + back.substring(0, 120) + "...";
+            an_show("an_res_parse", out);
+        }
+
+        function an_runPretty() {
+            const obj = JSON.parse(an_jsonStr);
+            // 第三参数 = 缩进空格数
+            const pretty = JSON.stringify(obj, null, 2);
+            an_show("an_res_pretty", pretty);
+        }
+
+        // JSON 语法高亮函数
+        function an_highlight(json) {
+            if (typeof json !== "string") json = JSON.stringify(json, null, 2);
+            // 先转义 HTML，再替换
+            const escaped = document.createElement("span");
+            escaped.textContent = json;
+            let html = escaped.innerHTML;
+            html = html.replace(/"([^"\\]*(\\.[^"\\]*)*)"\s*:/g, '<span class="an_json-key">"$1"</span>:');
+            html = html.replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, '<span class="an_json-str">"$1"</span>');
+            html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="an_json-num">$1</span>');
+            html = html.replace(/\b(true|false)\b/g, '<span class="an_json-bool">$1</span>');
+            html = html.replace(/\b(null)\b/g, '<span class="an_json-null">$1</span>');
+            return html;
+        }
+        function an_runHighlight() {
+            const obj = JSON.parse(an_jsonStr);
+            const pretty = JSON.stringify(obj, null, 2);
+            document.getElementById("an_res_highlight").innerHTML = an_highlight(pretty);
+        }
+
+        function an_runTable() {
+            const obj = JSON.parse(an_jsonStr);
+            const list = obj.students;
+            let html = '<table class="an_table"><thead><tr>';
+            // 表头
+            html += '<th>#</th>';
+            Object.keys(list[0]).forEach(k => html += '<th>' + k + '</th>');
+            html += '</tr></thead><tbody>';
+            // 表体
+            list.forEach((s, i) => {
+                html += '<tr><td>' + (i + 1) + '</td>';
+                Object.keys(s).forEach(k => html += '<td>' + (s[k] === null ? '<em>null</em>' : s[k]) + '</td>');
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById("an_res_table").innerHTML = html;
+        }
+
+        function an_runTraverse() {
+            const obj = JSON.parse(an_jsonStr);
+            let out = "=== Object.keys(obj) ===\n";
+            out += Object.keys(obj).join(", ") + "\n\n";
+
+            out += "=== for...in 遍历 ===\n";
+            for (let key in obj) {
+                let val = obj[key];
+                let type = Array.isArray(val) ? "array" : typeof val;
+                if (typeof val === "object" && val !== null) {
+                    out += "- " + key + ": " + type + " (length=" + (val.length || Object.keys(val).length) + ")\n";
+                } else {
+                    out += "- " + key + ": " + type + " = " + val + "\n";
+                }
+            }
+
+            out += "\n=== 数组遍历 (students) ===\n";
+            obj.students.forEach((s, i) => {
+                out += "  [" + i + "] " + s.name + " | score=" + s.score + " | isVip=" + s.isVip + "\n";
+            });
+            an_show("an_res_traverse", out);
+        }
+    </script>
+</body>
+</html>
