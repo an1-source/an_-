@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-02 | 模型：Seed-Code | 功能：商品列表 —— fetch dummyjson -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-3 商品列表</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #134e5e, #71b280);
+            min-height: 100vh;
+            padding: 30px 20px;
+            color: #222;
+        }
+        .an_back {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.35); }
+        .an_container { max-width: 1100px; margin: 0 auto; }
+        .an_header {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .an_header h1 { font-size: 26px; margin-bottom: 6px; }
+        .an_header p { font-size: 13px; opacity: 0.8; }
+
+        .an_toolbar {
+            background: #fff;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+        }
+        .an_info-label {
+            font-size: 12px;
+            color: #555;
+            font-family: Consolas, monospace;
+        }
+        .an_btn {
+            background: linear-gradient(135deg, #134e5e, #2d7a6b);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: transform 0.15s, opacity 0.2s;
+        }
+        .an_btn:hover { transform: translateY(-1px); }
+        .an_btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .an_status {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+        .an_status.idle    { background: #eee; color: #555; }
+        .an_status.loading { background: #3498db; color: #fff; }
+        .an_status.ok      { background: #27ae60; color: #fff; }
+        .an_status.err     { background: #c0392b; color: #fff; }
+
+        .an_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 16px;
+        }
+        .an_card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .an_card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 26px rgba(0,0,0,0.22);
+        }
+        .an_card-img {
+            width: 100%;
+            height: 160px;
+            background: #f0f0f0 no-repeat center/contain;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .an_card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .an_card-body { padding: 12px 14px 14px; }
+        .an_card-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 6px;
+            height: 38px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .an_card-price {
+            font-size: 18px;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .an_card-price small {
+            font-size: 12px;
+            color: #888;
+            text-decoration: line-through;
+            margin-left: 6px;
+            font-weight: normal;
+        }
+        .an_card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #888;
+            margin-top: 8px;
+        }
+        .an_rating { color: #f39c12; }
+
+        .an_empty {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff;
+            border-radius: 12px;
+            color: #888;
+            font-size: 14px;
+        }
+        .an_empty.err { color: #c0392b; }
+
+        .an_footer {
+            text-align: center;
+            color: #fff;
+            margin-top: 24px;
+            opacity: 0.6;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="an_container">
+        <a class="an_back" href="index.html">← 返回首页</a>
+        <div class="an_header">
+            <h1>商品列表</h1>
+            <p>数据源：<code>https://dummyjson.com/products?limit=8</code> · 点击卡片查看详情</p>
+        </div>
+
+        <div class="an_toolbar">
+            <span class="an_info-label">接口：GET /products?limit=8</span>
+            <div>
+                <button class="an_btn" id="an_btn" onclick="an_load()">加载商品</button>
+                <span class="an_status idle" id="an_status">待请求</span>
+            </div>
+        </div>
+
+        <div id="an_grid" class="an_grid">
+            <div class="an_empty">点击"加载商品"开始获取数据</div>
+        </div>
+
+        <div class="an_footer">— 商品列表 Demo · 安家成 —</div>
+    </div>
+
+    <script>
+        const an_API = "https://dummyjson.com/products?limit=8";
+
+        function an_setStatus(text, cls) {
+            const el = document.getElementById("an_status");
+            el.textContent = text;
+            el.className = "an_status " + cls;
+        }
+
+        async function an_load() {
+            an_setStatus("请求中…", "loading");
+            document.getElementById("an_btn").disabled = true;
+            document.getElementById("an_grid").innerHTML =
+                '<div class="an_empty">⏳ Loading…</div>';
+            try {
+                const res = await fetch(an_API);
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const json = await res.json();
+                const list = json.products;
+                if (!Array.isArray(list)) throw new Error("返回数据格式不符合预期");
+
+                an_setStatus("✅ " + list.length + " 个商品", "ok");
+                an_render(list);
+            } catch (e) {
+                an_setStatus("❌ " + e.message, "err");
+                document.getElementById("an_grid").innerHTML =
+                    '<div class="an_empty err">❌ 请求失败：' + e.message +
+                    '<br><span style="opacity:0.6;font-size:12px;">可能网络不通或该 CORS 接口临时不可达</span></div>';
+            } finally {
+                document.getElementById("an_btn").disabled = false;
+            }
+        }
+
+        function an_render(list) {
+            document.getElementById("an_grid").innerHTML = list.map(p => {
+                // 折扣价（dummyjson 里有 discountPercentage）
+                const oldPrice = p.price;
+                const newPrice = p.discountPercentage
+                    ? (oldPrice * (100 - p.discountPercentage) / 100).toFixed(2)
+                    : oldPrice.toFixed(2);
+                const img = (p.images && p.images[0]) || p.thumbnail || "";
+                return `
+                    <a class="an_card" href="17-3-detail.html?id=${p.id}">
+                        <div class="an_card-img">
+                            ${img
+                                ? `<img src="${img}" alt="${p.title}" onerror="this.style.display='none';this.parentElement.innerHTML='🖼';">`
+                                : "🖼"}
+                        </div>
+                        <div class="an_card-body">
+                            <div class="an_card-title">${p.title}</div>
+                            <div class="an_card-price">
+                                ¥ ${newPrice}
+                                ${p.discountPercentage ? `<small>¥${oldPrice.toFixed(2)}</small>` : ""}
+                            </div>
+                            <div class="an_card-meta">
+                                <span>📦 ${p.category || "-"}</span>
+                                <span class="an_rating">★ ${(p.rating ?? 0).toFixed(1)}</span>
+                            </div>
+                        </div>
+                    </a>`;
+            }).join("");
+        }
+    </script>
+</body>
+</html>

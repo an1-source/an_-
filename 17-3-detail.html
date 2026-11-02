@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-02 | 模型：Seed-Code | 功能：商品详情 —— fetch dummyjson by id -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-3 商品详情</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #134e5e, #71b280);
+            min-height: 100vh;
+            padding: 30px 20px;
+            color: #222;
+        }
+        .an_nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .an_back {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.35); }
+        .an_to-list {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            background: rgba(255,255,255,0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+        .an_container { max-width: 1000px; margin: 0 auto; }
+
+        .an_main {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 6px 22px rgba(0,0,0,0.18);
+            min-height: 300px;
+        }
+
+        .an_loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+            font-size: 14px;
+        }
+        .an_error {
+            text-align: center;
+            padding: 60px 20px;
+            color: #c0392b;
+        }
+        .an_error h3 { margin-bottom: 10px; }
+
+        .an_detail { display: grid; grid-template-columns: 340px 1fr; gap: 28px; }
+        @media (max-width: 720px) { .an_detail { grid-template-columns: 1fr; } }
+
+        .an_imgs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .an_main-img {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #f5f5f5 center/contain no-repeat;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+        .an_main-img img { width: 100%; height: 100%; object-fit: contain; }
+        .an_thumb-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+        .an_thumb {
+            width: 56px; height: 56px;
+            border-radius: 6px;
+            border: 2px solid #eee;
+            cursor: pointer;
+            background: #f5f5f5 center/contain no-repeat;
+            flex-shrink: 0;
+        }
+        .an_thumb.active { border-color: #134e5e; }
+
+        .an_info h1 {
+            font-size: 24px;
+            color: #222;
+            margin-bottom: 6px;
+        }
+        .an_brand {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 14px;
+        }
+        .an_brand span { color: #134e5e; font-weight: bold; }
+
+        .an_price-box {
+            background: #fef5f5;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            border-left: 4px solid #e74c3c;
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .an_price-now { font-size: 28px; color: #e74c3c; font-weight: bold; }
+        .an_price-old { font-size: 14px; color: #888; text-decoration: line-through; }
+        .an_discount {
+            background: #e74c3c; color: #fff; font-size: 12px;
+            padding: 3px 10px; border-radius: 4px;
+        }
+
+        .an_desc {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 18px;
+        }
+
+        .an_table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .an_table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .an_table td:first-child {
+            color: #888;
+            width: 120px;
+            background: #fafafa;
+        }
+        .an_tag {
+            display: inline-block;
+            background: #134e5e;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-right: 4px;
+        }
+        .an_tag + .an_tag { margin-top: 4px; }
+
+        details { margin-top: 20px; }
+        details summary { cursor: pointer; font-size: 12px; color: #888; }
+        .an_json {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            padding: 14px;
+            border-radius: 8px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-top: 8px;
+        }
+        .an_footer {
+            text-align: center;
+            color: #fff;
+            margin-top: 20px;
+            opacity: 0.5;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="an_container">
+        <div class="an_nav">
+            <a class="an_back" href="index.html">← 返回首页</a>
+            <a class="an_to-list" href="17-3.html">← 返回商品列表</a>
+        </div>
+
+        <div class="an_main" id="an_main">
+            <div class="an_loading">⏳ Loading…</div>
+        </div>
+
+        <div class="an_footer">— 商品详情 Demo · 安家成 —</div>
+    </div>
+
+    <script>
+        // 从 URL 读 ?id=
+        const an_params = new URLSearchParams(location.search);
+        const an_id = an_params.get("id");
+        const an_main = document.getElementById("an_main");
+
+        if (!an_id) {
+            an_main.innerHTML = `
+                <div class="an_error">
+                    <h3>❌ 缺少商品 ID</h3>
+                    <p>URL 中未找到 <code>?id=xxx</code> 参数，请从商品列表点进来。</p>
+                    <p style="margin-top:10px;"><a class="an_to-list" href="17-3.html" style="display:inline-block;">→ 去商品列表</a></p>
+                </div>`;
+        } else {
+            an_loadDetail(an_id);
+        }
+
+        async function an_loadDetail(id) {
+            try {
+                const res = await fetch("https://dummyjson.com/products/" + id);
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const p = await res.json();
+                an_render(p);
+            } catch (e) {
+                an_main.innerHTML = `
+                    <div class="an_error">
+                        <h3>❌ 请求失败</h3>
+                        <p>${e.message}</p>
+                        <p style="margin-top:10px;font-size:12px;opacity:0.6;">接口：GET https://dummyjson.com/products/${id}</p>
+                    </div>`;
+            }
+        }
+
+        function an_render(p) {
+            const oldPrice = p.price;
+            const newPrice = p.discountPercentage
+                ? (oldPrice * (100 - p.discountPercentage) / 100).toFixed(2)
+                : oldPrice.toFixed(2);
+            const discount = p.discountPercentage ? p.discountPercentage.toFixed(1) + "%" : null;
+            const mainImg = (p.images && p.images[0]) || p.thumbnail || "";
+
+            an_main.innerHTML = `
+                <div class="an_detail">
+                    <!-- 左侧图片 -->
+                    <div class="an_imgs">
+                        <div class="an_main-img" id="an_mainImg">
+                            ${mainImg ? `<img src="${mainImg}" alt="${p.title}">` : "🖼"}
+                        </div>
+                        ${(p.images || []).length > 1 ? `
+                        <div class="an_thumb-row">
+                            ${p.images.map((url, i) => `
+                                <div class="an_thumb ${i===0?'active':''}"
+                                     data-url="${url}"
+                                     style="background-image:url('${url}');"
+                                     onclick="an_switchImg(this)"></div>
+                            `).join("")}
+                        </div>` : ""}
+                    </div>
+
+                    <!-- 右侧信息 -->
+                    <div class="an_info">
+                        <h1>${p.title}</h1>
+                        <div class="an_brand">
+                            品牌：<span>${p.brand || "-"}</span>
+                            &nbsp;·&nbsp; 分类：<span>${p.category || "-"}</span>
+                        </div>
+
+                        <div class="an_price-box">
+                            <span class="an_price-now">¥ ${newPrice}</span>
+                            ${discount
+                                ? `<span class="an_price-old">¥ ${oldPrice.toFixed(2)}</span>
+                                   <span class="an_discount">-${discount}</span>`
+                                : ""}
+                        </div>
+
+                        <p class="an_desc">${p.description || "暂无商品描述"}</p>
+
+                        <table class="an_table">
+                            <tr><td>ID</td><td>${p.id}</td></tr>
+                            <tr><td>评分</td><td>⭐ ${(p.rating ?? 0).toFixed(1)}</td></tr>
+                            <tr><td>库存</td><td>${p.stock ?? "-"} 件</td></tr>
+                            <tr><td>SKU</td><td>${p.sku || "-"}</td></tr>
+                            <tr><td>重量</td><td>${p.weight ?? "-"} kg</td></tr>
+                            ${p.tags && p.tags.length ? `<tr><td>标签</td><td>${p.tags.map(t=>`<span class="an_tag">${t}</span>`).join(" ")}</td></tr>` : ""}
+                            ${p.warrantyInformation ? `<tr><td>保修</td><td>${p.warrantyInformation}</td></tr>` : ""}
+                            ${p.shippingInformation ? `<tr><td>物流</td><td>${p.shippingInformation}</td></tr>` : ""}
+                            ${p.availabilityStatus ? `<tr><td>状态</td><td>${p.availabilityStatus}</td></tr>` : ""}
+                            ${p.meta && p.meta.createdAt ? `<tr><td>上架时间</td><td>${new Date(p.meta.createdAt).toLocaleString()}</td></tr>` : ""}
+                        </table>
+
+                        <details open>
+                            <summary>▶ 查看原始 JSON 响应</summary>
+                            <pre class="an_json">${JSON.stringify(p, null, 2)}</pre>
+                        </details>
+                    </div>
+                </div>`;
+        }
+
+        // 缩略图切换
+        function an_switchImg(el) {
+            const url = el.getAttribute("data-url");
+            document.querySelectorAll(".an_thumb").forEach(t => t.classList.remove("active"));
+            el.classList.add("active");
+            const box = document.getElementById("an_mainImg");
+            box.innerHTML = `<img src="${url}" alt="" onerror="this.parentElement.innerHTML='🖼';">`;
+        }
+    </script>
+</body>
+</html>

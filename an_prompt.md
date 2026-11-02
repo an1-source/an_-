@@ -205,3 +205,12 @@ index.html要包括之前所有做的网页，新建的也要保存到里面
 1.完成17-1.html，展示json
 
 2.完成17-2.html，获取一个数据的接口并展示，接口可以跨域访问
+
+---
+
+**时间**: 2026-11-02
+**模型**: Seed-Code
+**提示词**: 
+
+重新完成17-2.html 获取一个接口的数据并展示。接口可以跨域访问。使用fetch和原生代码实现。
+完成17-3.html 和17-3-detail.html,显示列表和列表详情，数据来源于接口，使用fetch 列表：https://dummyjson.com/products?limit=8 详情：https://dummyjson.com/products/1
