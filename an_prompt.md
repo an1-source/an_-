@@ -214,3 +214,11 @@ index.html要包括之前所有做的网页，新建的也要保存到里面
 
 重新完成17-2.html 获取一个接口的数据并展示。接口可以跨域访问。使用fetch和原生代码实现。
 完成17-3.html 和17-3-detail.html,显示列表和列表详情，数据来源于接口，使用fetch 列表：https://dummyjson.com/products?limit=8 详情：https://dummyjson.com/products/1
+
+---
+
+**时间**: 2026-11-02
+**模型**: Seed-Code
+**提示词**: 
+
+完成17-4.html对远程数据接口进行测试，支持get、post等，显示返回的数据和错误提示信息，示例post接口：https://jsonplaceholder.typicode.com/posts
