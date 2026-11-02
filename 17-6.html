@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-02 | 模型：Seed-Code | 功能：Promise + async/await 异步流程演示 —— 包饺子 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-6 包饺子 · Promise 异步流程</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            min-height: 100vh;
+            padding: 28px 20px;
+        }
+        .an_back {
+            display: inline-block; color: #fff; text-decoration: none;
+            margin-bottom: 16px; font-size: 14px;
+            background: rgba(255,255,255,0.22);
+            padding: 6px 14px; border-radius: 20px;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.38); }
+        .an_container { max-width: 1000px; margin: 0 auto; color: #333; }
+        .an_header { text-align: center; color: #fff; margin-bottom: 22px; }
+        .an_header h1 { font-size: 28px; margin-bottom: 6px; }
+        .an_header p { font-size: 13px; opacity: 0.9; }
+
+        .an_card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .an_card h3 { color: #ff5e62; font-size: 17px; margin-bottom: 10px; }
+
+        /* 流程图 */
+        .an_flow {
+            display: flex; flex-direction: column; align-items: center; gap: 0;
+            margin: 14px 0;
+        }
+        .an_flow-step {
+            width: 100%;
+            max-width: 420px;
+            background: #fff;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 0;
+            text-align: center;
+            font-size: 14px;
+            color: #999;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+        .an_flow-step .an_time { font-size: 11px; color: #bbb; display: block; margin-top: 3px; }
+        .an_flow-step.active {
+            border-color: #ff9966;
+            background: linear-gradient(135deg, #fff0e6, #ffe0d0);
+            color: #ff5e62;
+            font-weight: bold;
+            transform: scale(1.05);
+            box-shadow: 0 4px 14px rgba(255,94,98,0.25);
+        }
+        .an_flow-step.done {
+            border-color: #27ae60;
+            background: #eafaf1;
+            color: #27ae60;
+        }
+        .an_flow-step .an_done-icon { display: none; }
+        .an_flow-step.done .an_done-icon { display: inline; }
+
+        .an_arrow {
+            width: 2px; height: 18px;
+            background: #ddd; margin: 0;
+        }
+        .an_arrow.active { background: #ff5e62; }
+        .an_arrow.done { background: #27ae60; }
+
+        /* 并行分支 */
+        .an_parallel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            width: 100%; max-width: 520px;
+            margin: 0 auto;
+        }
+        .an_parallel .an_flow-step { max-width: none; margin-bottom: 0; }
+        .an_parallel-label {
+            text-align: center;
+            font-size: 11px;
+            color: #888;
+            margin: 4px 0;
+            padding: 2px 8px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .an_btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+        .an_btn {
+            border: none; padding: 9px 22px; border-radius: 6px; cursor: pointer;
+            font-size: 13px; font-weight: bold; color: #fff;
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            transition: transform 0.15s, opacity 0.2s;
+        }
+        .an_btn:hover { transform: translateY(-1px); }
+        .an_btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .an_btn.ghost { background: #ecf0f1; color: #ff5e62; }
+
+        .an_log {
+            background: #1e1e2e; color: #cdd6f4;
+            padding: 14px 16px; border-radius: 8px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12.5px; line-height: 1.8;
+            max-height: 260px; overflow-y: auto;
+            margin-top: 14px;
+        }
+        .an_log .an_line.ok   { color: #a6e3a1; }
+        .an_log .an_line.warn { color: #f9e2af; }
+        .an_log .an_line.err  { color: #f38ba8; }
+        .an_log .an_line.info { color: #89b4fa; }
+
+        .an_code {
+            background: #1e1e2e; color: #cdd6f4;
+            padding: 14px 16px; border-radius: 8px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px; line-height: 1.7;
+            overflow-x: auto; white-space: pre-wrap; word-break: break-all;
+        }
+
+        .an_timeline-title {
+            color: #fff; font-size: 20px; font-weight: bold;
+            margin: 10px 0 14px; padding-left: 12px;
+            border-left: 4px solid #fff;
+        }
+
+        .an_footer { text-align: center; color: #fff; opacity: 0.55; font-size: 12px; margin-top: 18px; }
+    </style>
+</head>
+<body>
+    <div class="an_container">
+        <a class="an_back" href="index.html">← 返回首页</a>
+        <div class="an_header">
+            <h1>🥟 包饺子异步流程</h1>
+            <p>Promise + async/await + Promise.all 演示：线性等待 + 并行执行</p>
+        </div>
+
+        <div class="an_timeline-title">流程时间线</div>
+        <div class="an_card">
+            <div class="an_flow" id="an_flow">
+                <div class="an_flow-step" data-key="buy">
+                    🛒 买原料 <span class="an_time">setTimeout · 6s</span>
+                </div>
+                <div class="an_arrow" id="an_arrow1"></div>
+
+                <div class="an_flow-step" data-key="gather">
+                    🧺 取原料 <span class="an_time">setTimeout · 2s</span>
+                </div>
+                <div class="an_arrow" id="an_arrow2"></div>
+
+                <div>
+                    <span class="an_parallel-label">▼ 并行执行 Promise.all ▼</span>
+                    <div class="an_parallel">
+                        <div class="an_flow-step" data-key="dough">
+                            🍞 和面 <span class="an_time">setTimeout · 3s</span>
+                        </div>
+                        <div class="an_flow-step" data-key="fill">
+                            🥕 做馅 <span class="an_time">setTimeout · 4s</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="an_arrow" id="an_arrow3"></div>
+
+                <div class="an_flow-step" data-key="wrap">
+                    🥟 包饺子 <span class="an_time">setTimeout · 5s</span>
+                </div>
+                <div class="an_arrow" id="an_arrow4"></div>
+
+                <div class="an_flow-step" data-key="eat">
+                    😋 吃饺子 <span class="an_time">setTimeout · 3s</span>
+                </div>
+            </div>
+
+            <div class="an_btn-row">
+                <button class="an_btn" id="an_runBtn" onclick="an_run()">▶ 启动包饺子全流程</button>
+                <button class="an_btn ghost" onclick="an_reset()">🔄 重置</button>
+            </div>
+        </div>
+
+        <!-- 日志 -->
+        <div class="an_card">
+            <h3>运行日志（实时更新）</h3>
+            <div class="an_log" id="an_log">（等待启动）</div>
+        </div>
+
+        <!-- 源码 -->
+        <div class="an_card">
+            <h3>核心代码（简化版）</h3>
+            <pre class="an_code">// 通用包装：把 setTimeout 变成 Promise
+function an_delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// 每个步骤都是异步函数，返回自己的名字 + 耗时
+async function an_doStep(name, ms) {
+    an_highlight(name, "active");
+    await an_delay(ms);
+    an_highlight(name, "done");
+    return { name, ms };
+}
+
+// 主流程
+async function an_run() {
+    // 1️⃣ 2️⃣ 顺序等待
+    await an_doStep("buy",    6000);   // 买原料 6s
+    await an_doStep("gather", 2000);   // 取原料 2s
+
+    // 3️⃣ 并行！和面和馅同时开始，取最长的那个完成
+    await Promise.all([
+        an_doStep("dough", 3000),      // 和面 3s
+        an_doStep("fill",  4000),      // 做馅 4s
+    ]);  // 实际用了 4s（不是 3+4=7s）
+
+    // 4️⃣ 5️⃣ 继续顺序
+    await an_doStep("wrap",  5000);    // 包饺子 5s
+    await an_doStep("eat",   3000);    // 吃饺子 3s
+}</pre>
+        </div>
+
+        <div class="an_footer">— Promise / async-await Demo · 安家成 —</div>
+    </div>
+
+    <script>
+        // ========= 工具 =========
+        function an_delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function an_highlight(key, cls) {
+            // 所有 key 对应的步骤节点
+            document.querySelectorAll('.an_flow-step[data-key="' + key + '"]').forEach(el => {
+                el.classList.remove("active", "done");
+                if (cls) el.classList.add(cls);
+            });
+            // 箭头（按 step 顺序关联）
+            const arrowMap = { buy: "an_arrow1", gather: "an_arrow2", dough: "an_arrow3", fill: "an_arrow3", wrap: "an_arrow4" };
+            const arrowId = arrowMap[key];
+            if (arrowId) {
+                const arrow = document.getElementById(arrowId);
+                if (cls === "active") arrow.classList.add("active");
+                else if (cls === "done") arrow.classList.add("done");
+            }
+        }
+
+        function an_log(msg, cls) {
+            const el = document.getElementById("an_log");
+            if (el.textContent === "（等待启动）") el.textContent = "";
+            const div = document.createElement("div");
+            div.className = "an_line" + (cls ? " " + cls : "");
+            const time = new Date().toLocaleTimeString();
+            div.textContent = "[" + time + "] " + msg;
+            el.appendChild(div);
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function an_stepLabel(key) {
+            const map = {
+                buy: "🛒 买原料", gather: "🧺 取原料",
+                dough: "🍞 和面", fill: "🥕 做馅",
+                wrap: "🥟 包饺子", eat: "😋 吃饺子"
+            };
+            return map[key] || key;
+        }
+
+        // 通用步骤函数
+        async function an_doStep(key, ms, note) {
+            an_highlight(key, "active");
+            an_log("▶ 开始：" + an_stepLabel(key) + "（预计 " + (ms/1000) + "s）", "info");
+            const start = Date.now();
+            await an_delay(ms);
+            const took = Date.now() - start;
+            an_highlight(key, "done");
+            an_log("✅ 完成：" + an_stepLabel(key) + "（用时 " + (took/1000).toFixed(1) + "s）", "ok");
+            if (note) an_log("   ↳ " + note, "info");
+            return { key, ms };
+        }
+
+        // ========= 主流程 =========
+        let an_running = false;
+        async function an_run() {
+            if (an_running) { an_log("⚠️ 流程正在进行中，请等它跑完", "warn"); return; }
+            an_running = true;
+            document.getElementById("an_runBtn").disabled = true;
+            an_log("🚀 包饺子流程启动！");
+            an_log("────────────────────────────────");
+            const totalStart = Date.now();
+
+            try {
+                // 1. 买原料 6s
+                await an_doStep("buy", 6000, "→ 从菜市场买到面粉、猪肉、白菜");
+                an_log("   🔗 串行：下一步必须等上一步完成", "info");
+
+                // 2. 取原料 2s
+                await an_doStep("gather", 2000, "→ 把原料从门口搬到厨房");
+                an_log("   🔗 接下来进入【并行】阶段！和面和馅同时开始", "info");
+
+                // 3. 并行：和面 + 做馅
+                const p_dough = an_doStep("dough", 3000, "→ 面团揉好了");
+                const p_fill  = an_doStep("fill",  4000, "→ 肉馅调好了（用时最长，决定并行总时长）");
+                await Promise.all([p_dough, p_fill]);
+                an_log("   ✨ Promise.all 完成！并行阶段实际用了 ~4s（不是 3+4=7s）", "ok");
+
+                // 4. 包饺子 5s
+                await an_doStep("wrap", 5000, "→ 捏了满满一大盘 🥟");
+
+                // 5. 吃饺子 3s
+                await an_doStep("eat", 3000, "→ 嗯~ 真香！");
+
+                const total = ((Date.now() - totalStart) / 1000).toFixed(1);
+                an_log("────────────────────────────────");
+                an_log("🎉 全部搞定！总耗时 " + total + " 秒", "ok");
+                an_log("   💡 如果串行做所有事要 6+2+3+4+5+3 = 23s", "info");
+                an_log("      用了 Promise.all 并行后只花了 ≈ " + total + "s，省了近一半！", "ok");
+            } catch (e) {
+                an_log("❌ 流程中断：" + e.message, "err");
+            } finally {
+                an_running = false;
+                document.getElementById("an_runBtn").disabled = false;
+            }
+        }
+
+        function an_reset() {
+            // 清样式
+            document.querySelectorAll(".an_flow-step").forEach(el => el.classList.remove("active", "done"));
+            document.querySelectorAll(".an_arrow").forEach(el => el.classList.remove("active", "done"));
+            // 清日志
+            document.getElementById("an_log").textContent = "（已重置，点击启动重新开始）";
+        }
+    </script>
+</body>
+</html>
