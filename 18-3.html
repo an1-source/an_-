@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-05 | 模型：Seed-Code | 功能：SVG 科研方向知识库智能客服系统架构图 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-3 科研方向知识库智能客服架构</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #0c1426 0%, #1a2744 50%, #0c1426 100%);
+            min-height: 100vh;
+            padding: 24px 16px 40px;
+            color: #e2e8f0;
+        }
+        .an_back {
+            display: inline-block; color: #fff; text-decoration: none;
+            margin-bottom: 16px; font-size: 14px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px; border-radius: 20px;
+            transition: background 0.2s;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.3); }
+
+        .an_header { text-align: center; margin-bottom: 20px; }
+        .an_header h1 { font-size: 26px; color: #fff; margin-bottom: 6px; }
+        .an_header p { font-size: 13px; color: rgba(255,255,255,0.7); }
+        .an_header .an_en { font-family: Georgia, serif; font-style: italic; color: #8896b3; font-size: 12px; margin-top: 4px; }
+
+        .an_wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+            padding: 16px;
+            overflow: hidden;
+        }
+        svg#an_arch {
+            display: block;
+            width: 100%;
+            height: auto;
+            cursor: default;
+        }
+        svg#an_arch a { cursor: pointer; }
+
+        /* SVG 内部样式（通过 class） */
+        .an-box         { rx: 10; ry: 10; stroke-width: 1.2; cursor: pointer; transition: filter 0.2s; }
+        .an-box:hover   { filter: brightness(1.15) drop-shadow(0 4px 6px rgba(0,0,0,0.25)); stroke-width: 2; }
+        .an-layer-box   { rx: 12; ry: 12; stroke-width: 1.4; stroke-dasharray: 6 3; opacity: 0.35; }
+        .an-arrow       { fill: none; stroke-width: 1.4; }
+        .an-arrow-label { font-family: "Microsoft YaHei", sans-serif; font-size: 10px; fill: #64748b; }
+        .an-title       { font-family: "Microsoft YaHei", sans-serif; font-size: 13px; font-weight: bold; fill: #1e293b; }
+        .an-desc        { font-family: "Microsoft YaHei", sans-serif; font-size: 10.5px; fill: #475569; }
+        .an-layer-name  { font-family: "Microsoft YaHei", sans-serif; font-size: 15px; font-weight: bold; }
+        .an-tag         { font-family: "Consolas", monospace; font-size: 9px; fill: #6366f1; }
+
+        .an_tools {
+            max-width: 1280px; margin: 14px auto 0;
+            display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+        }
+        .an_tools button {
+            background: rgba(255,255,255,0.12); color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 14px; padding: 5px 14px; font-size: 12px; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .an_tools button:hover { background: rgba(255,255,255,0.28); }
+
+        .an_caption {
+            max-width: 1280px; margin: 18px auto 0;
+            font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.9;
+            text-align: center;
+        }
+        .an_caption b { color: #a5b4fc; }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">← 返回首页</a>
+
+    <div class="an_header">
+        <h1>📚 科研方向 · 基于知识库的智能客服系统架构</h1>
+        <p>Knowledge-Base Grounded Intelligent Customer Service System (Research-Oriented)</p>
+        <div class="an_en">Embedding · RAG · Graph · Retrieval-Augmented Generation · Human-in-the-Loop</div>
+    </div>
+
+    <div class="an_wrap">
+        <!-- SVG 架构图 -->
+        <svg id="an_arch" viewBox="0 0 1200 980" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- 箭头 -->
+                <marker id="an_arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+                </marker>
+                <marker id="an_arr-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/>
+                </marker>
+                <marker id="an_arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+                </marker>
+                <marker id="an_arr-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b5cf6"/>
+                </marker>
+                <marker id="an_arr-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/>
+                </marker>
+
+                <!-- 盒子渐变 -->
+                <linearGradient id="g-client" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#dbeafe"/><stop offset="100%" stop-color="#bfdbfe"/>
+                </linearGradient>
+                <linearGradient id="g-gw" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#fce7f3"/><stop offset="100%" stop-color="#fbcfe8"/>
+                </linearGradient>
+                <linearGradient id="g-core" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#e0f2fe"/><stop offset="100%" stop-color="#bae6fd"/>
+                </linearGradient>
+                <linearGradient id="g-ai" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ede9fe"/><stop offset="100%" stop-color="#ddd6fe"/>
+                </linearGradient>
+                <linearGradient id="g-kb" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#dcfce7"/><stop offset="100%" stop-color="#bbf7d0"/>
+                </linearGradient>
+                <linearGradient id="g-res" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#fef3c7"/><stop offset="100%" stop-color="#fde68a"/>
+                </linearGradient>
+                <linearGradient id="g-research" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#f1f5f9"/><stop offset="100%" stop-color="#cbd5e1"/>
+                </linearGradient>
+            </defs>
+
+            <!-- ====== 背景层 ====== -->
+            <!-- ① 用户交互层 -->
+            <rect class="an-layer-box" x="20" y="15" width="1160" height="115" fill="#dbeafe" stroke="#3b82f6"/>
+            <text class="an-layer-name" x="35" y="40" fill="#1e40af">① 用户交互层 · Interaction</text>
+
+            <!-- ② 网关层 -->
+            <rect class="an-layer-box" x="20" y="145" width="1160" height="80" fill="#fce7f3" stroke="#ec4899"/>
+            <text class="an-layer-name" x="35" y="170" fill="#9d174d">② 网关与安全层 · Gateway & Security</text>
+
+            <!-- ③ 核心服务层 -->
+            <rect class="an-layer-box" x="20" y="245" width="1160" height="155" fill="#e0f2fe" stroke="#0ea5e9"/>
+            <text class="an-layer-name" x="35" y="270" fill="#075985">③ 核心服务层 · Core Service</text>
+
+            <!-- ④ AI 模型层 -->
+            <rect class="an-layer-box" x="20" y="415" width="1160" height="115" fill="#ede9fe" stroke="#8b5cf6"/>
+            <text class="an-layer-name" x="35" y="440" fill="#5b21b6">④ AI 模型层 · Foundation Models</text>
+
+            <!-- ⑤ 知识库与检索层 -->
+            <rect class="an-layer-box" x="20" y="545" width="1160" height="115" fill="#dcfce7" stroke="#22c55e"/>
+            <text class="an-layer-name" x="35" y="570" fill="#166534">⑤ 知识库与检索层 · Knowledge Base & Retrieval</text>
+
+            <!-- ⑥ 基础设施层 -->
+            <rect class="an-layer-box" x="20" y="675" width="1160" height="80" fill="#fef3c7" stroke="#f59e0b"/>
+            <text class="an-layer-name" x="35" y="700" fill="#92400e">⑥ 基础设施层 · Infrastructure</text>
+
+            <!-- ⑦ 科研闭环层（右侧突出） -->
+            <rect class="an-layer-box" x="760" y="770" width="420" height="190" fill="#f1f5f9" stroke="#475569"/>
+            <text class="an-layer-name" x="775" y="795" fill="#1e293b">⑦ 科研闭环层 · Research Loop</text>
+
+            <!-- ====== 箭头：用户 → 网关 ====== -->
+            <path class="an-arrow" stroke="#3b82f6" marker-end="url(#an_arr-blue)" d="M 200 110 L 200 145"/>
+            <path class="an-arrow" stroke="#3b82f6" marker-end="url(#an_arr-blue)" d="M 600 110 L 600 145"/>
+            <path class="an-arrow" stroke="#3b82f6" marker-end="url(#an_arr-blue)" d="M 1000 110 L 1000 145"/>
+
+            <!-- 网关 → 核心（汇总到中间 API Gateway） -->
+            <path class="an-arrow" stroke="#ec4899" marker-end="url(#an_arr)" d="M 200 225 L 600 225 L 600 245"/>
+            <path class="an-arrow" stroke="#ec4899" marker-end="url(#an_arr)" d="M 600 225 L 600 245"/>
+            <path class="an-arrow" stroke="#ec4899" marker-end="url(#an_arr)" d="M 1000 225 L 600 225 L 600 245"/>
+
+            <!-- 核心 → AI -->
+            <path class="an-arrow" stroke="#0ea5e9" marker-end="url(#an_arr-blue)" d="M 300 400 L 300 415"/>
+            <path class="an-arrow" stroke="#0ea5e9" marker-end="url(#an_arr-blue)" d="M 600 400 L 600 415"/>
+            <path class="an-arrow" stroke="#0ea5e9" marker-end="url(#an_arr-blue)" d="M 900 400 L 900 415"/>
+
+            <!-- AI → 知识库 -->
+            <path class="an-arrow" stroke="#8b5cf6" marker-end="url(#an_arr-purple)" d="M 300 530 L 300 545"/>
+            <path class="an-arrow" stroke="#8b5cf6" marker-end="url(#an_arr-purple)" d="M 600 530 L 600 545"/>
+            <path class="an-arrow" stroke="#8b5cf6" marker-end="url(#an_arr-purple)" d="M 900 530 L 900 545"/>
+
+            <!-- 知识库 ← 基础设施（双向支撑虚线） -->
+            <path class="an-arrow" stroke="#f59e0b" stroke-dasharray="5 4" marker-end="url(#an_arr-amber)" d="M 600 660 L 600 675"/>
+
+            <!-- 科研闭环输入：来自历史对话日志 -->
+            <path class="an-arrow" stroke="#475569" stroke-dasharray="4 3" marker-end="url(#an_arr)"
+                  d="M 1090 755 C 1120 755, 1180 770, 1175 770"/>
+            <path class="an-arrow" stroke="#475569" stroke-dasharray="4 3" marker-end="url(#an_arr)"
+                  d="M 950 755 C 980 755, 1010 770, 1020 770"/>
+            <path class="an-arrow" stroke="#475569" stroke-dasharray="4 3" marker-end="url(#an_arr)"
+                  d="M 600 755 C 600 765, 700 770, 800 770"/>
+
+            <!-- ====== 模块：用户交互层 ====== -->
+            <g class="an-module">
+                <rect class="an-box" x="70"  y="55" width="260" height="52" fill="url(#g-client)" stroke="#3b82f6"/>
+                <text class="an-title" x="200" y="78" text-anchor="middle">💻 Web 客服工作台</text>
+                <text class="an-desc" x="200" y="95" text-anchor="middle">浏览器端 · 会话管理 / 转人工 / 质检</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="450" y="55" width="300" height="52" fill="url(#g-client)" stroke="#3b82f6"/>
+                <text class="an-title" x="600" y="78" text-anchor="middle">📱 移动端 & 小程序</text>
+                <text class="an-desc" x="600" y="95" text-anchor="middle">APP / 微信 / 支付宝 · 语音 · 图文 · 富媒体</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="840" y="55" width="300" height="52" fill="url(#g-client)" stroke="#3b82f6"/>
+                <text class="an-title" x="990" y="78" text-anchor="middle">🤖 Bot Platform 接入</text>
+                <text class="an-desc" x="990" y="95" text-anchor="middle">企业微信 / 钉钉 / 飞书 / 开放平台 API</text>
+            </g>
+
+            <!-- ====== 模块：网关层 ====== -->
+            <g class="an-module">
+                <rect class="an-box" x="120" y="170" width="180" height="44" fill="url(#g-gw)" stroke="#ec4899"/>
+                <text class="an-title" x="210" y="190" text-anchor="middle">🛡 WAF + 反爬</text>
+                <text class="an-desc" x="210" y="207" text-anchor="middle">DDoS / 限流 / 签名校验</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="360" y="170" width="180" height="44" fill="url(#g-gw)" stroke="#ec4899"/>
+                <text class="an-title" x="450" y="190" text-anchor="middle">⚖ Nginx 负载均衡</text>
+                <text class="an-desc" x="450" y="207" text-anchor="middle">SSL 终结 / 健康检查</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="600" y="170" width="180" height="44" fill="url(#g-gw)" stroke="#ec4899"/>
+                <text class="an-title" x="690" y="190" text-anchor="middle">🔑 API Gateway</text>
+                <text class="an-desc" x="690" y="207" text-anchor="middle">鉴权 / 路由 / 熔断</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="840" y="170" width="180" height="44" fill="url(#g-gw)" stroke="#ec4899"/>
+                <text class="an-title" x="930" y="190" text-anchor="middle">🗄 会话上下文缓存</text>
+                <text class="an-desc" x="930" y="207" text-anchor="middle">Session / 历史消息</text>
+            </g>
+
+            <!-- ====== 模块：核心服务层 ====== -->
+            <g class="an-module">
+                <rect class="an-box" x="40"  y="285" width="180" height="58" fill="url(#g-core)" stroke="#0ea5e9"/>
+                <text class="an-title" x="130" y="308" text-anchor="middle">💬 会话管理</text>
+                <text class="an-desc" x="130" y="326" text-anchor="middle">多轮上下文 / 窗口截断</text>
+                <text class="an-tag"  x="130" y="341" text-anchor="middle">Session / Memory</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="250" y="285" width="180" height="58" fill="url(#g-core)" stroke="#0ea5e9"/>
+                <text class="an-title" x="340" y="308" text-anchor="middle">🎯 意图识别</text>
+                <text class="an-desc" x="340" y="326" text-anchor="middle">分类 / 槽位填充 / 澄清</text>
+                <text class="an-tag"  x="340" y="341" text-anchor="middle">Intent / NLU</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="460" y="285" width="180" height="58" fill="url(#g-core)" stroke="#0ea5e9"/>
+                <text class="an-title" x="550" y="308" text-anchor="middle">🧠 RAG 编排器</text>
+                <text class="an-desc" x="550" y="326" text-anchor="middle">Query Rewrite → Retriever → Ranker</text>
+                <text class="an-tag"  x="550" y="341" text-anchor="middle">Retrieval-Augmented Gen</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="670" y="285" width="180" height="58" fill="url(#g-core)" stroke="#0ea5e9"/>
+                <text class="an-title" x="760" y="308" text-anchor="middle">⚙️ Prompt 工程</text>
+                <text class="an-desc" x="760" y="326" text-anchor="middle">模板 / CoT / 约束注入</text>
+                <text class="an-tag"  x="760" y="341" text-anchor="middle">System Prompt</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="880" y="285" width="180" height="58" fill="url(#g-core)" stroke="#0ea5e9"/>
+                <text class="an-title" x="970" y="308" text-anchor="middle">🛠 工具调用</text>
+                <text class="an-desc" x="970" y="326" text-anchor="middle">Function Calling / 外部 API</text>
+                <text class="an-tag"  x="970" y="341" text-anchor="middle">Agent</text>
+            </g>
+
+            <!-- 核心层下方三个小模块 -->
+            <g class="an-module">
+                <rect class="an-box" x="40"  y="355" width="240" height="38" fill="url(#g-core)" stroke="#0ea5e9"/>
+                <text class="an-title" x="160" y="379" text-anchor="middle">🔍 检索策略 · Hybrid Search（稠密 + 稀疏 + 重排）</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="320" y="355" width="300" height="38" fill="url(#g-core)" stroke="#0ea5e9"/>
+                <text class="an-title" x="470" y="379" text-anchor="middle">✍️ 答案合成 · LLM 生成 + 引用溯源 + Hallucination 检测</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="670" y="355" width="390" height="38" fill="url(#g-core)" stroke="#0ea5e9"/>
+                <text class="an-title" x="865" y="379" text-anchor="middle">💡 置信度评估 · 触发转人工 / 追问澄清 / 反馈回收</text>
+            </g>
+
+            <!-- ====== 模块：AI 模型层 ====== -->
+            <g class="an-module">
+                <rect class="an-box" x="60"  y="450" width="240" height="60" fill="url(#g-ai)" stroke="#8b5cf6"/>
+                <text class="an-title" x="180" y="474" text-anchor="middle">📐 Embedding 模型</text>
+                <text class="an-desc" x="180" y="492" text-anchor="middle">bge / text-embedding-3 / 自研微调</text>
+                <text class="an-tag"  x="180" y="506" text-anchor="middle">向量表征</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="350" y="450" width="260" height="60" fill="url(#g-ai)" stroke="#8b5cf6"/>
+                <text class="an-title" x="480" y="474" text-anchor="middle">🧠 大语言模型 LLM</text>
+                <text class="an-desc" x="480" y="492" text-anchor="middle">LLaMA3 / Qwen / DeepSeek / Doubao</text>
+                <text class="an-tag"  x="480" y="506" text-anchor="middle">LoRA / 量化 / 推理加速</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="670" y="450" width="240" height="60" fill="url(#g-ai)" stroke="#8b5cf6"/>
+                <text class="an-title" x="790" y="474" text-anchor="middle">📊 Rerank 重排模型</text>
+                <text class="an-desc" x="790" y="492" text-anchor="middle">bge-reranker / CrossEncoder</text>
+                <text class="an-tag"  x="790" y="506" text-anchor="middle">Top-K 精排</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="960" y="450" width="170" height="60" fill="url(#g-ai)" stroke="#8b5cf6"/>
+                <text class="an-title" x="1045" y="474" text-anchor="middle">🎙 多模态</text>
+                <text class="an-desc" x="1045" y="492" text-anchor="middle">ASR / TTS / OCR / VLM</text>
+            </g>
+
+            <!-- ====== 模块：知识库与检索层 ====== -->
+            <g class="an-module">
+                <rect class="an-box" x="40"  y="580" width="220" height="60" fill="url(#g-kb)" stroke="#22c55e"/>
+                <text class="an-title" x="150" y="604" text-anchor="middle">🌲 向量数据库</text>
+                <text class="an-desc" x="150" y="622" text-anchor="middle">Milvus / FAISS / Pinecone / pgvector</text>
+                <text class="an-tag"  x="150" y="636" text-anchor="middle">ANN 近似最近邻检索</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="300" y="580" width="220" height="60" fill="url(#g-kb)" stroke="#22c55e"/>
+                <text class="an-title" x="410" y="604" text-anchor="middle">🕸 知识图谱</text>
+                <text class="an-desc" x="410" y="622" text-anchor="middle">Neo4j / NebulaGraph / 本体建模</text>
+                <text class="an-tag"  x="410" y="636" text-anchor="middle">实体 · 关系 · 规则推理</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="560" y="580" width="220" height="60" fill="url(#g-kb)" stroke="#22c55e"/>
+                <text class="an-title" x="670" y="604" text-anchor="middle">📄 文档存储</text>
+                <text class="an-desc" x="670" y="622" text-anchor="middle">Elasticsearch · OSS · Markdown</text>
+                <text class="an-tag"  x="670" y="636" text-anchor="middle">BM25 关键词召回</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="820" y="580" width="200" height="60" fill="url(#g-kb)" stroke="#22c55e"/>
+                <text class="an-title" x="920" y="604" text-anchor="middle">💾 结构化数据</text>
+                <text class="an-desc" x="920" y="622" text-anchor="middle">MySQL / PostgreSQL</text>
+                <text class="an-tag"  x="920" y="636" text-anchor="middle">FAQ / 工单 / 业务表</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="1050" y="580" width="120" height="60" fill="url(#g-kb)" stroke="#22c55e"/>
+                <text class="an-title" x="1110" y="604" text-anchor="middle">🗂 索引构建</text>
+                <text class="an-desc" x="1110" y="622" text-anchor="middle">ETL / 增量更新</text>
+            </g>
+
+            <!-- ====== 模块：基础设施层 ====== -->
+            <g class="an-module">
+                <rect class="an-box" x="80"  y="700" width="220" height="42" fill="url(#g-res)" stroke="#f59e0b"/>
+                <text class="an-title" x="190" y="720" text-anchor="middle">📡 消息队列 Kafka / RocketMQ</text>
+                <text class="an-desc" x="190" y="736" text-anchor="middle">异步解耦 · 削峰填谷</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="340" y="700" width="220" height="42" fill="url(#g-res)" stroke="#f59e0b"/>
+                <text class="an-title" x="450" y="720" text-anchor="middle">🔗 Redis 分布式缓存</text>
+                <text class="an-desc" x="450" y="736" text-anchor="middle">热点问题 / FAQ 命中</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="600" y="700" width="220" height="42" fill="url(#g-res)" stroke="#f59e0b"/>
+                <text class="an-title" x="710" y="720" text-anchor="middle">☸ Docker + Kubernetes</text>
+                <text class="an-desc" x="710" y="736" text-anchor="middle">弹性伸缩 · GPU 调度</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="860" y="700" width="280" height="42" fill="url(#g-res)" stroke="#f59e0b"/>
+                <text class="an-title" x="1000" y="720" text-anchor="middle">📈 Prometheus + Grafana</text>
+                <text class="an-desc" x="1000" y="736" text-anchor="middle">可观测性 · 延迟 / 命中率 / 满意度</text>
+            </g>
+
+            <!-- ====== 科研闭环层 ====== -->
+            <g class="an-module">
+                <rect class="an-box" x="785" y="810" width="175" height="48" fill="url(#g-research)" stroke="#475569"/>
+                <text class="an-title" x="872" y="831" text-anchor="middle">📋 数据集管理</text>
+                <text class="an-desc" x="872" y="848" text-anchor="middle">对话日志 · 人工标注</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="985" y="810" width="175" height="48" fill="url(#g-research)" stroke="#475569"/>
+                <text class="an-title" x="1072" y="831" text-anchor="middle">🧪 离线评测</text>
+                <text class="an-desc" x="1072" y="848" text-anchor="middle">BLEU / ROUGE / RAGAS / LLM-as-Judge</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="785" y="870" width="175" height="48" fill="url(#g-research)" stroke="#475569"/>
+                <text class="an-title" x="872" y="891" text-anchor="middle">🔧 模型微调</text>
+                <text class="an-desc" x="872" y="908" text-anchor="middle">SFT / LoRA / 领域对齐</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="985" y="870" width="175" height="48" fill="url(#g-research)" stroke="#475569"/>
+                <text class="an-title" x="1072" y="891" text-anchor="middle">🧑‍🔬 A/B 实验平台</text>
+                <text class="an-desc" x="1072" y="908" text-anchor="middle">Prompt / 检索 / 模型版本对比</text>
+            </g>
+            <g class="an-module">
+                <rect class="an-box" x="785" y="925" width="375" height="30" fill="url(#g-research)" stroke="#475569"/>
+                <text class="an-title" x="972" y="945" text-anchor="middle">🔁 Human-in-the-Loop · 反馈回流 → 持续迭代</text>
+            </g>
+
+            <!-- 科研闭环内部箭头 -->
+            <path class="an-arrow" stroke="#475569" marker-end="url(#an_arr)" d="M 872 858 L 872 870"/>
+            <path class="an-arrow" stroke="#475569" marker-end="url(#an_arr)" d="M 1072 858 L 1072 870"/>
+            <path class="an-arrow" stroke="#475569" marker-end="url(#an_arr)" d="M 972 918 L 972 925"/>
+
+            <!-- ========= 主流程文字标注 ========= -->
+            <text class="an-arrow-label" x="207" y="133" text-anchor="middle">用户请求</text>
+            <text class="an-arrow-label" x="575" y="238" text-anchor="middle">鉴权 / 路由</text>
+            <text class="an-arrow-label" x="255" y="410" text-anchor="middle">Query → Prompt</text>
+            <text class="an-arrow-label" x="295" y="538" text-anchor="middle">Embedding / 生成</text>
+            <text class="an-arrow-label" x="525" y="668" text-anchor="middle">CRUD / 检索</text>
+
+            <!-- 版本 / 页脚 -->
+            <text x="600" y="970" text-anchor="middle" font-size="11" fill="#94a3b8" font-family="Microsoft YaHei">
+                图 3-1  基于知识库的智能客服系统总体架构  |  安家成 · 2026
+            </text>
+        </svg>
+    </div>
+
+    <div class="an_tools">
+        <button onclick="an_exportSvg()">📥 下载 SVG 源文件</button>
+        <button onclick="an_exportPng()">🖼 下载 PNG 图片</button>
+    </div>
+
+    <div class="an_caption">
+        本架构遵循 <b>分层解耦 · RAG 增强 · 人机协同</b> 三项核心设计原则。
+        核心创新点在于将 <b>向量检索 + 关键词检索 + 知识图谱推理</b> 三者融合，并通过
+        <b>Human-in-the-Loop</b> 闭环持续优化检索召回率与答案忠实度，形成科研场景下的可迭代智能客服范式。
+    </div>
+
+    <script>
+        function an_exportSvg() {
+            const el = document.getElementById("an_arch");
+            const serializer = new XMLSerializer();
+            const src = '<?xml version="1.0" encoding="UTF-8"?>\n' + serializer.serializeToString(el);
+            const blob = new Blob([src], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url; a.download = "智能客服架构图-安家成.svg";
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function an_exportPng() {
+            const svg = document.getElementById("an_arch");
+            const serializer = new XMLSerializer();
+            const src = '<?xml version="1.0" encoding="UTF-8"?>\n' + serializer.serializeToString(svg);
+            const svgBlob = new Blob([src], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(svgBlob);
+
+            const img = new Image();
+            img.onload = () => {
+                const scale = 2; // 2x 高清
+                const w = svg.viewBox.baseVal.width * scale;
+                const h = svg.viewBox.baseVal.height * scale;
+                const canvas = document.createElement("canvas");
+                canvas.width = w; canvas.height = h;
+                const ctx = canvas.getContext("2d");
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, w, h);
+                ctx.drawImage(img, 0, 0, w, h);
+                URL.revokeObjectURL(url);
+
+                const a = document.createElement("a");
+                a.href = canvas.toDataURL("image/png");
+                a.download = "智能客服架构图-安家成.png";
+                a.click();
+            };
+            img.src = url;
+        }
+    </script>
+</body>
+</html>
