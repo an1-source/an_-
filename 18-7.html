@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-05 | 模型：Seed-Code | 功能：Three.js 两个 3D 场景（本地 cdn） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-7 Three.js 3D 场景</title>
+    <script src="cdn/three.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b, #312e81);
+            min-height: 100vh;
+            padding: 24px 18px 40px;
+            color: #e2e8f0;
+        }
+        .an_back {
+            display: inline-block; color: #fff; text-decoration: none;
+            margin-bottom: 16px; font-size: 14px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px; border-radius: 20px;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.3); }
+        .an_header { text-align: center; margin-bottom: 22px; }
+        .an_header h1 { font-size: 26px; color: #fff; margin-bottom: 6px; }
+        .an_header p { font-size: 13px; color: rgba(255,255,255,0.7); }
+        .an_header code { background: rgba(255,255,255,0.15); padding: 1px 8px; border-radius: 4px; font-size: 11px; }
+
+        .an_container { max-width: 1100px; margin: 0 auto; }
+
+        .an_scene {
+            background: #000;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 14px 34px rgba(0,0,0,0.5);
+            margin-bottom: 24px;
+        }
+        .an_scene-header {
+            padding: 14px 20px;
+            background: rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .an_scene-title {
+            font-size: 15px; font-weight: bold; color: #fff;
+        }
+        .an_scene-sub {
+            font-size: 11px; color: rgba(255,255,255,0.55);
+            margin-top: 2px;
+        }
+        .an_canvas-wrap {
+            position: relative;
+            width: 100%;
+            height: 460px;
+        }
+        .an_canvas-wrap canvas {
+            display: block;
+            width: 100%; height: 100%;
+        }
+        .an_scene-hint {
+            position: absolute;
+            bottom: 10px; right: 14px;
+            background: rgba(0,0,0,0.55);
+            color: #fff; font-size: 10px; padding: 3px 10px;
+            border-radius: 10px; pointer-events: none;
+        }
+        .an_controls {
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        .an_controls button {
+            background: rgba(255,255,255,0.12); color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 14px; padding: 4px 12px; font-size: 11px; cursor: pointer;
+        }
+        .an_controls button:hover { background: rgba(255,255,255,0.28); }
+        .an_controls button.active { background: #818cf8; color: #1e1b4b; border-color: #818cf8; font-weight: bold; }
+
+        .an_footer { text-align: center; color: rgba(255,255,255,0.45); font-size: 12px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="an_container">
+        <a class="an_back" href="index.html">← 返回首页</a>
+        <div class="an_header">
+            <h1>🎲 Three.js 3D 场景</h1>
+            <p>库文件：<code>cdn/three.min.js</code>（本地离线） · 版本：Three.js r160</p>
+        </div>
+
+        <!-- ===== 场景 ① 旋转彩色立方体阵列 ===== -->
+        <div class="an_scene">
+            <div class="an_scene-header">
+                <div>
+                    <div class="an_scene-title">场景 ① 旋转彩色立方体阵列</div>
+                    <div class="an_scene-sub">BoxGeometry 阵列 + PhongMaterial 光照 + 自动旋转动画</div>
+                </div>
+                <div class="an_controls" id="an_ctrl1">
+                    <button class="active" onclick="an_scene1Set('cube')">立方体</button>
+                    <button onclick="an_scene1Set('sphere')">球体</button>
+                    <button onclick="an_scene1Set('torus')">圆环</button>
+                    <button onclick="an_scene1Set('ico')">二十面体</button>
+                </div>
+            </div>
+            <div class="an_canvas-wrap" id="an_scene1">
+                <div class="an_scene-hint">🖱 拖拽旋转 · 滚轮缩放</div>
+            </div>
+        </div>
+
+        <!-- ===== 场景 ② 粒子星空 ===== -->
+        <div class="an_scene">
+            <div class="an_scene-header">
+                <div>
+                    <div class="an_scene-title">场景 ② 旋转粒子星空</div>
+                    <div class="an_scene-sub">Points + BufferGeometry 10000 粒子 · 地球轨道漂浮</div>
+                </div>
+                <div class="an_controls" id="an_ctrl2">
+                    <button class="active" onclick="an_scene2Speed(0.2)">慢速</button>
+                    <button onclick="an_scene2Speed(0.6)">正常</button>
+                    <button onclick="an_scene2Speed(1.5)">快速</button>
+                </div>
+            </div>
+            <div class="an_canvas-wrap" id="an_scene2">
+                <div class="an_scene-hint">🖱 拖拽旋转 · 滚轮缩放</div>
+            </div>
+        </div>
+
+        <div class="an_footer">— Three.js r160 · 本地离线 · 安家成 —</div>
+    </div>
+
+    <script>
+        // ================================================================
+        // 场景 ① 彩色几何体阵列（OrbitControls-like 实现）
+        // ================================================================
+        (function an_scene1() {
+            const container = document.getElementById("an_scene1");
+            const w = container.clientWidth, h = container.clientHeight;
+
+            // 场景 + 相机 + 渲染器
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0b1221);
+
+            const camera = new THREE.PerspectiveCamera(55, w / h, 0.1, 2000);
+            camera.position.set(9, 8, 12);
+            camera.lookAt(0, 0, 0);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(w, h);
+            container.appendChild(renderer.domElement);
+
+            // 灯光
+            const ambient = new THREE.AmbientLight(0xffffff, 0.35);
+            scene.add(ambient);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+            dirLight.position.set(6, 10, 6);
+            scene.add(dirLight);
+            const pointLight = new THREE.PointLight(0x818cf8, 0.8, 30);
+            pointLight.position.set(-5, 4, -5);
+            scene.add(pointLight);
+
+            // 地面网格
+            const grid = new THREE.GridHelper(20, 20, 0x1e40af, 0x1e293b);
+            scene.add(grid);
+
+            // 轨道控制（简化版 OrbitControls，r160 自带在 three.min.js 是 ESM，这里手写）
+            let an_isDragging = false;
+            let an_lastX = 0, an_lastY = 0;
+            let an_theta = 0.8, an_phi = 1.0, an_radius = 16;
+            let an_target = new THREE.Vector3(0, 0, 0);
+            function an_updateCamera() {
+                const cx = an_target.x + an_radius * Math.sin(an_phi) * Math.sin(an_theta);
+                const cy = an_target.y + an_radius * Math.cos(an_phi);
+                const cz = an_target.z + an_radius * Math.sin(an_phi) * Math.cos(an_theta);
+                camera.position.set(cx, cy, cz);
+                camera.lookAt(an_target);
+            }
+            renderer.domElement.addEventListener("mousedown", e => { an_isDragging = true; an_lastX = e.clientX; an_lastY = e.clientY; });
+            window.addEventListener("mouseup", () => an_isDragging = false);
+            window.addEventListener("mousemove", e => {
+                if (!an_isDragging) return;
+                const dx = e.clientX - an_lastX, dy = e.clientY - an_lastY;
+                an_theta -= dx * 0.006;
+                an_phi   -= dy * 0.006;
+                an_phi = Math.max(0.15, Math.min(Math.PI - 0.15, an_phi));
+                an_lastX = e.clientX; an_lastY = e.clientY;
+                an_updateCamera();
+            });
+            renderer.domElement.addEventListener("wheel", e => {
+                e.preventDefault();
+                an_radius *= (1 + e.deltaY * 0.001);
+                an_radius = Math.max(5, Math.min(40, an_radius));
+                an_updateCamera();
+            }, { passive: false });
+
+            // ===== 几何体阵列（4x4） =====
+            let an_group = new THREE.Group();
+            scene.add(an_group);
+
+            function an_makeMat(i, j) {
+                const hue = (i * 4 + j * 5) / 16 * 0.85;
+                const color = new THREE.Color().setHSL(hue, 0.75, 0.55);
+                return new THREE.MeshPhongMaterial({ color, shininess: 80, specular: 0x333333 });
+            }
+
+            function an_rebuild(shape) {
+                // 清掉旧的
+                scene.remove(an_group);
+                an_group.traverse(obj => {
+                    if (obj.geometry) obj.geometry.dispose();
+                    if (obj.material) obj.material.dispose();
+                });
+                an_group = new THREE.Group();
+                const N = 4;
+                const step = 2.2;
+                for (let i = 0; i < N; i++) {
+                    for (let j = 0; j < N; j++) {
+                        let geo;
+                        switch (shape) {
+                            case "sphere": geo = new THREE.SphereGeometry(0.7, 32, 16); break;
+                            case "torus":  geo = new THREE.TorusGeometry(0.6, 0.22, 16, 48); break;
+                            case "ico":    geo = new THREE.IcosahedronGeometry(0.75, 0); break;
+                            default:       geo = new THREE.BoxGeometry(1.2, 1.2, 1.2);
+                        }
+                        const mesh = new THREE.Mesh(geo, an_makeMat(i, j));
+                        mesh.position.x = (i - (N - 1) / 2) * step;
+                        mesh.position.z = (j - (N - 1) / 2) * step;
+                        mesh.position.y = Math.sin((i + j) * 0.6) * 0.4;
+                        mesh.userData.baseY = mesh.position.y;
+                        mesh.userData.speed = 0.5 + Math.random() * 1.2;
+                        an_group.add(mesh);
+                    }
+                }
+                scene.add(an_group);
+            }
+            an_rebuild("cube");
+
+            window.an_scene1Set = function(shape) {
+                document.querySelectorAll("#an_ctrl1 button").forEach(b => b.classList.remove("active"));
+                event.target.classList.add("active");
+                an_rebuild(shape);
+            };
+
+            // 动画
+            const clock = new THREE.Clock();
+            function an_animate() {
+                requestAnimationFrame(an_animate);
+                const t = clock.getElapsedTime();
+                an_group.rotation.y = t * 0.25;
+                an_group.children.forEach(mesh => {
+                    mesh.rotation.x += 0.01;
+                    mesh.rotation.y += 0.012;
+                    mesh.position.y = mesh.userData.baseY + Math.sin(t * mesh.userData.speed) * 0.25;
+                });
+                renderer.render(scene, camera);
+            }
+            an_updateCamera();
+            an_animate();
+
+            // 响应式
+            window.addEventListener("resize", () => {
+                const nw = container.clientWidth, nh = container.clientHeight;
+                camera.aspect = nw / nh; camera.updateProjectionMatrix();
+                renderer.setSize(nw, nh);
+            });
+        })();
+
+
+        // ================================================================
+        // 场景 ② 粒子星空 + 地球
+        // ================================================================
+        (function an_scene2() {
+            const container = document.getElementById("an_scene2");
+            const w = container.clientWidth, h = container.clientHeight;
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000810);
+
+            const camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 3000);
+            camera.position.set(0, 0, 30);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(w, h);
+            container.appendChild(renderer.domElement);
+
+            // ========== 星星粒子（环形带） ==========
+            const STARS = 6000;
+            const positions = new Float32Array(STARS * 3);
+            const colors = new Float32Array(STARS * 3);
+            const sizes = new Float32Array(STARS);
+
+            const palette = [
+                new THREE.Color(0xffffff),
+                new THREE.Color(0xa0c4ff),
+                new THREE.Color(0xffd6a0),
+                new THREE.Color(0xffa0a0)
+            ];
+            for (let i = 0; i < STARS; i++) {
+                // 在一个薄球壳上分布
+                const r = 80 + Math.random() * 40;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                positions[i * 3 + 0] = r * Math.sin(phi) * Math.cos(theta);
+                positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+                positions[i * 3 + 2] = r * Math.cos(phi);
+                const c = palette[Math.floor(Math.random() * palette.length)];
+                colors[i * 3 + 0] = c.r;
+                colors[i * 3 + 1] = c.g;
+                colors[i * 3 + 2] = c.b;
+                sizes[i] = Math.random() * 2 + 0.5;
+            }
+            const starGeo = new THREE.BufferGeometry();
+            starGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+            starGeo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+            starGeo.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+
+            // 粒子材质（用 Points，让 size 生效）
+            const starMat = new THREE.PointsMaterial({
+                size: 0.5,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.9,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+            const stars = new THREE.Points(starGeo, starMat);
+            scene.add(stars);
+
+            // ========== 中心 "地球" ==========
+            const earthGeo = new THREE.SphereGeometry(2.5, 48, 32);
+            // 简单的蓝色海洋 + 绿色陆地（用顶点颜色）
+            const ecolors = [];
+            const posAttr = earthGeo.attributes.position;
+            for (let i = 0; i < posAttr.count; i++) {
+                const x = posAttr.getX(i), y = posAttr.getY(i), z = posAttr.getZ(i);
+                // 模拟：接近赤道随机陆地
+                const lat = Math.acos(Math.max(-1, Math.min(1, y / 2.5)));
+                const isLand = (Math.sin(x * 2.1) + Math.cos(z * 1.7) + Math.sin(y * 3.3)) > 0.25;
+                if (isLand) {
+                    ecolors.push(0.25, 0.6, 0.3); // 绿色
+                } else {
+                    ecolors.push(0.1, 0.35, 0.7); // 蓝色
+                }
+            }
+            earthGeo.setAttribute("color", new THREE.Float32BufferAttribute(ecolors, 3));
+            const earthMat = new THREE.MeshPhongMaterial({
+                vertexColors: true, shininess: 40, specular: 0x222222
+            });
+            const earth = new THREE.Mesh(earthGeo, earthMat);
+            scene.add(earth);
+
+            // 大气光环
+            const haloGeo = new THREE.SphereGeometry(2.65, 48, 32);
+            const haloMat = new THREE.MeshBasicMaterial({
+                color: 0x4f9dff, transparent: true, opacity: 0.12, side: THREE.BackSide
+            });
+            const halo = new THREE.Mesh(haloGeo, haloMat);
+            scene.add(halo);
+
+            // ========== 灯光 ==========
+            const ambient = new THREE.AmbientLight(0x404060, 0.6);
+            scene.add(ambient);
+            const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+            sun.position.set(20, 10, 15);
+            scene.add(sun);
+
+            // ========== 轨道控制 ==========
+            let an_isDragging = false;
+            let an_lastX = 0, an_lastY = 0;
+            let an_theta = 0, an_phi = 1.0, an_radius = 30;
+            function an_updateCamera() {
+                const cx = an_radius * Math.sin(an_phi) * Math.sin(an_theta);
+                const cy = an_radius * Math.cos(an_phi);
+                const cz = an_radius * Math.sin(an_phi) * Math.cos(an_theta);
+                camera.position.set(cx, cy, cz);
+                camera.lookAt(0, 0, 0);
+            }
+            renderer.domElement.addEventListener("mousedown", e => { an_isDragging = true; an_lastX = e.clientX; an_lastY = e.clientY; });
+            window.addEventListener("mouseup", () => an_isDragging = false);
+            window.addEventListener("mousemove", e => {
+                if (!an_isDragging) return;
+                const dx = e.clientX - an_lastX, dy = e.clientY - an_lastY;
+                an_theta -= dx * 0.006;
+                an_phi   -= dy * 0.006;
+                an_phi = Math.max(0.15, Math.min(Math.PI - 0.15, an_phi));
+                an_lastX = e.clientX; an_lastY = e.clientY;
+                an_updateCamera();
+            });
+            renderer.domElement.addEventListener("wheel", e => {
+                e.preventDefault();
+                an_radius *= (1 + e.deltaY * 0.001);
+                an_radius = Math.max(8, Math.min(80, an_radius));
+                an_updateCamera();
+            }, { passive: false });
+
+            // ========== 动画 ==========
+            let an_speed = 0.2;
+            window.an_scene2Speed = function(v) {
+                an_speed = v;
+                document.querySelectorAll("#an_ctrl2 button").forEach(b => b.classList.remove("active"));
+                event.target.classList.add("active");
+            };
+            const clock = new THREE.Clock();
+            function an_animate() {
+                requestAnimationFrame(an_animate);
+                const t = clock.getElapsedTime();
+                earth.rotation.y = t * 0.3;
+                halo.rotation.y  = -t * 0.25;
+                stars.rotation.y = t * 0.01 * an_speed;
+                stars.rotation.x = t * 0.003 * an_speed;
+                renderer.render(scene, camera);
+            }
+            an_updateCamera();
+            an_animate();
+
+            // 响应式
+            window.addEventListener("resize", () => {
+                const nw = container.clientWidth, nh = container.clientHeight;
+                camera.aspect = nw / nh; camera.updateProjectionMatrix();
+                renderer.setSize(nw, nh);
+            });
+        })();
+    </script>
+</body>
+</html>
