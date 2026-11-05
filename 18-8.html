@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-05 | 模型：Seed-Code | 功能：数据可视化大屏（ECharts + 中国地图） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-8 数据可视化大屏</title>
+    <script src="cdn/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background:
+                radial-gradient(ellipse at top, #0f1d3a 0%, #050a1a 60%),
+                #02050c;
+            color: #d8e3f5;
+            overflow-x: hidden;
+        }
+        .an_back {
+            position: fixed; top: 10px; left: 10px; z-index: 100;
+            display: inline-block; color: #fff; text-decoration: none;
+            font-size: 12px; background: rgba(255,255,255,0.12);
+            padding: 4px 12px; border-radius: 14px;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.25); }
+
+        /* ========== 顶部标题栏 ========== */
+        .an_topbar {
+            height: 64px;
+            background: linear-gradient(180deg, rgba(16,40,80,0.8) 0%, rgba(8,20,40,0.3) 100%);
+            border-bottom: 1px solid rgba(100,180,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: relative;
+        }
+        .an_topbar::before, .an_topbar::after {
+            content: ""; position: absolute; top: 0; bottom: 0;
+            width: 120px; border-top: 2px solid #4f9dff; border-bottom: 2px solid #4f9dff;
+        }
+        .an_topbar::before { left: 0; clip-path: polygon(0 0, 100% 0, calc(100% - 18px) 100%, 18px 100%); }
+        .an_topbar::after  { right: 0; clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 100%, 0 100%); }
+
+        .an_topbar h1 {
+            font-size: 22px; font-weight: bold;
+            letter-spacing: 6px;
+            background: linear-gradient(90deg, #4f9dff, #a0c4ff, #4f9dff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(79,157,255,0.3);
+        }
+        .an_topbar .an_time { font-size: 13px; color: #8ab4ff; font-family: Consolas, monospace; }
+
+        /* ========== 大屏三列网格 ========== */
+        .an_dash {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr 1fr;
+            gap: 12px;
+            padding: 12px;
+            height: calc(100vh - 64px);
+        }
+
+        .an_col {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 0; /* 允许子元素 flex 收缩 */
+        }
+
+        /* ========== 卡片 ========== */
+        .an_panel {
+            background: linear-gradient(135deg, rgba(20,50,100,0.35), rgba(8,20,45,0.6));
+            border: 1px solid rgba(79,157,255,0.25);
+            border-radius: 8px;
+            padding: 10px 12px 12px;
+            position: relative;
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .an_panel::before {
+            content: "";
+            position: absolute; top: -1px; left: 16px;
+            width: 12px; height: 2px; background: #4f9dff;
+        }
+        .an_panel::after {
+            content: "";
+            position: absolute; bottom: -1px; right: 16px;
+            width: 12px; height: 2px; background: #4f9dff;
+        }
+        .an_panel-title {
+            font-size: 13px; color: #a0c4ff;
+            padding-bottom: 8px;
+            margin-bottom: 4px;
+            border-bottom: 1px dashed rgba(79,157,255,0.25);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .an_panel-title::before {
+            content: "▸"; color: #4f9dff; margin-right: 4px;
+        }
+        .an_chart {
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* ========== 指标卡 ========== */
+        .an_kpi-row {
+            display: flex;
+            gap: 10px;
+            flex: 0 0 auto;
+        }
+        .an_kpi {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(79,157,255,0.15), rgba(30,80,160,0.15));
+            border: 1px solid rgba(79,157,255,0.3);
+            border-radius: 6px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+        .an_kpi .an_kpi-label { font-size: 11px; color: #8ab4ff; margin-bottom: 4px; }
+        .an_kpi .an_kpi-val {
+            font-size: 22px; font-weight: bold;
+            font-family: Consolas, monospace;
+            background: linear-gradient(90deg, #4f9dff, #a0c4ff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .an_kpi .an_kpi-trend { font-size: 10px; color: #4ade80; margin-top: 2px; }
+        .an_kpi .an_kpi-trend.down { color: #f87171; }
+
+        /* ========== 实时表格 ========== */
+        .an_table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .an_table th {
+            background: rgba(79,157,255,0.15);
+            color: #a0c4ff;
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: normal;
+        }
+        .an_table td {
+            padding: 5px 8px;
+            border-bottom: 1px solid rgba(79,157,255,0.15);
+            color: #c8d6e5;
+        }
+        .an_table tbody tr:hover { background: rgba(79,157,255,0.08); }
+        .an_badge {
+            display: inline-block; padding: 1px 8px; border-radius: 10px;
+            font-size: 10px;
+        }
+        .an_badge.ok   { background: rgba(74,222,128,0.15); color: #4ade80; }
+        .an_badge.warn { background: rgba(250,204,21,0.15); color: #facc15; }
+        .an_badge.err  { background: rgba(248,113,113,0.15); color: #f87171; }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 1100px) {
+            .an_dash { grid-template-columns: 1fr; height: auto; }
+            .an_col { flex: none; }
+            .an_panel { min-height: 260px; }
+        }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">← 返回首页</a>
+
+    <!-- 顶部 -->
+    <div class="an_topbar">
+        <div class="an_time" id="an_time">—</div>
+        <h1>🌐 全国电商运营数据可视化大屏</h1>
+        <div class="an_time">实时更新 · Refresh 5s</div>
+    </div>
+
+    <!-- 大屏主体 -->
+    <div class="an_dash">
+        <!-- ========== 左列 ========== -->
+        <div class="an_col">
+            <!-- KPI -->
+            <div class="an_kpi-row">
+                <div class="an_kpi">
+                    <div class="an_kpi-label">今日订单</div>
+                    <div class="an_kpi-val" id="an_kpi_orders">128,452</div>
+                    <div class="an_kpi-trend">▲ 12.3% vs 昨日</div>
+                </div>
+                <div class="an_kpi">
+                    <div class="an_kpi-label">GMV（万元）</div>
+                    <div class="an_kpi-val" id="an_kpi_gmv">3,482</div>
+                    <div class="an_kpi-trend">▲ 8.6% vs 昨日</div>
+                </div>
+                <div class="an_kpi">
+                    <div class="an_kpi-label">活跃用户</div>
+                    <div class="an_kpi-val" id="an_kpi_uv">89,204</div>
+                    <div class="an_kpi-trend down">▼ 2.1% vs 昨日</div>
+                </div>
+            </div>
+
+            <!-- 月度趋势 -->
+            <div class="an_panel">
+                <div class="an_panel-title">月度销售趋势</div>
+                <div id="an_trend" class="an_chart"></div>
+            </div>
+
+            <!-- 设备分布 -->
+            <div class="an_panel">
+                <div class="an_panel-title">访问设备分布</div>
+                <div id="an_device" class="an_chart"></div>
+            </div>
+        </div>
+
+        <!-- ========== 中列 ========== -->
+        <div class="an_col">
+            <!-- 中国地图（上方，重点） -->
+            <div class="an_panel" style="flex: 2 1 auto;">
+                <div class="an_panel-title">
+                    <span>🗺 全国销售地理分布</span>
+                    <span style="font-size:10px;color:#8ab4ff;">单位：万元</span>
+                </div>
+                <div id="an_map" class="an_chart"></div>
+            </div>
+
+            <!-- 实时订单滚动表 -->
+            <div class="an_panel" style="flex: 1 1 auto;">
+                <div class="an_panel-title">实时订单流水</div>
+                <div style="flex:1; overflow-y:auto;">
+                    <table class="an_table">
+                        <thead>
+                            <tr>
+                                <th>时间</th><th>城市</th><th>商品</th><th>金额</th><th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="an_order_tbody">
+                            <!-- JS 动态填充 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 右列 ========== -->
+        <div class="an_col">
+            <!-- 分类占比 -->
+            <div class="an_panel">
+                <div class="an_panel-title">商品分类占比</div>
+                <div id="an_category" class="an_chart"></div>
+            </div>
+
+            <!-- 仪表盘 -->
+            <div class="an_panel">
+                <div class="an_panel-title">服务器负载 · CPU</div>
+                <div id="an_gauge" class="an_chart"></div>
+            </div>
+
+            <!-- 城市榜单 -->
+            <div class="an_panel">
+                <div class="an_panel-title">城市销售 Top 10</div>
+                <div id="an_rank" class="an_chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 顶部时间 ==========
+        function an_tick() {
+            const d = new Date();
+            const pad = n => String(n).padStart(2, "0");
+            document.getElementById("an_time").textContent =
+                d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()) +
+                " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+        }
+        an_tick(); setInterval(an_tick, 1000);
+
+        // ========== 加载中国地图 GeoJSON 并注册 ==========
+        async function an_loadMap() {
+            try {
+                const res = await fetch("cdn/geo/china.json");
+                const geo = await res.json();
+                echarts.registerMap("china", geo);
+                an_initMap();
+            } catch (e) {
+                console.warn("地图加载失败：", e);
+                document.getElementById("an_map").innerHTML =
+                    '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;">地图加载失败</div>';
+            }
+        }
+
+        // ========== 模拟数据 ==========
+        const an_provinces = [
+            "北京市","天津市","上海市","重庆市","河北省","山西省","辽宁省","吉林省","黑龙江省",
+            "江苏省","浙江省","安徽省","福建省","江西省","山东省","河南省","湖北省","湖南省",
+            "广东省","海南省","四川省","贵州省","云南省","陕西省","甘肃省","青海省","台湾省",
+            "内蒙古自治区","广西壮族自治区","西藏自治区","宁夏回族自治区","新疆维吾尔自治区",
+            "香港特别行政区","澳门特别行政区"
+        ];
+        function an_rndInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+        function an_mockGeoSales() {
+            const hot = { "广东省": 1, "江苏省": 1, "浙江省": 1, "北京市": 1, "上海市": 1,
+                          "山东省": 1, "四川省": 1, "湖北省": 1, "福建省": 1, "河南省": 1 };
+            return an_provinces.map(p => ({
+                name: p,
+                value: hot[p] ? an_rndInt(600, 1200) : an_rndInt(30, 380)
+            }));
+        }
+        function an_mockScatter() {
+            return [
+                { name: "北京",   value: [116.46, 39.92, 980] },
+                { name: "上海",   value: [121.48, 31.22, 1120] },
+                { name: "广州",   value: [113.23, 23.16, 1350] },
+                { name: "深圳",   value: [114.07, 22.62, 1280] },
+                { name: "杭州",   value: [120.19, 30.26, 920] },
+                { name: "成都",   value: [104.06, 30.67, 720] },
+                { name: "武汉",   value: [114.31, 30.52, 680] },
+                { name: "西安",   value: [108.95, 34.27, 560] },
+                { name: "重庆",   value: [106.54, 29.59, 640] },
+                { name: "南京",   value: [118.78, 32.04, 700] }
+            ];
+        }
+
+        // ========== 图表 ① 月度趋势（左列中） ==========
+        const an_trendChart = echarts.init(document.getElementById("an_trend"));
+        an_trendChart.setOption({
+            tooltip: { trigger: "axis" },
+            legend: { data: ["订单数", "GMV"], textStyle: { color: "#a0c4ff", fontSize: 11 }, top: 2 },
+            grid: { left: "10%", right: "6%", top: "22%", bottom: "10%" },
+            xAxis: {
+                type: "category",
+                data: ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],
+                axisLine: { lineStyle: { color: "#4f9dff" } },
+                axisLabel: { color: "#8ab4ff", fontSize: 10 }
+            },
+            yAxis: [
+                { type: "value", name: "订单", nameTextStyle: { color: "#8ab4ff" },
+                  axisLine: { lineStyle: { color: "#4f9dff" } },
+                  splitLine: { lineStyle: { color: "rgba(79,157,255,0.12)" } },
+                  axisLabel: { color: "#8ab4ff", fontSize: 10 } },
+                { type: "value", name: "GMV(万)", nameTextStyle: { color: "#facc15" },
+                  axisLine: { lineStyle: { color: "#facc15" } },
+                  splitLine: { show: false },
+                  axisLabel: { color: "#facc15", fontSize: 10 } }
+            ],
+            series: [
+                { name: "订单数", type: "bar", data: [82,78,95,102,118,125,138,142,156,172,198,220],
+                  itemStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[
+                      { offset:0, color:"#4f9dff" }, { offset:1, color:"#1e40af" }
+                  ]), borderRadius:[3,3,0,0] } },
+                { name: "GMV", type: "line", yAxisIndex: 1, smooth: true,
+                  data: [2100,1980,2450,2780,3120,3450,3890,4120,4560,4980,5420,6200],
+                  itemStyle: { color: "#facc15" }, lineStyle: { width: 2 } }
+            ]
+        });
+
+        // ========== 图表 ② 设备分布（左列下） ==========
+        const an_deviceChart = echarts.init(document.getElementById("an_device"));
+        an_deviceChart.setOption({
+            tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
+            legend: { bottom: 0, textStyle: { color: "#a0c4ff", fontSize: 11 } },
+            series: [{
+                type: "pie", radius: ["40%", "65%"], center: ["50%", "45%"],
+                avoidLabelOverlap: false,
+                itemStyle: { borderRadius: 6, borderColor: "#0a1a30", borderWidth: 2 },
+                label: { show: true, color: "#c8d6e5", fontSize: 11, formatter: "{b}\n{d}%" },
+                data: [
+                    { value: 48200, name: "Android" },
+                    { value: 28500, name: "iOS" },
+                    { value: 18200, name: "Web" },
+                    { value:  8100, name: "小程序" },
+                    { value:  3204, name: "其他" }
+                ],
+                color: ["#4f9dff", "#a0c4ff", "#facc15", "#4ade80", "#f87171"]
+            }]
+        });
+
+        // ========== 图表 ③ 中国地图（中列上） ==========
+        let an_mapChart;
+        function an_initMap() {
+            an_mapChart = echarts.init(document.getElementById("an_map"));
+            const salesData = an_mockGeoSales();
+            const scatterData = an_mockScatter();
+
+            an_mapChart.setOption({
+                backgroundColor: "transparent",
+                tooltip: {
+                    trigger: "item",
+                    backgroundColor: "rgba(10,20,40,0.9)",
+                    borderColor: "#4f9dff",
+                    textStyle: { color: "#fff", fontSize: 12 },
+                    formatter: p => {
+                        if (p.seriesType === "effectScatter" || p.seriesType === "scatter") {
+                            return `<b>${p.name}</b><br/>销量：${p.value[2]} 万`;
+                        }
+                        return `<b>${p.name}</b><br/>销量：${p.value} 万`;
+                    }
+                },
+                visualMap: {
+                    min: 0, max: 1350,
+                    left: 10, bottom: 10,
+                    textStyle: { color: "#a0c4ff", fontSize: 11 },
+                    inRange: { color: ["#0a3060", "#1e40af", "#2563eb", "#4f9dff", "#facc15", "#f87171"] },
+                    calculable: true
+                },
+                geo: {
+                    map: "china",
+                    roam: true,
+                    zoom: 1.15,
+                    scaleLimit: { min: 0.8, max: 4 },
+                    label: {
+                        show: true, color: "#a0c4ff", fontSize: 10
+                    },
+                    itemStyle: {
+                        areaColor: "#0f2544",
+                        borderColor: "#4f9dff",
+                        borderWidth: 0.8
+                    },
+                    emphasis: {
+                        label: { show: true, color: "#fff" },
+                        itemStyle: { areaColor: "#1e40af" }
+                    }
+                },
+                series: [
+                    {
+                        name: "各省销量", type: "map", geoIndex: 0, data: salesData
+                    },
+                    {
+                        name: "核心城市", type: "effectScatter", coordinateSystem: "geo",
+                        data: scatterData, symbolSize: v => Math.max(8, v[2] / 120),
+                        showEffectOn: "render", rippleEffect: { brushType: "stroke", scale: 3 },
+                        label: { show: true, position: "right", formatter: "{b}", color: "#fff", fontSize: 11 },
+                        itemStyle: { color: "#facc15", shadowBlur: 10, shadowColor: "#facc15" },
+                        zlevel: 2
+                    },
+                    {
+                        name: "主要城市", type: "scatter", coordinateSystem: "geo",
+                        data: an_mockScatter().slice(2, 8),
+                        symbolSize: 6,
+                        itemStyle: { color: "#4f9dff" },
+                        zlevel: 1
+                    }
+                ]
+            });
+        }
+
+        // ========== 实时订单流水（中列下） ==========
+        const an_cities = ["北京","上海","广州","深圳","杭州","成都","武汉","西安","南京","重庆","天津","苏州"];
+        const an_goods  = ["iPhone 15 Pro","MacBook Air","小米手环","AirPods Pro","戴森吹风机",
+                          "iPad Air","Kindle","华为 Mate 60","Sony 耳机","DJI 无人机"];
+        const an_status = [
+            { text: "已支付", cls: "ok" },
+            { text: "配送中", cls: "warn" },
+            { text: "已签收", cls: "ok" },
+            { text: "已取消", cls: "err" }
+        ];
+        function an_appendOrder() {
+            const tbody = document.getElementById("an_order_tbody");
+            const now = new Date();
+            const pad = n => String(n).padStart(2, "0");
+            const hhmmss = pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
+            const city  = an_cities[an_rndInt(0, an_cities.length - 1)];
+            const good  = an_goods[an_rndInt(0, an_goods.length - 1)];
+            const amt   = (Math.random() * 8000 + 200).toFixed(2);
+            const st    = an_status[an_rndInt(0, an_status.length - 1)];
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${hhmmss}</td><td>${city}</td><td>${good}</td><td>¥ ${amt}</td>
+                           <td><span class="an_badge ${st.cls}">${st.text}</span></td>`;
+            tbody.insertBefore(tr, tbody.firstChild);
+            while (tbody.children.length > 14) tbody.removeChild(tbody.lastChild);
+        }
+        for (let i = 0; i < 10; i++) an_appendOrder(); // 预填充
+        setInterval(an_appendOrder, 2500);
+
+        // ========== 图表 ④ 分类占比（右列上） ==========
+        const an_catChart = echarts.init(document.getElementById("an_category"));
+        an_catChart.setOption({
+            tooltip: { trigger: "item", formatter: "{b}: {c} 万 ({d}%)" },
+            legend: { show: false },
+            series: [{
+                type: "pie", radius: ["55%", "80%"],
+                label: { color: "#c8d6e5", fontSize: 11, formatter: "{b} {d}%" },
+                itemStyle: { borderColor: "#0a1a30", borderWidth: 2 },
+                data: [
+                    { value: 1280, name: "数码" },
+                    { value:  980, name: "服饰" },
+                    { value:  680, name: "家居" },
+                    { value:  520, name: "食品" },
+                    { value:  380, name: "美妆" },
+                    { value:  282, name: "其他" }
+                ],
+                color: ["#4f9dff","#a0c4ff","#facc15","#4ade80","#f87171","#c084fc"]
+            }]
+        });
+
+        // ========== 图表 ⑤ CPU 仪表盘（右列中） ==========
+        const an_gaugeChart = echarts.init(document.getElementById("an_gauge"));
+        function an_setGauge(v) {
+            an_gaugeChart.setOption({
+                series: [{
+                    type: "gauge", startAngle: 200, endAngle: -20,
+                    min: 0, max: 100,
+                    radius: "95%", center: ["50%", "58%"],
+                    axisLine: { lineStyle: { width: 14, color: [
+                        [0.6, "#4ade80"], [0.85, "#facc15"], [1, "#f87171"]
+                    ]}},
+                    pointer: { width: 4, length: "60%", itemStyle: { color: "#a0c4ff" } },
+                    axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false },
+                    detail: { offsetCenter: [0, "30%"], color: "#a0c4ff", fontSize: 20,
+                              formatter: v + "%" },
+                    title: { offsetCenter: [0, "58%"], color: "#8ab4ff", fontSize: 12 }
+                }],
+                graphic: [{ type: "text", left: "center", bottom: "5%",
+                           style: { text: "CPU 使用率", fill: "#8ab4ff", fontSize: 12 } }]
+            });
+        }
+        an_setGauge(62);
+        setInterval(() => {
+            const v = an_rndInt(45, 88);
+            an_setGauge(v);
+        }, 3000);
+
+        // ========== 图表 ⑥ 城市 Top10（右列下） ==========
+        const an_rankChart = echarts.init(document.getElementById("an_rank"));
+        function an_setRank() {
+            const sorted = an_mockGeoSales()
+                .filter(d => d.value > 500)
+                .sort((a, b) => b.value - a.value)
+                .slice(0, 10);
+            an_rankChart.setOption({
+                tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+                grid: { left: "2%", right: "8%", top: "4%", bottom: "4%", containLabel: true },
+                xAxis: { type: "value", axisLabel: { color: "#8ab4ff", fontSize: 10 },
+                         splitLine: { lineStyle: { color: "rgba(79,157,255,0.12)" } } },
+                yAxis: { type: "category", inverse: true,
+                         data: sorted.map(d => d.name),
+                         axisLabel: { color: "#c8d6e5", fontSize: 11 },
+                         axisLine: { show: false }, axisTick: { show: false } },
+                series: [{
+                    type: "bar", data: sorted.map((d, i) => ({
+                        value: d.value,
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                                { offset: 0, color: i < 3 ? "#f87171" : "#4f9dff" },
+                                { offset: 1, color: i < 3 ? "#facc15" : "#a0c4ff" }
+                            ]),
+                            borderRadius: [0, 4, 4, 0]
+                        }
+                    })),
+                    barWidth: 14,
+                    label: { show: true, position: "right", color: "#a0c4ff", fontSize: 10,
+                             formatter: "{c} 万" }
+                }]
+            });
+        }
+        an_setRank();
+        setInterval(an_setRank, 5000);
+
+        // ========== 窗口 resize 自适应 ==========
+        window.addEventListener("resize", () => {
+            an_trendChart.resize();
+            an_deviceChart.resize();
+            an_catChart.resize();
+            an_gaugeChart.resize();
+            an_rankChart.resize();
+            if (an_mapChart) an_mapChart.resize();
+        });
+
+        // ========== 启动 ==========
+        an_loadMap();
+
+        // KPI 数字轻微抖动（模拟实时）
+        setInterval(() => {
+            const jitter = (v, pct) => Math.round(v * (1 + (Math.random() - 0.5) * pct));
+            document.getElementById("an_kpi_orders").textContent =
+                jitter(128452, 0.02).toLocaleString();
+            document.getElementById("an_kpi_gmv").textContent =
+                (3482 * (1 + (Math.random() - 0.5) * 0.015)).toFixed(0);
+            document.getElementById("an_kpi_uv").textContent =
+                jitter(89204, 0.02).toLocaleString();
+        }, 4000);
+    </script>
+</body>
+</html>
