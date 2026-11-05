@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-05 | 模型：Seed-Code | 功能：Mermaid 智能客服流程图 + ER 图（本地 cdn） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-6 Mermaid 流程图 & ER 图</title>
+    <!-- 本地 Mermaid，不依赖外网 -->
+    <script src="cdn/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #2d1b4e, #1b2838, #1a1a2e);
+            min-height: 100vh;
+            padding: 24px 18px 40px;
+            color: #e2e8f0;
+        }
+        .an_back {
+            display: inline-block; color: #fff; text-decoration: none;
+            margin-bottom: 16px; font-size: 14px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px; border-radius: 20px;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.3); }
+        .an_header { text-align: center; margin-bottom: 22px; }
+        .an_header h1 { font-size: 26px; color: #fff; margin-bottom: 6px; }
+        .an_header p { font-size: 13px; color: rgba(255,255,255,0.7); }
+        .an_header code {
+            background: rgba(255,255,255,0.15);
+            padding: 1px 8px; border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .an_chart-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+            padding: 20px;
+            margin-bottom: 26px;
+        }
+        .an_chart-title {
+            font-size: 16px; font-weight: bold;
+            color: #1a1a2e; margin-bottom: 4px;
+            padding-left: 10px;
+            border-left: 4px solid #6d28d9;
+        }
+        .an_chart-subtitle {
+            font-size: 12px; color: #64748b; margin-bottom: 14px;
+            padding-left: 14px;
+        }
+        .an_mermaid-wrap {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 18px;
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .an_mermaid-wrap svg { max-width: 100%; height: auto; }
+
+        .an_code-toggle {
+            margin-top: 12px;
+            text-align: right;
+        }
+        .an_code-toggle button {
+            background: #6d28d9; color: #fff; border: none;
+            border-radius: 14px; padding: 4px 14px; font-size: 11px;
+            cursor: pointer;
+        }
+        .an_code-toggle button:hover { opacity: 0.85; }
+
+        pre.an_mermaid-src {
+            background: #1e1e2e; color: #cdd6f4;
+            padding: 14px 16px; border-radius: 8px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px; line-height: 1.7;
+            overflow-x: auto;
+            margin-top: 10px;
+            display: none;
+            white-space: pre;
+        }
+        pre.an_mermaid-src.show { display: block; }
+
+        .an_tools {
+            max-width: 1100px; margin: -6px auto 18px;
+            display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+        }
+        .an_tools button {
+            background: rgba(255,255,255,0.12); color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 14px; padding: 5px 14px; font-size: 12px; cursor: pointer;
+        }
+        .an_tools button:hover { background: rgba(255,255,255,0.28); }
+
+        .an_footer { text-align: center; color: rgba(255,255,255,0.45); font-size: 12px; margin-top: 10px; }
+
+        /* 容器居中 */
+        .an_container { max-width: 1100px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="an_container">
+        <a class="an_back" href="index.html">← 返回首页</a>
+
+        <div class="an_header">
+            <h1>🧜 Mermaid 图表</h1>
+            <p>库文件：<code>cdn/mermaid.min.js</code>（本地离线） · 版本：Mermaid 11.4 · 智能客服系统流程 + ER 模型</p>
+        </div>
+
+        <div class="an_tools">
+            <button onclick="an_toggleAll()">🔄 切换全部源码显示</button>
+            <button onclick="an_rerender()">♻️ 重新渲染</button>
+        </div>
+
+        <!-- ===== 图 ① 智能客服处理流程 ===== -->
+        <div class="an_chart-card">
+            <div class="an_chart-title">图 ① 智能客服消息处理流程图</div>
+            <div class="an_chart-subtitle">
+                从用户发消息 → 会话管理 → 意图识别 → RAG 检索 → LLM 生成 → 置信度评估 → 答案下发
+            </div>
+            <div class="an_mermaid-wrap">
+                <div class="mermaid">
+flowchart TD
+    subgraph 用户端
+        A[👤 用户发送消息]
+    end
+
+    subgraph 网关层
+        B{鉴权 & 会话校验}
+    end
+
+    subgraph 核心服务层
+        C[📋 会话管理器<br>拼上下文 / 窗口截断]
+        D{🎯 意图识别<br>NLU 分类器}
+        E[🧠 RAG 编排器]
+        F[⚙️ Prompt 模板填充]
+        G[🛠 Function Calling<br>工具调用]
+        H[✍️ LLM 大模型生成答案]
+        I{💡 置信度评估}
+    end
+
+    subgraph AI & 知识库
+        J[📐 Query Rewrite]
+        K[🔍 Hybrid 检索<br>向量 + BM25]
+        L[📊 Rerank 重排<br>Top-K]
+        M[🕸 知识图谱推理]
+    end
+
+    subgraph 知识库
+        N[📄 文档库<br>FAQ / 手册]
+        O[🌲 向量数据库<br>Milvus / FAISS]
+        P[💾 结构化数据<br>MySQL / Redis]
+        Q[🕸 知识图谱<br>Neo4j]
+    end
+
+    subgraph 出口
+        R{置信度 ≥ 阈值?}
+        S[✅ 下发答案]
+        T[❓ 追问澄清]
+        U[☎️ 转人工客服]
+    end
+
+    A --> B --> C --> D
+    D -- 明确意图 --> E
+    D -- 模糊意图 --> T
+    E --> J --> K --> L
+    L --> N
+    L --> O
+    E --> M --> Q
+    E -- 命中工具意图 --> G
+    E -- 普通问答 --> F --> H
+    G -- 拿到工具结果 --> H
+    H --> I --> R
+    R -- 是 --> S
+    R -- 否 --> U
+
+    style A fill:#dbeafe,stroke:#3b82f6
+    style S fill:#bbf7d0,stroke:#22c55e
+    style T fill:#fef3c7,stroke:#f59e0b
+    style U fill:#fecaca,stroke:#ef4444
+    style R fill:#fef9c3,stroke:#ca8a04
+                </div>
+            </div>
+            <div class="an_code-toggle"><button onclick="this.nextElementSibling.classList.toggle('show')">📄 查看 Mermaid 源码</button></div>
+            <pre class="an_mermaid-src">flowchart TD
+    subgraph 用户端
+        A[👤 用户发送消息]
+    end
+
+    subgraph 网关层
+        B{鉴权 & 会话校验}
+    end
+    ... （见页面内完整源码）</pre>
+        </div>
+
+        <!-- ===== 图 ② ER 图 ===== -->
+        <div class="an_chart-card">
+            <div class="an_chart-title">图 ② 智能客服系统 ER 模型</div>
+            <div class="an_chart-subtitle">
+                核心实体：用户 · 会话 · 消息 · 知识库 · 文档 · FAQ · 反馈 · 转人工工单 —— 及它们之间的关系
+            </div>
+            <div class="an_mermaid-wrap">
+                <div class="mermaid">
+erDiagram
+    USER ||--o{ SESSION : "发起"
+    SESSION ||--o{ MESSAGE : "包含"
+    SESSION ||--o{ FEEDBACK : "关联"
+    USER ||--o{ FEEDBACK : "提交"
+    USER ||--o| AGENT_TICKET : "发起"
+    MESSAGE }o--|| KNOWLEDGE_BASE : "引用片段"
+    MESSAGE ||--o{ RETRIEVAL_LOG : "触发检索"
+    KNOWLEDGE_BASE ||--o{ DOCUMENT : "聚合"
+    KNOWLEDGE_BASE ||--o{ FAQ : "维护"
+    KNOWLEDGE_BASE ||--o{ ENTITY : "建模实体"
+    DOCUMENT ||--o{ DOC_CHUNK : "切分为"
+    FAQ }o--|| DOCUMENT : "关联来源"
+    ENTITY ||--o{ ENTITY_RELATION : "与"
+    AGENT_TICKET }o--|| SESSION : "基于"
+
+    USER {
+        bigint    user_id      PK   "用户 ID"
+        varchar   open_id          "第三方唯一标识"
+        varchar   nickname         "昵称"
+        varchar   avatar           "头像 URL"
+        varchar   register_src     "注册来源：WEB/APP/MP"
+        datetime  created_at       "注册时间"
+        datetime  last_active_at   "最后活跃"
+        tinyint   is_vip           "是否 VIP"
+    }
+
+    SESSION {
+        bigint    session_id   PK   "会话 ID"
+        bigint    user_id      FK   "用户 ID"
+        varchar   channel          "渠道：web/app/mp/bot"
+        varchar   intent_domain    "当前意图领域"
+        int       turn_count       "对话轮数"
+        datetime  start_time       "开始时间"
+        datetime  end_time         "结束时间"
+        tinyint   status           "0进行中 1已结束 2转人工"
+    }
+
+    MESSAGE {
+        bigint    msg_id       PK   "消息 ID"
+        bigint    session_id   FK   "所属会话"
+        tinyint   msg_type         "1用户 2机器人 3系统"
+        text      content          "消息内容"
+        varchar   model_version    "生成所用模型版本"
+        text      source_ref       "引用片段 JSON（文档/chunk/相似度）"
+        float     confidence       "置信度 0-1"
+        datetime  created_at       "消息时间"
+    }
+
+    KNOWLEDGE_BASE {
+        bigint    kb_id        PK   "知识库 ID"
+        varchar   kb_name          "名称"
+        varchar   kb_type          "faq/doc/hybrid/graph"
+        text      description      "描述"
+        bigint    doc_count        "文档数（冗余）"
+        datetime  last_sync_at     "最后同步"
+    }
+
+    DOCUMENT {
+        bigint    doc_id       PK   "文档 ID"
+        bigint    kb_id        FK   "所属知识库"
+        varchar   title            "标题"
+        varchar   source_url       "原始 URL / 文件路径"
+        int       word_count       "字数"
+        datetime  indexed_at       "索引入库时间"
+        tinyint   chunk_strategy   "切分策略 ID"
+    }
+
+    DOC_CHUNK {
+        bigint    chunk_id     PK   "块 ID"
+        bigint    doc_id       FK   "所属文档"
+        int       chunk_index      "序号"
+        text      content          "块内容"
+        varchar   embedding_model  "向量模型"
+        datetime  embedded_at      "向量化时间"
+    }
+
+    FAQ {
+        bigint    faq_id       PK   "FAQ ID"
+        bigint    kb_id        FK   "所属知识库"
+        bigint    doc_id       FK   "关联来源文档（可空）"
+        text      question         "问题"
+        text      answer           "标准答案"
+        int       hit_count        "命中次数"
+        float     quality_score    "质量分"
+    }
+
+    FEEDBACK {
+        bigint    fb_id        PK   "反馈 ID"
+        bigint    user_id      FK   "用户 ID"
+        bigint    session_id   FK   "所属会话"
+        bigint    msg_id       FK   "关联消息（机器人那条）"
+        tinyint   rating           "1👍 2👎 3中性"
+        text      comment          "用户备注"
+        datetime  created_at       "反馈时间"
+    }
+
+    AGENT_TICKET {
+        bigint    ticket_id    PK   "工单 ID"
+        bigint    session_id   FK   "原会话"
+        bigint    user_id      FK   "用户"
+        varchar   reason           "转人工原因"
+        varchar   agent            "接人工号"
+        tinyint   status           "0待接 1进行中 2已结"
+        datetime  handoff_at       "转人工时间"
+        datetime  close_at         "关闭时间"
+    }
+
+    RETRIEVAL_LOG {
+        bigint    log_id       PK   "检索日志 ID"
+        bigint    msg_id       FK   "所属消息"
+        text      query            "原始 query"
+        text      rewritten_query  "重写后 query"
+        varchar   retriever        "hybrid/bm25/dense/graph"
+        text      topk_result      "TopK 结果 JSON"
+        float     recall_score     "召回质量评估"
+    }
+
+    ENTITY {
+        bigint    entity_id    PK   "实体 ID"
+        bigint    kb_id        FK   "所属知识库"
+        varchar   entity_type      "实体类型：产品/政策/人物..."
+        varchar   entity_name      "实体名称"
+        text      properties       "属性 JSON"
+    }
+
+    ENTITY_RELATION {
+        bigint    rel_id       PK   "关系 ID"
+        bigint    head_id      FK   "头实体"
+        bigint    tail_id      FK   "尾实体"
+        varchar   relation_type    "关系类型：属于/包含/依赖..."
+        float     confidence       "关系置信度"
+    }
+                </div>
+            </div>
+            <div class="an_code-toggle"><button onclick="this.nextElementSibling.classList.toggle('show')">📄 查看 Mermaid 源码</button></div>
+            <pre class="an_mermaid-src">erDiagram
+    USER ||--o{ SESSION : 发起
+    ... （见页面内完整源码）</pre>
+        </div>
+
+        <div class="an_footer">
+            — Mermaid 11.4 · 本地离线 · 智能客服系统建模 · 安家成 —
+        </div>
+    </div>
+
+    <script>
+        // Mermaid 初始化（必须在 DOM ready + script 已加载后）
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: "default",           // 白底清晰风格
+            securityLevel: "loose",     // 允许 subgraph 等特性
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: "basis"
+            },
+            er: {
+                useMaxWidth: true
+            }
+        });
+
+        // 切换全部源码
+        let an_allOpen = false;
+        function an_toggleAll() {
+            an_allOpen = !an_allOpen;
+            document.querySelectorAll("pre.an_mermaid-src").forEach(p => {
+                p.classList.toggle("show", an_allOpen);
+            });
+        }
+
+        // 手动重新渲染
+        async function an_rerender() {
+            try {
+                // Mermaid 会自动处理已渲染的节点；手动方式是清空后重塞
+                const wraps = document.querySelectorAll(".an_mermaid-wrap .mermaid");
+                for (let el of wraps) {
+                    const code = el.getAttribute("data-mermaid-src") || el.textContent;
+                    el.innerHTML = "";
+                    const { svg } = await mermaid.render("mmd_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6), code);
+                    el.innerHTML = svg;
+                }
+            } catch (e) {
+                alert("渲染失败：" + e.message);
+            }
+        }
+    </script>
+</body>
+</html>
