@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-05 | 模型：Seed-Code | 功能：ECharts 两个示例图（本地 cdn 引入） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-4 ECharts 图表</title>
+    <!-- 本地下载的 ECharts，不依赖外网 -->
+    <script src="cdn/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            min-height: 100vh;
+            padding: 24px 20px 40px;
+            color: #e2e8f0;
+        }
+        .an_back {
+            display: inline-block; color: #fff; text-decoration: none;
+            margin-bottom: 16px; font-size: 14px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px; border-radius: 20px;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.3); }
+        .an_header { text-align: center; margin-bottom: 22px; }
+        .an_header h1 { font-size: 26px; color: #fff; margin-bottom: 6px; }
+        .an_header p { font-size: 13px; color: rgba(255,255,255,0.7); }
+
+        .an_chart {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+            padding: 18px;
+            margin-bottom: 22px;
+        }
+        .an_chart-title {
+            font-size: 15px; font-weight: bold;
+            color: #1e293b; margin-bottom: 10px;
+            padding-left: 10px;
+            border-left: 4px solid #0f3460;
+        }
+        .an_chart-subtitle {
+            font-size: 12px; color: #64748b; margin-bottom: 12px;
+        }
+        .an_chart-subtitle code {
+            background: #f1f5f9; padding: 1px 6px; border-radius: 3px;
+            font-size: 11px; color: #0f3460;
+        }
+        .an_chart-box {
+            width: 100%;
+            height: 420px;
+        }
+        @media (max-width: 720px) { .an_chart-box { height: 320px; } }
+
+        .an_footer {
+            text-align: center; color: rgba(255,255,255,0.45);
+            font-size: 12px; margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">← 返回首页</a>
+
+    <div class="an_header">
+        <h1>📊 ECharts 图表示例</h1>
+        <p>库文件：<code>cdn/echarts.min.js</code>（本地离线版） · 版本：ECharts 5.5.0</p>
+    </div>
+
+    <!-- 图 1：折线 + 柱状混合（月度销售） -->
+    <div class="an_chart">
+        <div class="an_chart-title">图 ① 月度销售与增长率</div>
+        <div class="an_chart-subtitle">
+            双 Y 轴：柱状图（销售额 万元）+ 折线图（同比增长率 %）· 来自
+            <code>echarts.apache.org → Line + Bar · Dual Y-Axis</code> 思路
+        </div>
+        <div id="an_chart1" class="an_chart-box"></div>
+    </div>
+
+    <!-- 图 2：环形饼图（设备访问来源） -->
+    <div class="an_chart">
+        <div class="an_chart-title">图 ② 全站访问设备类型分布</div>
+        <div class="an_chart-subtitle">
+            环形图 + 中心文字 + 圆角扇区 · 来自
+            <code>echarts.apache.org → Pie · Donut with Rounded Border</code> 思路
+        </div>
+        <div id="an_chart2" class="an_chart-box"></div>
+    </div>
+
+    <div class="an_footer">— ECharts 5.5.0 · 本地离线 · 安家成 —</div>
+
+    <script>
+        // ========= 图 ① 折线 + 柱状混合（月度销售） =========
+        (function an_initChart1() {
+            const chart = echarts.init(document.getElementById("an_chart1"));
+            const months = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+            const sales  = [1280, 1320, 1600, 1780, 1950, 2200, 2480, 2360, 2180, 1980, 2340, 2900];
+            const growth = [ 5.2,  3.1, 12.6, 11.3,  9.5, 12.8, 13.2, -4.8, -7.6, -9.2, 18.2, 23.9];
+
+            const option = {
+                tooltip: {
+                    trigger: "axis",
+                    axisPointer: { type: "cross" }
+                },
+                legend: {
+                    data: ["销售额", "同比增长率"],
+                    top: 0
+                },
+                grid: {
+                    left: "5%", right: "5%", bottom: "12%", top: "16%",
+                    containLabel: true
+                },
+                xAxis: {
+                    type: "category",
+                    data: months,
+                    boundaryGap: true
+                },
+                yAxis: [
+                    {
+                        type: "value",
+                        name: "销售额（万元）",
+                        position: "left",
+                        axisLine: { show: true, lineStyle: { color: "#5470c6" } }
+                    },
+                    {
+                        type: "value",
+                        name: "增长率（%）",
+                        position: "right",
+                        axisLine: { show: true, lineStyle: { color: "#ee6666" } },
+                        splitLine: { show: false }
+                    }
+                ],
+                series: [
+                    {
+                        name: "销售额",
+                        type: "bar",
+                        data: sales,
+                        barWidth: "45%",
+                        itemStyle: {
+                            borderRadius: [6, 6, 0, 0],
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: "#83bff6" },
+                                { offset: 1, color: "#188df0" }
+                            ])
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    { offset: 0, color: "#a6cfff" },
+                                    { offset: 1, color: "#2f9bff" }
+                                ])
+                            }
+                        }
+                    },
+                    {
+                        name: "同比增长率",
+                        type: "line",
+                        yAxisIndex: 1,
+                        data: growth,
+                        smooth: true,
+                        symbolSize: 10,
+                        itemStyle: { color: "#ee6666" },
+                        lineStyle: { width: 3, color: "#ee6666" },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: "rgba(238,102,102,0.35)" },
+                                { offset: 1, color: "rgba(238,102,102,0.02)" }
+                            ])
+                        },
+                        label: {
+                            show: true,
+                            position: "top",
+                            formatter: "{c}%",
+                            fontSize: 11,
+                            color: "#ee6666"
+                        }
+                    }
+                ]
+            };
+            chart.setOption(option);
+            window.addEventListener("resize", () => chart.resize());
+        })();
+
+        // ========= 图 ② 环形饼图（设备访问来源） =========
+        (function an_initChart2() {
+            const chart = echarts.init(document.getElementById("an_chart2"));
+            const option = {
+                tooltip: {
+                    trigger: "item",
+                    formatter: "{b}: {c} ({d}%)"
+                },
+                legend: {
+                    orient: "vertical",
+                    right: "2%",
+                    top: "center",
+                    itemGap: 14,
+                    textStyle: { fontSize: 13 }
+                },
+                title: {
+                    text: "48,291",
+                    subtext: "总访问量（次）",
+                    left: "center",
+                    top: "38%",
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: "bold",
+                        color: "#1e293b"
+                    },
+                    subtextStyle: {
+                        fontSize: 13,
+                        color: "#64748b"
+                    }
+                },
+                series: [
+                    {
+                        name: "设备类型",
+                        type: "pie",
+                        radius: ["52%", "75%"],
+                        center: ["40%", "50%"],
+                        avoidLabelOverlap: true,
+                        itemStyle: {
+                            borderRadius: 8,
+                            borderColor: "#fff",
+                            borderWidth: 3
+                        },
+                        label: {
+                            show: true,
+                            formatter: "{b}\n{c} · {d}%",
+                            fontSize: 11,
+                            color: "#475569"
+                        },
+                        labelLine: {
+                            show: true,
+                            length: 10,
+                            length2: 8
+                        },
+                        data: [
+                            { value: 19820, name: "Windows PC" },
+                            { value: 14250, name: "Android" },
+                            { value:  8640, name: "iOS" },
+                            { value:  3520, name: "macOS" },
+                            { value:  1280, name: "Linux" },
+                            { value:   781, name: "其他" }
+                        ]
+                    }
+                ],
+                color: ["#5470c6", "#91cc75", "#fac858", "#ee6666", "#73c0de", "#3ba272", "#fc8452"]
+            };
+            chart.setOption(option);
+            window.addEventListener("resize", () => chart.resize());
+        })();
+    </script>
+</body>
+</html>
