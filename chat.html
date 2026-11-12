@@ -35,7 +35,79 @@
             justify-content: center;
             gap: 10px;
             flex-shrink: 0;
+            position: relative;
         }
+        .an_header .an_settings-btn {
+            position: absolute;
+            right: 16px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #cbd5e1;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .an_header .an_settings-btn:hover {
+            background: rgba(255,255,255,0.22);
+            transform: rotate(45deg);
+        }
+
+        /* 设置弹窗 */
+        .an_modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: an_fadeIn 0.2s;
+        }
+        @keyframes an_fadeIn { from { opacity:0; } to { opacity:1; } }
+        .an_modal-box {
+            background: #1e293b;
+            border: 1px solid rgba(148,163,184,0.25);
+            border-radius: 14px;
+            padding: 22px 26px;
+            width: 90%; max-width: 460px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .an_modal-box h3 { color: #f1f5f9; margin-bottom: 8px; font-size: 16px; }
+        .an_modal-hint {
+            color: #94a3b8; font-size: 12px; line-height: 1.6; margin-bottom: 14px;
+        }
+        .an_modal-hint a { color: #60a5fa; }
+        #an_keyInput {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid rgba(148,163,184,0.3);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #e2e8f0;
+            font-size: 13px;
+            font-family: Consolas, monospace;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        #an_keyInput:focus { border-color: #60a5fa; }
+        .an_modal-actions {
+            display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;
+        }
+        .an_modal-cancel, .an_modal-save {
+            padding: 7px 18px; border-radius: 8px; cursor: pointer;
+            font-size: 13px; border: none;
+        }
+        .an_modal-cancel {
+            background: rgba(148,163,184,0.15); color: #cbd5e1;
+        }
+        .an_modal-cancel:hover { background: rgba(148,163,184,0.3); }
+        .an_modal-save {
+            background: linear-gradient(135deg, #3b82f6, #7c3aed);
+            color: #fff; font-weight: bold;
+        }
+        .an_modal-save:hover { opacity: 0.9; }
         .an_header h1 {
             font-size: 18px;
             background: linear-gradient(90deg, #60a5fa, #a78bfa);
@@ -218,6 +290,20 @@
         <div class="an_dot"></div>
         <h1>🤖 AI 智能助手</h1>
         <span class="an_model">DeepSeek-V4-Flash</span>
+        <button class="an_settings-btn" id="an_settingsBtn" title="设置 API Key">⚙️</button>
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div class="an_modal" id="an_modal" style="display:none;">
+        <div class="an_modal-box">
+            <h3>🔑 设置 API Key（硅基流动）</h3>
+            <p class="an_modal-hint">访问 <a href="https://cloud.siliconflow.cn/" target="_blank">cloud.siliconflow.cn</a> 创建 API Key，保存在浏览器 localStorage。</p>
+            <input type="text" id="an_keyInput" placeholder="sk-..." />
+            <div class="an_modal-actions">
+                <button class="an_modal-cancel" id="an_modalCancel">取消</button>
+                <button class="an_modal-save" id="an_modalSave">保存</button>
+            </div>
+        </div>
     </div>
 
     <!-- 消息区 -->
@@ -239,13 +325,49 @@
     </div>
 
     <script>
-        // ========== API 配置 ==========
+        // ========== API 配置（Key 从 localStorage 读取） ==========
         const an_CONFIG = {
-            apiKey: "sk-9dAYudJAgKhmiXSbgEAUHIyGWKgJWszGXwizueHGQwruU2IY",
             url:    "https://api.siliconflow.cn/v1/chat/completions",
             model:  "deepseek-ai/DeepSeek-V4-Flash",
-            systemPrompt: "你是一个有用的助手，请用中文简洁回答用户问题。"
+            systemPrompt: "你是一个有用的助手，请用中文简洁回答用户问题。",
+            get apiKey() {
+                return localStorage.getItem("an_silicon_api_key") ||
+                       "sk-9dAYudJAgKhmiXSbgEAUHIyGWKgJWszGXwizueHGQwruU2IY";
+            },
+            set apiKey(v) { localStorage.setItem("an_silicon_api_key", v.trim()); }
         };
+
+        // ========== 设置弹窗 ==========
+        const an_modal      = document.getElementById("an_modal");
+        const an_settingsBtn = document.getElementById("an_settingsBtn");
+        const an_keyInput    = document.getElementById("an_keyInput");
+        const an_modalCancel = document.getElementById("an_modalCancel");
+        const an_modalSave   = document.getElementById("an_modalSave");
+
+        an_settingsBtn.addEventListener("click", () => {
+            an_keyInput.value = an_CONFIG.apiKey;
+            an_modal.style.display = "flex";
+            setTimeout(() => an_keyInput.focus(), 50);
+        });
+        an_modalCancel.addEventListener("click", () => { an_modal.style.display = "none"; });
+        an_modalSave.addEventListener("click", () => {
+            const k = an_keyInput.value.trim();
+            if (!k.startsWith("sk-")) {
+                alert("API Key 格式不对，应该以 sk- 开头");
+                return;
+            }
+            an_CONFIG.apiKey = k;
+            an_modal.style.display = "none";
+            an_addMsg("ai", "✅ API Key 已保存，开始聊天吧！");
+        });
+        // 点击遮罩关闭
+        an_modal.addEventListener("click", e => {
+            if (e.target === an_modal) an_modal.style.display = "none";
+        });
+        // Enter 快速保存
+        an_keyInput.addEventListener("keydown", e => {
+            if (e.key === "Enter") an_modalSave.click();
+        });
 
         // ========== 会话历史 ==========
         let an_messages = [
@@ -401,8 +523,13 @@
                 typingEl.remove();
                 console.error("❌ 聊天请求失败:", err);
                 let an_usrMsg = "请求失败：" + err.message;
-                // 如果是跨域错误
-                if (err.name === "TypeError" && err.message.includes("Failed to fetch")) {
+
+                // 401 —— key 失效
+                if (err.message.includes("(401)")) {
+                    an_usrMsg = "🔑 API Key 无效或已失效！\n\n请点击右上角 ⚙️ 按钮，粘贴有效的硅基流动 API Key 后重试。\n获取地址：cloud.siliconflow.cn";
+                }
+                // 跨域错误
+                else if (err.name === "TypeError" && err.message.includes("Failed to fetch")) {
                     an_usrMsg = "网络错误（可能是跨域 CORS 拦截）。请确认 API 已开放浏览器跨域调用，或使用后端代理。";
                 }
                 an_addMsg("ai", an_usrMsg, true);
