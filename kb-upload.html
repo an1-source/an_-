@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-12 | 模型：Seed-Code | 功能：RAG 知识库文件上传与管理 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库管理 · RAG</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html,body { height:100%; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            color: #e2e8f0;
+            padding: 20px 16px;
+            min-height: 100vh;
+        }
+        .an_back {
+            position: fixed; top:10px; left:10px; z-index:50;
+            color:#fff; text-decoration:none; font-size:12px;
+            background: rgba(255,255,255,.15); padding:4px 12px; border-radius:14px;
+        }
+        .an_back:hover { background: rgba(255,255,255,.3); }
+
+        .an_container { max-width: 960px; margin: 0 auto; }
+        h1 {
+            font-size: 22px; text-align: center; margin-bottom: 6px;
+            background: linear-gradient(90deg,#60a5fa,#a78bfa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .an_sub { text-align:center; color:#94a3b8; font-size:12px; margin-bottom:22px; }
+
+        /* ========== 上传区 ========== */
+        .an_drop {
+            border: 2px dashed rgba(96,165,250,.5);
+            border-radius: 14px;
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(30,41,59,.4);
+            cursor: pointer;
+            transition: border-color .25s, background .25s;
+            margin-bottom: 16px;
+        }
+        .an_drop:hover, .an_drop.an_drag {
+            border-color: #60a5fa;
+            background: rgba(96,165,250,.08);
+        }
+        .an_drop.an_drag { border-style: solid; }
+        .an_drop .an_icon { font-size: 40px; margin-bottom: 10px; }
+        .an_drop .an_main { font-size: 15px; color:#cbd5e1; margin-bottom: 4px; }
+        .an_drop .an_hint { font-size: 11px; color:#64748b; }
+        #an_file { display: none; }
+
+        /* ========== 统计卡 ========== */
+        .an_stats {
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+            margin-bottom: 16px;
+        }
+        .an_stat {
+            background: rgba(30,41,59,.6);
+            border: 1px solid rgba(148,163,184,.2);
+            border-radius: 10px; padding: 12px; text-align:center;
+        }
+        .an_stat .an_v { font-size:22px; font-weight:bold; color:#60a5fa; font-family: Consolas,monospace; }
+        .an_stat .an_l { font-size:11px; color:#94a3b8; margin-top:2px; }
+
+        /* ========== 文件列表 ========== */
+        .an_section-title {
+            font-size:13px; color:#a0c4ff; margin:14px 0 8px;
+            padding-left: 10px; border-left: 3px solid #60a5fa;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .an_section-title button {
+            background: rgba(239,68,68,.15); color:#fca5a5; border:1px solid rgba(239,68,68,.3);
+            padding:3px 10px; border-radius:10px; font-size:11px; cursor:pointer;
+        }
+        .an_section-title button:hover { background: rgba(239,68,68,.3); }
+
+        .an_file-item {
+            background: rgba(30,41,59,.5);
+            border: 1px solid rgba(148,163,184,.15);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            display:flex; align-items:center; gap:12px;
+        }
+        .an_file-icon { font-size: 24px; }
+        .an_file-info { flex:1; min-width:0; }
+        .an_file-name { font-size:13px; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .an_file-meta { font-size:11px; color:#64748b; margin-top:2px; }
+        .an_file-actions { display:flex; gap:6px; }
+        .an_file-actions button {
+            background: rgba(148,163,184,.1); color:#cbd5e1;
+            border: 1px solid rgba(148,163,184,.2);
+            border-radius: 6px; padding: 4px 10px; font-size:11px; cursor:pointer;
+        }
+        .an_file-actions button:hover { background: rgba(148,163,184,.25); }
+        .an_file-actions .an_del:hover { background: rgba(239,68,68,.3); color:#fca5a5; }
+
+        /* ========== 预览 ========== */
+        .an_chunk-list { max-height: 360px; overflow-y: auto; }
+        .an_chunk {
+            background: rgba(15,23,42,.6);
+            border: 1px solid rgba(148,163,184,.12);
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: border-color .15s;
+        }
+        .an_chunk:hover { border-color: #60a5fa; }
+        .an_chunk .an_chunk-head { font-size:10px; color:#64748b; margin-bottom:4px; }
+
+        /* ========== Toast ========== */
+        .an_toast {
+            position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+            background: rgba(15,23,42,.95); border: 1px solid #60a5fa;
+            padding: 8px 20px; border-radius: 20px; font-size: 12px;
+            opacity: 0; pointer-events: none; transition: opacity .25s, top .25s;
+            z-index: 200;
+        }
+        .an_toast.show { opacity:1; top:90px; }
+        .an_toast.err { border-color:#f87171; color:#fca5a5; }
+        .an_toast.ok  { border-color:#4ade80; color:#86efac; }
+
+        /* empty */
+        .an_empty {
+            text-align:center; color:#475569; padding:40px 0; font-size:13px;
+        }
+
+        /* scrollbar */
+        .an_chunk-list::-webkit-scrollbar { width:6px; }
+        .an_chunk-list::-webkit-scrollbar-thumb { background: rgba(148,163,184,.2); border-radius:3px; }
+
+        /* 按钮 */
+        .an_btn-chat {
+            display: inline-block; margin-top:12px;
+            background: linear-gradient(135deg,#3b82f6,#7c3aed);
+            color:#fff; text-decoration:none; font-size:12px;
+            padding:6px 16px; border-radius:14px; font-weight:bold;
+        }
+        .an_btn-chat:hover { opacity:.9; }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">← 返回首页</a>
+
+    <div class="an_container">
+        <h1>📚 知识库管理</h1>
+        <p class="an_sub">上传 TXT / MD / PDF 文件 · 自动解析切分 · 构建 RAG 知识库</p>
+
+        <!-- 上传 -->
+        <div class="an_drop" id="an_drop">
+            <div class="an_icon">📄</div>
+            <div class="an_main">点击选择文件，或拖拽到此处</div>
+            <div class="an_hint">支持 .txt / .md / .json（PDF 暂需后端解析）</div>
+            <input type="file" id="an_file" multiple accept=".txt,.md,.json">
+        </div>
+
+        <!-- 统计 -->
+        <div class="an_stats">
+            <div class="an_stat"><div class="an_v" id="an_statF">0</div><div class="an_l">文件数</div></div>
+            <div class="an_stat"><div class="an_v" id="an_statC">0</div><div class="an_l">片段数</div></div>
+            <div class="an_stat"><div class="an_v" id="an_statT">0</div><div class="an_l">总字符</div></div>
+            <div class="an_stat"><div class="an_v" id="an_statA">0</div><div class="an_l">平均片段</div></div>
+        </div>
+
+        <!-- 文件列表 -->
+        <div class="an_section-title">
+            <span>📋 已上传文件</span>
+            <button id="an_clearAll">🗑 清空全部</button>
+        </div>
+        <div id="an_fileList"></div>
+
+        <div style="text-align:center;">
+            <a class="an_btn-chat" href="kb-chat.html">💬 进入知识库问答 →</a>
+        </div>
+    </div>
+
+    <div class="an_toast" id="an_toast"></div>
+
+    <script>
+        // ========== 存储键 ==========
+        const AN_KB_KEY = "an_rag_knowledge_base";
+
+        // ========== 工具 ==========
+        function an_toast(msg, type="") {
+            const t = document.getElementById("an_toast");
+            t.textContent = msg;
+            t.className = "an_toast show " + type;
+            clearTimeout(an_toast._h);
+            an_toast._h = setTimeout(() => t.classList.remove("show"), 2000);
+        }
+
+        function an_load() {
+            try { return JSON.parse(localStorage.getItem(AN_KB_KEY)) || { files: {} }; }
+            catch { return { files: {} }; }
+        }
+        function an_save(db) { localStorage.setItem(AN_KB_KEY, JSON.stringify(db)); }
+
+        // 切分文本：按段落，过长段落再按句号切
+        function an_chunkText(text, maxSize=300, overlap=30) {
+            const chunks = [];
+            // 先按空行段落切
+            const paras = text.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+            for (const para of paras) {
+                if (para.length <= maxSize) {
+                    chunks.push(para);
+                } else {
+                    // 长段落按句号/问号/感叹号切
+                    const sents = para.split(/(?<=[。！？!?；;\n])/).map(s => s.trim()).filter(Boolean);
+                    let buf = "";
+                    for (const s of sents) {
+                        if ((buf + s).length > maxSize) {
+                            if (buf) chunks.push(buf.trim());
+                            // overlap：从 buf 末尾取一些字
+                            buf = buf.slice(-overlap) + s;
+                        } else {
+                            buf += s;
+                        }
+                    }
+                    if (buf.trim()) chunks.push(buf.trim());
+                }
+            }
+            return chunks;
+        }
+
+        // ========== 渲染 ==========
+        function an_render() {
+            const db = an_load();
+            const files = Object.values(db.files);
+            document.getElementById("an_statF").textContent = files.length;
+            const totalChunk = files.reduce((s,f) => s + f.chunks.length, 0);
+            const totalChar  = files.reduce((s,f) => s + f.chars, 0);
+            document.getElementById("an_statC").textContent = totalChunk;
+            document.getElementById("an_statT").textContent = totalChar.toLocaleString();
+            document.getElementById("an_statA").textContent = totalChunk ? Math.round(totalChar/totalChunk) : 0;
+
+            const list = document.getElementById("an_fileList");
+            if (files.length === 0) {
+                list.innerHTML = `<div class="an_empty">📭 还没有上传任何文件</div>`;
+                return;
+            }
+            list.innerHTML = "";
+            files.forEach(f => {
+                const div = document.createElement("div");
+                div.className = "an_file-item";
+                div.innerHTML = `
+                    <div class="an_file-icon">📄</div>
+                    <div class="an_file-info">
+                        <div class="an_file-name">${f.name}</div>
+                        <div class="an_file-meta">${f.chunks.length} 片段 · ${f.chars} 字符 · ${new Date(f.ts).toLocaleString()}</div>
+                    </div>
+                    <div class="an_file-actions">
+                        <button onclick="an_preview('${f.id}')">👁 预览</button>
+                        <button class="an_del" onclick="an_del('${f.id}')">🗑 删除</button>
+                    </div>`;
+                list.appendChild(div);
+            });
+        }
+
+        window.an_preview = function(id) {
+            const db = an_load();
+            const f = db.files[id];
+            if (!f) return;
+            let html = `<div class="an_chunk-list">`;
+            f.chunks.forEach((c, i) => {
+                html += `<div class="an_chunk"><div class="an_chunk-head">#${i+1} · ${c.length} 字符</div>${c}</div>`;
+            });
+            html += `</div>`;
+            an_toast(`📋 ${f.name} · ${f.chunks.length} 个片段`, "ok");
+            alert(`${f.name}\n\n共 ${f.chunks.length} 个片段，${f.chars} 字符\n\n${f.chunks.slice(0,3).map((c,i)=>`--- #${i+1} ---\n${c}`).join('\n\n')}\n\n...（完整内容请进 kb-chat.html 问答查看）`);
+        };
+
+        window.an_del = function(id) {
+            const db = an_load();
+            if (!db.files[id]) return;
+            if (!confirm(`确定删除 "${db.files[id].name}" 吗？`)) return;
+            delete db.files[id];
+            an_save(db);
+            an_render();
+            an_toast("已删除", "ok");
+        };
+
+        // ========== 上传 ==========
+        function an_handleFiles(fileList) {
+            const files = Array.from(fileList);
+            if (files.length === 0) return;
+            const db = an_load();
+            let added = 0, skipped = 0;
+
+            files.forEach(file => {
+                const ext = file.name.split(".").pop().toLowerCase();
+                if (!["txt","md","json"].includes(ext)) { skipped++; return; }
+                const reader = new FileReader();
+                reader.onload = e => {
+                    let text = e.target.result;
+                    if (ext === "json") {
+                        try { text = JSON.stringify(JSON.parse(text), null, 2); }
+                        catch { /* 保持原样 */ }
+                    }
+                    const chunks = an_chunkText(text);
+                    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+                    db.files[id] = {
+                        id, name: file.name, ext,
+                        size: file.size, chars: text.length,
+                        chunks, ts: Date.now()
+                    };
+                    an_save(db);
+                    added++;
+                    an_render();
+                    an_toast(`✅ ${file.name} · ${chunks.length} 片段`, "ok");
+                };
+                reader.readAsText(file, "UTF-8");
+            });
+            if (skipped) an_toast(`⚠️ ${skipped} 个文件格式不支持，已跳过`, "err");
+        }
+
+        // 拖拽
+        const drop = document.getElementById("an_drop");
+        drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("an_drag"); });
+        drop.addEventListener("dragleave", () => drop.classList.remove("an_drag"));
+        drop.addEventListener("drop", e => {
+            e.preventDefault();
+            drop.classList.remove("an_drag");
+            an_handleFiles(e.dataTransfer.files);
+        });
+        drop.addEventListener("click", () => document.getElementById("an_file").click());
+        document.getElementById("an_file").addEventListener("change", e => an_handleFiles(e.target.files));
+
+        // 清空
+        document.getElementById("an_clearAll").addEventListener("click", () => {
+            const db = an_load();
+            const n = Object.keys(db.files).length;
+            if (n === 0) return an_toast("知识库已空");
+            if (!confirm(`确定清空全部 ${n} 个文件吗？`)) return;
+            localStorage.removeItem(AN_KB_KEY);
+            an_render();
+            an_toast("已清空", "ok");
+        });
+
+        // 控制台输出存储快照（调试）
+        window.an_kbDebug = () => {
+            const db = an_load();
+            console.group("📚 知识库快照");
+            console.log(db);
+            Object.values(db.files).forEach(f => {
+                console.log(`\n📄 ${f.name} (${f.chunks.length} chunks, ${f.chars} chars)`);
+                f.chunks.forEach((c, i) => console.log(`  #${i+1}: ${c.slice(0, 60)}...`));
+            });
+            console.groupEnd();
+        };
+
+        an_render();
+    </script>
+</body>
+</html>

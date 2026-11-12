@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-12 | 模型：Seed-Code | 功能：RAG 知识库问答（BM25 检索 + baiyulabs LLM） -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库问答 · RAG</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html,body { height:100%; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            color: #e2e8f0;
+            display: flex; flex-direction: column;
+            height: 100vh;
+        }
+        .an_back {
+            position: fixed; top:10px; left:10px; z-index:100;
+            color:#fff; text-decoration:none; font-size:12px;
+            background: rgba(255,255,255,.15); padding:4px 12px; border-radius:14px;
+        }
+        .an_back:hover { background: rgba(255,255,255,.3); }
+
+        /* ========== 顶栏 ========== */
+        .an_header {
+            height: 60px;
+            background: rgba(15,23,42,.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(148,163,184,.2);
+            display:flex; align-items:center; justify-content:center;
+            gap:10px; flex-shrink:0; position:relative;
+        }
+        .an_header h1 {
+            font-size:18px;
+            background: linear-gradient(90deg,#60a5fa,#a78bfa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .an_header .an_tag {
+            font-size:11px; color:#94a3b8; background: rgba(255,255,255,.08);
+            padding: 2px 10px; border-radius: 10px;
+        }
+        .an_header .an_kb-info {
+            position:absolute; right:16px;
+            font-size:11px; color:#64748b;
+        }
+
+        /* ========== 消息区 ========== */
+        .an_chat {
+            flex:1; overflow-y:auto;
+            padding: 20px 16px 10px;
+            max-width: 900px; margin: 0 auto; width: 100%;
+        }
+        .an_msg { display:flex; margin-bottom:16px; gap:10px; animation: an_fade .3s; }
+        @keyframes an_fade { from{opacity:0;transform:translateY(6px);} to{opacity:1;} }
+        .an_avatar {
+            width:34px; height:34px; border-radius:50%; flex-shrink:0;
+            display:flex; align-items:center; justify-content:center; font-size:16px;
+        }
+        .an_user .an_avatar { background: linear-gradient(135deg,#60a5fa,#3b82f6); }
+        .an_ai   .an_avatar { background: linear-gradient(135deg,#a78bfa,#7c3aed); }
+        .an_bubble {
+            max-width:75%; padding:12px 16px; border-radius:14px;
+            line-height:1.7; font-size:14px;
+            white-space:pre-wrap; word-break:break-word;
+        }
+        .an_user { flex-direction:row-reverse; }
+        .an_user .an_bubble {
+            background: linear-gradient(135deg,#3b82f6,#2563eb);
+            border-bottom-right-radius:4px;
+        }
+        .an_ai .an_bubble {
+            background: rgba(30,41,59,.9);
+            border:1px solid rgba(148,163,184,.2);
+            border-bottom-left-radius:4px;
+        }
+        .an_err .an_bubble {
+            background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.4);
+            color: #fca5a5; font-size: 13px;
+        }
+
+        /* 引用 */
+        .an_refs {
+            max-width:75%; margin-left:44px; margin-bottom:10px;
+            background: rgba(250,204,21,.08);
+            border:1px solid rgba(250,204,21,.3);
+            border-radius:8px; padding:8px 12px;
+            font-size:11px; color:#fcd34d;
+        }
+        .an_ref-head { font-size:10px; color:#ca8a04; margin-bottom:4px; font-weight:bold; }
+        .an_ref-item { margin-bottom:3px; line-height:1.5; opacity:.9; }
+
+        /* Loading */
+        .an_typing .an_bubble { padding:14px 18px; }
+        .an_typing span {
+            display:inline-block; width:6px; height:6px; border-radius:50%;
+            background:#94a3b8; margin:0 2px; animation:an_bounce 1.2s infinite ease-in-out;
+        }
+        .an_typing span:nth-child(2){animation-delay:.15s;}
+        .an_typing span:nth-child(3){animation-delay:.3s;}
+        @keyframes an_bounce {
+            0%,80%,100%{transform:scale(.6);opacity:.5;} 40%{transform:scale(1);opacity:1;}
+        }
+
+        /* ========== 输入区 ========== */
+        .an_input-area {
+            flex-shrink:0; padding:12px 16px 16px;
+            max-width:900px; margin:0 auto; width:100%;
+        }
+        .an_input-wrap {
+            background: rgba(30,41,59,.9);
+            border:1px solid rgba(148,163,184,.25);
+            border-radius:16px; padding:10px 12px;
+            display:flex; align-items:flex-end; gap:10px;
+            transition: border-color .2s;
+        }
+        .an_input-wrap:focus-within {
+            border-color:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,.15);
+        }
+        textarea.an_input {
+            flex:1; background:transparent; border:none; outline:none;
+            color:#e2e8f0; font-family:inherit; font-size:14px;
+            resize:none; max-height:150px; line-height:1.6;
+        }
+        textarea.an_input::placeholder { color:#64748b; }
+        button.an_send {
+            background: linear-gradient(135deg,#3b82f6,#7c3aed);
+            color:#fff; border:none; border-radius:12px;
+            padding:10px 18px; font-size:13px; cursor:pointer; font-weight:bold;
+            flex-shrink:0;
+        }
+        button.an_send:hover:not(:disabled){opacity:.9;}
+        button.an_send:disabled{opacity:.4;cursor:not-allowed;}
+
+        .an_input-tools {
+            display:flex; justify-content:space-between; margin-top:8px;
+            font-size:11px; color:#64748b;
+        }
+        .an_kb-warn {
+            text-align:center; padding:40px 20px;
+            color:#64748b; font-size:13px;
+        }
+        .an_kb-warn a { color:#60a5fa; }
+
+        /* scrollbar */
+        .an_chat::-webkit-scrollbar { width:6px; }
+        .an_chat::-webkit-scrollbar-thumb { background:rgba(148,163,184,.25); border-radius:3px; }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">← 返回首页</a>
+
+    <div class="an_header">
+        <h1>💬 知识库问答</h1>
+        <span class="an_tag">RAG · BM25</span>
+        <span class="an_kb-info" id="an_kbInfo">加载知识库...</span>
+    </div>
+
+    <div class="an_chat" id="an_chat"></div>
+
+    <div class="an_input-area">
+        <div class="an_input-wrap">
+            <textarea class="an_input" id="an_input" rows="1"
+                      placeholder="基于知识库提问，Enter 发送，Shift+Enter 换行"></textarea>
+            <button class="an_send" id="an_send">发送</button>
+        </div>
+        <div class="an_input-tools">
+            <span id="an_status">就绪</span>
+            <span>检索 Top-3 · 窗口 1800 chars</span>
+        </div>
+    </div>
+
+    <script>
+        // ========== 配置（同 chat.html） ==========
+        const AN_KB_KEY = "an_rag_knowledge_base";
+        const an_API = {
+            get baseUrl() {
+                return localStorage.getItem("an_baiyulabs_base") || "https://api.baiyulabs.com/v1";
+            },
+            get model() {
+                return localStorage.getItem("an_baiyulabs_model") || "deepseek-v4.1-flash";
+            },
+            get apiKey() {
+                return localStorage.getItem("an_baiyulabs_key") ||
+                       "sk-9dAYudJAgKhmiXSbgEAUHIyGWKgJWszGXwizueHGQwruU2IY";
+            },
+            get url() { return this.baseUrl + "/chat/completions"; }
+        };
+
+        // ========== 加载知识库 ==========
+        function an_loadKB() {
+            try { return JSON.parse(localStorage.getItem(AN_KB_KEY)) || { files: {} }; }
+            catch { return { files: {} }; }
+        }
+        function an_flatten(db) {
+            // 把所有文件的 chunks 展平成 {text, source, idx} 数组
+            const docs = [];
+            Object.values(db.files).forEach(f => {
+                f.chunks.forEach((c, i) => {
+                    docs.push({ text: c, source: f.name, idx: i });
+                });
+            });
+            return docs;
+        }
+
+        // ========== 中文分词（unigram + bigram + 英文词） ==========
+        function an_tokenize(text) {
+            const tokens = new Set();
+            // 英文/数字词
+            (text.match(/[a-zA-Z][a-zA-Z0-9_\-]{1,}|[\u4e00-\u9fa5]{1}|[\u4e00-\u9fa5]{2}/g) || []).forEach(t => tokens.add(t.toLowerCase()));
+            // 中文字符 unigram
+            for (const ch of text) {
+                if (/[\u4e00-\u9fa5]/.test(ch)) tokens.add(ch);
+            }
+            return Array.from(tokens);
+        }
+
+        // ========== BM25-like 检索 ==========
+        const an_BM25 = {
+            build(docs) {
+                this.docs = docs;
+                this.N = docs.length;
+                // 每篇 doc 的词频
+                this.tfs = docs.map(d => {
+                    const tf = {};
+                    an_tokenize(d.text).forEach(t => tf[t] = (tf[t] || 0) + 1);
+                    return tf;
+                });
+                // 文档频率（DF）
+                const df = {};
+                this.tfs.forEach(tf => Object.keys(tf).forEach(t => df[t] = (df[t] || 0) + 1));
+                // IDF = log((N+1)/(DF+1)) + 1
+                this.idf = {};
+                Object.entries(df).forEach(([t, n]) => {
+                    this.idf[t] = Math.log((this.N + 1) / (n + 1)) + 1;
+                });
+                // 平均 doc 长度
+                this.avgLen = docs.reduce((s, d) => s + d.text.length, 0) / (this.N || 1);
+                // BM25 参数
+                this.k1 = 1.5; this.b = 0.75;
+            },
+            score(query, topK=3) {
+                const qTokens = an_tokenize(query);
+                const scores = this.docs.map((d, i) => {
+                    const tf = this.tfs[i];
+                    let s = 0;
+                    qTokens.forEach(t => {
+                        const f = tf[t] || 0;
+                        if (f === 0) return;
+                        const idf = this.idf[t] || 0;
+                        const dl = d.text.length;
+                        const denom = f + this.k1 * (1 - this.b + this.b * (dl / this.avgLen));
+                        s += idf * (f * (this.k1 + 1)) / denom;
+                    });
+                    return { doc: d, score: s };
+                });
+                scores.sort((a, b) => b.score - a.score);
+                return scores.slice(0, topK);
+            }
+        };
+
+        // ========== DOM ==========
+        const an_chatEl  = document.getElementById("an_chat");
+        const an_inputEl = document.getElementById("an_input");
+        const an_sendBtn = document.getElementById("an_send");
+        const an_statusEl= document.getElementById("an_status");
+        const an_kbInfo  = document.getElementById("an_kbInfo");
+        let an_docs = [];
+
+        // ========== 初始化 ==========
+        function an_init() {
+            const db = an_loadKB();
+            an_docs = an_flatten(db);
+            an_BM25.build(an_docs);
+
+            const nFiles = Object.keys(db.files).length;
+            const nChunks = an_docs.length;
+            an_kbInfo.textContent = `📚 ${nFiles} 文件 · ${nChunks} 片段`;
+
+            if (nFiles === 0) {
+                an_chatEl.innerHTML = `
+                    <div class="an_kb-warn">
+                        📭 知识库是空的！<br><br>
+                        请先去 <a href="kb-upload.html">知识库上传页</a> 上传文件，
+                        或访问 <a href="index.html">首页</a> 选择其他练习。
+                    </div>`;
+                an_sendBtn.disabled = true;
+                an_inputEl.disabled = true;
+                return;
+            }
+
+            an_addMsg("ai",
+                `✅ 知识库已加载：${nFiles} 个文件 · ${nChunks} 个片段\n\n` +
+                `模型：${an_API.model}\n` +
+                `检索：BM25 · Top-3\n\n` +
+                `你可以问任何关于知识库内容的问题，例如：\n` +
+                `"DeepSeek 支持哪些模型？"\n` +
+                `"退换货政策是什么？"\n` +
+                `"如何修改订单地址？"`);
+        }
+
+        // ========== 工具 ==========
+        function an_scrollBottom() { an_chatEl.scrollTop = an_chatEl.scrollHeight; }
+        function an_setStatus(t) { an_statusEl.textContent = t; }
+
+        function an_addMsg(role, content, isErr) {
+            const div = document.createElement("div");
+            div.className = "an_msg " + (role === "user" ? "an_user" : (isErr ? "an_err" : "an_ai"));
+            div.innerHTML = `
+                <div class="an_avatar">${role === "user" ? "👤" : "🤖"}</div>
+                <div class="an_bubble"></div>`;
+            div.querySelector(".an_bubble").textContent = content;
+            an_chatEl.appendChild(div);
+            an_scrollBottom();
+            return div;
+        }
+
+        function an_addRefs(refs) {
+            if (!refs || refs.length === 0) return;
+            const div = document.createElement("div");
+            div.className = "an_refs";
+            let html = `<div class="an_ref-head">📎 参考片段（Top-${refs.length}）</div>`;
+            refs.forEach((r, i) => {
+                const snippet = r.doc.text.length > 120 ? r.doc.text.slice(0, 120) + "..." : r.doc.text;
+                html += `<div class="an_ref-item">· [${i+1}] ${r.doc.source} #${r.doc.idx+1} (score: ${r.score.toFixed(3)})\n  ${snippet}</div>`;
+            });
+            div.innerHTML = html;
+            an_chatEl.appendChild(div);
+            an_scrollBottom();
+        }
+
+        function an_addTyping() {
+            const div = document.createElement("div");
+            div.className = "an_msg an_ai an_typing";
+            div.innerHTML = `<div class="an_avatar">🤖</div>
+                             <div class="an_bubble"><span></span><span></span><span></span></div>`;
+            an_chatEl.appendChild(div);
+            an_scrollBottom();
+            return div;
+        }
+
+        // ========== RAG 主流程 ==========
+        async function an_send() {
+            const q = an_inputEl.value.trim();
+            if (!q) return;
+
+            an_sendBtn.disabled = true;
+            an_inputEl.disabled = true;
+            an_setStatus("检索中...");
+
+            an_addMsg("user", q);
+            an_inputEl.value = ""; an_inputEl.style.height = "auto";
+
+            // Step 1: BM25 检索
+            const topK = an_BM25.score(q, 3);
+            console.group("🔎 RAG 检索");
+            console.log("查询:", q);
+            console.log("分词:", an_tokenize(q));
+            console.log("Top-3 结果:");
+            topK.forEach((r, i) => console.log(`  [${i+1}] score=${r.score.toFixed(4)} · ${r.doc.source} #${r.doc.idx+1}\n       "${r.doc.text.slice(0,80)}..."`));
+            console.groupEnd();
+
+            // Step 2: 拼接 context（限长 1800 字符）
+            let context = "";
+            const usedRefs = [];
+            for (const r of topK) {
+                if (context.length + r.doc.text.length + 20 > 1800) break;
+                context += `\n[来源: ${r.doc.source}, 片段#${r.doc.idx+1}]\n${r.doc.text}\n`;
+                usedRefs.push(r);
+            }
+
+            // Step 3: 构建 messages
+            const system = `你是一个基于检索增强生成（RAG）的智能客服助手。
+请严格根据下面的【知识库内容】回答用户问题。
+如果知识库内容不足以回答，请如实说"知识库中没有找到相关信息"，不要编造。
+回答时请标注引用来源（文件名+片段号）。
+
+【知识库内容】${context || "（知识库为空）"}`;
+
+            const messages = [
+                { role: "system", content: system },
+                { role: "user",   content: q }
+            ];
+
+            // 控制台输出发送给 LLM 的完整信息
+            console.group("📤 发送给 LLM");
+            console.log("URL:", an_API.url);
+            console.log("Model:", an_API.model);
+            console.log("Context 长度:", context.length, "chars");
+            console.log("System Prompt:");
+            console.log(system);
+            console.log("Messages:", messages);
+            console.groupEnd();
+
+            const typingEl = an_addTyping();
+            try {
+                an_setStatus("LLM 生成中...");
+                const res = await fetch(an_API.url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":  "application/json",
+                        "Authorization": "Bearer " + an_API.apiKey
+                    },
+                    body: JSON.stringify({
+                        model: an_API.model,
+                        messages,
+                        max_tokens: 1024,
+                        temperature: 0.5
+                    })
+                });
+
+                typingEl.remove();
+
+                const raw = await res.text();
+                console.group("📥 LLM 原始响应");
+                console.log("HTTP", res.status);
+                console.log(raw);
+                console.groupEnd();
+
+                let data;
+                try { data = JSON.parse(raw); }
+                catch { throw new Error("响应非合法 JSON"); }
+
+                if (!res.ok) {
+                    const m = data?.error?.message || data?.message || res.statusText;
+                    throw new Error("(" + res.status + ") " + m);
+                }
+
+                console.group("📥 LLM 解析后数据");
+                console.log(data);
+                console.groupEnd();
+
+                const reply = data?.choices?.[0]?.message?.content;
+                if (!reply) throw new Error("响应中无 content");
+
+                an_addMsg("ai", reply);
+                an_addRefs(usedRefs);
+                an_setStatus("就绪 · tokens: " + (data?.usage?.total_tokens || "?"));
+
+            } catch (err) {
+                typingEl.remove();
+                console.error("❌ RAG 失败:", err);
+                let msg = "请求失败：" + err.message;
+                if (err.message.includes("(401)")) msg = "🔑 API Key 无效";
+                else if (err.message.includes("Failed to fetch")) msg = "🌐 网络/CORS 错误";
+                an_addMsg("ai", msg, true);
+                an_setStatus("出错");
+            } finally {
+                an_sendBtn.disabled = false;
+                an_inputEl.disabled = false;
+                an_inputEl.focus();
+            }
+        }
+
+        // ========== 交互 ==========
+        an_inputEl.addEventListener("input", () => {
+            an_inputEl.style.height = "auto";
+            an_inputEl.style.height = Math.min(an_inputEl.scrollHeight, 150) + "px";
+        });
+        an_inputEl.addEventListener("keydown", e => {
+            if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); an_send(); }
+        });
+        an_sendBtn.addEventListener("click", an_send);
+
+        // ========== 启动 ==========
+        an_init();
+        an_inputEl.focus();
+    </script>
+</body>
+</html>

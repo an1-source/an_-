@@ -1,0 +1,65 @@
+DeepSeek 产品使用手册
+======================
+
+一、产品简介
+-----------
+DeepSeek 是深度求索公司开发的大语言模型系列，包括 DeepSeek-V3、DeepSeek-V4-Pro、
+DeepSeek-V4.1-Flash 等多个版本。它可以处理文本生成、代码编写、逻辑推理、
+多语言翻译、知识问答等多种任务。DeepSeek 的特点是中文能力强、推理成本低、
+支持长上下文（最高 128K tokens）。
+
+二、API 接入方式
+---------------
+DeepSeek 提供 OpenAI 兼容的 REST API。调用格式如下：
+POST https://api.baiyulabs.com/v1/chat/completions
+Headers:
+  Authorization: Bearer sk-xxxxxxxxxxxxxxxxx
+  Content-Type: application/json
+
+请求体示例：
+{
+  "model": "deepseek-v4.1-flash",
+  "messages": [
+    {"role": "system", "content": "你是一个有用的助手"},
+    {"role": "user", "content": "你好"}
+  ],
+  "max_tokens": 1024,
+  "temperature": 0.7
+}
+
+三、支持的模型列表
+-----------------
+deepseek-v4.1-flash：轻量快速版，适合日常问答和简单任务，响应速度快、价格低。
+deepseek-v4-pro：旗舰版，推理能力更强，适合复杂分析、代码生成、数学推理。
+
+四、参数说明
+-----------
+model：模型名称，必填。
+messages：对话历史数组，每个元素包含 role 和 content。
+temperature：采样温度，0~2 之间，越高越发散，越低越确定。
+max_tokens：最大输出 token 数，限制回复长度。
+top_p：核采样阈值，默认 1。
+stream：是否流式输出，默认 false。
+
+五、最佳实践
+-----------
+1. 系统提示词（system prompt）应该明确角色和任务。
+2. 使用多轮对话时要把完整历史传进去。
+3. 长文档问答建议用 RAG（检索增强生成）架构，把文档切块后检索相关片段。
+4. 对代码生成任务建议加 temperature=0.2 以获得更稳定的输出。
+
+六、计费说明
+-----------
+按 token 数计费，输入和输出分别计算。Flash 版比 Pro 版便宜约 3 倍。
+新用户通常有免费额度，可以通过控制台查看余额和用量。
+
+七、常见问题
+-----------
+Q: 报错 401 Token is invalid 怎么办？
+A: 检查 API Key 是否正确，注意 Key 要以 sk- 开头。
+
+Q: 响应太慢怎么办？
+A: 换用 deepseek-v4.1-flash 模型，或降低 max_tokens。
+
+Q: 如何让 AI 回答更准确？
+A: 优化提示词，给出更多上下文；对专业问题接入 RAG 知识库。
