@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<!-- 安家成 | 日期：2026-11-12 | 模型：Seed-Code | 功能：硅基流动 DeepSeek AI 聊天 -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 聊天 · DeepSeek</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .an_back {
+            position: fixed; top: 10px; left: 10px; z-index: 50;
+            display: inline-block; color: #fff; text-decoration: none;
+            font-size: 12px; background: rgba(255,255,255,0.15);
+            padding: 4px 12px; border-radius: 14px;
+        }
+        .an_back:hover { background: rgba(255,255,255,0.3); }
+
+        /* ========== 顶部 ========== */
+        .an_header {
+            height: 60px;
+            background: rgba(15,23,42,0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(148,163,184,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .an_header h1 {
+            font-size: 18px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .an_header .an_dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 10px #4ade80;
+            animation: an_pulse 2s infinite;
+        }
+        @keyframes an_pulse {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: 0.4; }
+        }
+        .an_header .an_model {
+            font-size: 11px; color: #94a3b8;
+            background: rgba(255,255,255,0.08);
+            padding: 2px 10px; border-radius: 10px;
+        }
+
+        /* ========== 消息区 ========== */
+        .an_chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 16px 10px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .an_msg {
+            display: flex;
+            margin-bottom: 16px;
+            gap: 10px;
+            animation: an_fade 0.3s ease;
+        }
+        @keyframes an_fade {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .an_msg .an_avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .an_msg.an_user .an_avatar {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+        }
+        .an_msg.an_ai .an_avatar {
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+        }
+        .an_msg .an_bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            line-height: 1.7;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .an_msg.an_user { flex-direction: row-reverse; }
+        .an_msg.an_user .an_bubble {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-bottom-right-radius: 4px;
+        }
+        .an_msg.an_ai .an_bubble {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Loading 动画 */
+        .an_typing .an_bubble {
+            padding: 14px 18px;
+        }
+        .an_typing span {
+            display: inline-block;
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #94a3b8;
+            margin: 0 2px;
+            animation: an_bounce 1.2s infinite ease-in-out;
+        }
+        .an_typing span:nth-child(2) { animation-delay: 0.15s; }
+        .an_typing span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes an_bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40%           { transform: scale(1);   opacity: 1;   }
+        }
+
+        /* 错误提示 */
+        .an_msg.an_err .an_bubble {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            font-size: 13px;
+        }
+
+        /* ========== 输入区 ========== */
+        .an_input-area {
+            flex-shrink: 0;
+            padding: 12px 16px 16px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .an_input-wrap {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 16px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            transition: border-color 0.2s;
+        }
+        .an_input-wrap:focus-within {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+        }
+        textarea.an_input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 14px;
+            resize: none;
+            max-height: 150px;
+            line-height: 1.6;
+        }
+        textarea.an_input::placeholder { color: #64748b; }
+        button.an_send {
+            background: linear-gradient(135deg, #3b82f6, #7c3aed);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s, transform 0.1s;
+            flex-shrink: 0;
+        }
+        button.an_send:hover:not(:disabled) { opacity: 0.9; }
+        button.an_send:active:not(:disabled) { transform: scale(0.96); }
+        button.an_send:disabled {
+            opacity: 0.4; cursor: not-allowed;
+        }
+
+        .an_input-tools {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 11px;
+            color: #64748b;
+        }
+        .an_input-tools .an_clear {
+            background: none; border: none; color: #64748b;
+            cursor: pointer; font-size: 11px;
+        }
+        .an_input-tools .an_clear:hover { color: #ef4444; }
+
+        /* ========== 滚动条 ========== */
+        .an_chat::-webkit-scrollbar { width: 6px; }
+        .an_chat::-webkit-scrollbar-track { background: transparent; }
+        .an_chat::-webkit-scrollbar-thumb {
+            background: rgba(148,163,184,0.25);
+            border-radius: 3px;
+        }
+        .an_chat::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.45); }
+    </style>
+</head>
+<body>
+    <a class="an_back" href="index.html">← 返回首页</a>
+
+    <!-- 顶部栏 -->
+    <div class="an_header">
+        <div class="an_dot"></div>
+        <h1>🤖 AI 智能助手</h1>
+        <span class="an_model">DeepSeek-V4-Flash</span>
+    </div>
+
+    <!-- 消息区 -->
+    <div class="an_chat" id="an_chat">
+        <!-- JS 动态插入 -->
+    </div>
+
+    <!-- 输入区 -->
+    <div class="an_input-area">
+        <div class="an_input-wrap">
+            <textarea class="an_input" id="an_input" rows="1"
+                      placeholder="输入消息，Enter 发送，Shift+Enter 换行"></textarea>
+            <button class="an_send" id="an_send">发送</button>
+        </div>
+        <div class="an_input-tools">
+            <span id="an_status">就绪</span>
+            <button class="an_clear" id="an_clear">🗑 清空对话</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== API 配置 ==========
+        const an_CONFIG = {
+            apiKey: "sk-9dAYudJAgKhmiXSbgEAUHIyGWKgJWszGXwizueHGQwruU2IY",
+            url:    "https://api.siliconflow.cn/v1/chat/completions",
+            model:  "deepseek-ai/DeepSeek-V4-Flash",
+            systemPrompt: "你是一个有用的助手，请用中文简洁回答用户问题。"
+        };
+
+        // ========== 会话历史 ==========
+        let an_messages = [
+            { role: "system", content: an_CONFIG.systemPrompt }
+        ];
+
+        // ========== DOM ==========
+        const an_chatEl   = document.getElementById("an_chat");
+        const an_inputEl  = document.getElementById("an_input");
+        const an_sendBtn  = document.getElementById("an_send");
+        const an_clearBtn = document.getElementById("an_clear");
+        const an_statusEl = document.getElementById("an_status");
+
+        // ========== 工具函数 ==========
+        function an_scrollBottom() {
+            an_chatEl.scrollTop = an_chatEl.scrollHeight;
+        }
+
+        function an_addMsg(role, content, isErr) {
+            const div = document.createElement("div");
+            div.className = "an_msg " + (role === "user" ? "an_user" : (isErr ? "an_err" : "an_ai"));
+            const avatar = document.createElement("div");
+            avatar.className = "an_avatar";
+            avatar.textContent = role === "user" ? "👤" : "🤖";
+            const bubble = document.createElement("div");
+            bubble.className = "an_bubble";
+            bubble.textContent = content;
+            div.appendChild(avatar);
+            div.appendChild(bubble);
+            an_chatEl.appendChild(div);
+            an_scrollBottom();
+            return div;
+        }
+
+        function an_addTyping() {
+            const div = document.createElement("div");
+            div.className = "an_msg an_ai an_typing";
+            div.innerHTML = `
+                <div class="an_avatar">🤖</div>
+                <div class="an_bubble"><span></span><span></span><span></span></div>`;
+            an_chatEl.appendChild(div);
+            an_scrollBottom();
+            return div;
+        }
+
+        function an_setStatus(text) { an_statusEl.textContent = text; }
+
+        // ========== 自动调整 textarea 高度 ==========
+        an_inputEl.addEventListener("input", () => {
+            an_inputEl.style.height = "auto";
+            an_inputEl.style.height = Math.min(an_inputEl.scrollHeight, 150) + "px";
+        });
+
+        // ========== 键盘事件 ==========
+        an_inputEl.addEventListener("keydown", e => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                an_send();
+            }
+        });
+
+        an_sendBtn.addEventListener("click", an_send);
+        an_clearBtn.addEventListener("click", () => {
+            if (confirm("确定要清空对话吗？")) {
+                an_messages = [{ role: "system", content: an_CONFIG.systemPrompt }];
+                an_chatEl.innerHTML = "";
+                an_addMsg("ai", "对话已清空，开始新的提问吧 😊");
+                an_setStatus("就绪");
+            }
+        });
+
+        // ========== 发送消息核心 ==========
+        async function an_send() {
+            const text = an_inputEl.value.trim();
+            if (!text) return;
+
+            // 禁用
+            an_sendBtn.disabled = true;
+            an_inputEl.disabled = true;
+            an_setStatus("请求中...");
+
+            // 用户消息
+            an_addMsg("user", text);
+            an_messages.push({ role: "user", content: text });
+            an_inputEl.value = "";
+            an_inputEl.style.height = "auto";
+
+            // 控制台输出（发送前的提示词和数据）
+            console.group("📤 发送给 LLM 的请求数据");
+            console.log("URL:", an_CONFIG.url);
+            console.log("Model:", an_CONFIG.model);
+            console.log("Messages (含 system):", an_messages);
+            console.groupEnd();
+
+            // Loading
+            const typingEl = an_addTyping();
+
+            try {
+                const an_body = {
+                    model:    an_CONFIG.model,
+                    messages: an_messages,
+                    max_tokens: 1024,
+                    temperature: 0.7
+                };
+                const an_res = await fetch(an_CONFIG.url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":  "application/json",
+                        "Authorization": "Bearer " + an_CONFIG.apiKey
+                    },
+                    body: JSON.stringify(an_body)
+                });
+
+                // 移除 typing
+                typingEl.remove();
+
+                // 控制台输出原始响应
+                const an_rawText = await an_res.text();
+                console.group("📥 LLM 原始响应");
+                console.log("HTTP Status:", an_res.status, an_res.statusText);
+                console.log("Raw Text:", an_rawText);
+                console.groupEnd();
+
+                let an_data;
+                try {
+                    an_data = JSON.parse(an_rawText);
+                } catch {
+                    throw new Error("响应不是合法 JSON：" + an_rawText.slice(0, 200));
+                }
+
+                if (!an_res.ok) {
+                    const an_msg = an_data?.error?.message || an_data?.message || an_res.statusText;
+                    throw new Error("API 错误 (" + an_res.status + "): " + an_msg);
+                }
+
+                // 控制台输出解析后的完整响应
+                console.group("📥 LLM 解析后数据");
+                console.log(an_data);
+                console.groupEnd();
+
+                const an_reply = an_data?.choices?.[0]?.message?.content;
+                if (!an_reply) {
+                    throw new Error("响应中没有 choices[0].message.content");
+                }
+
+                // 正常回复
+                an_addMsg("ai", an_reply);
+                an_messages.push({ role: "assistant", content: an_reply });
+                an_setStatus("就绪 · Tokens used: " +
+                    (an_data?.usage?.total_tokens || "?"));
+
+            } catch (err) {
+                typingEl.remove();
+                console.error("❌ 聊天请求失败:", err);
+                let an_usrMsg = "请求失败：" + err.message;
+                // 如果是跨域错误
+                if (err.name === "TypeError" && err.message.includes("Failed to fetch")) {
+                    an_usrMsg = "网络错误（可能是跨域 CORS 拦截）。请确认 API 已开放浏览器跨域调用，或使用后端代理。";
+                }
+                an_addMsg("ai", an_usrMsg, true);
+                an_setStatus("出错");
+            } finally {
+                an_sendBtn.disabled = false;
+                an_inputEl.disabled = false;
+                an_inputEl.focus();
+            }
+        }
+
+        // ========== 欢迎消息 ==========
+        an_addMsg("ai", "你好！我是 DeepSeek 智能助手 🤖\n\n我可以帮你：\n• 解答知识问题\n• 写作/润色文本\n• 编程辅助\n• 分析数据\n\n有什么想聊的？");
+        an_inputEl.focus();
+    </script>
+</body>
+</html>

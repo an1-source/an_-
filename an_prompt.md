@@ -279,3 +279,14 @@ index.html要包括之前所有做的网页，新建的也要保存到里面
 **提示词**: 
 
 实现18-8.html，实现基于three.js或echarts的数据大屏，大屏要求：三列，中间上面是某种地理信息的图，cdn文件下载到cdn目录下。
+
+## 2026-11-09 13:30 | opencode/mimo-v2.6-flash-free
+按照该图片里的要求完成：基于 vibe coding 的全栈项目开发基本流程（零~四）：node24/cnpm 检查；在 D:\高级网页设计\vibe-fullstack 创建项目并设立 AGENTS.md 规则；git init + .gitignore（排除 node_modules、.env）+ 首次提交；创建前后端目录骨架并安装依赖；创建前端首页 index.html（姓名安家成、学号24001010415、项目名称全栈待办清单、项目类别自选、所有完成页面超链接、canvas 背景动画、页面链接导航、美观）；创建 readme.md（学号、姓名）；创建运行后台的 bat 文件；MySQL 数据库：创建 database.html 输入用户名密码连接数据库，成功和错误都有提示。
+
+
+## 2026-11-09 13:54 | opencode/mimo-v2.6-flash-free
+C:\Users\安家成\Desktop\全栈提示词.docx：在当前项目根目录创建 AGENTS.md 写入规则 —— frontend/（原生三件套、css/js/fonts/images 子目录）+ backend/（Node+Express、RESTful+MVC、/api 前缀、端口 8415、express.static 托管 frontend、CORS 全开放）；依赖优先 cnpm i；MySQL 凭据写入 backend/.env（DB_USER、DB_PASSWORD、DB_HOST、DB_NAME）不得出现在代码或 AGENTS.md、.env 加入 .gitignore；每表插入至少 8 条真实测试数据；CSS 类名/JS 变量函数/表名字段一律 an_ 开头；文件头注释块（姓名/学号/时间/大模型）；记录文件 anjiacheng_prompt.md、backend/an_interface.md、backend/an_database.md 一律追加；JSON 响应 { code:0, msg, data }；前端服务器返回输出 console；新页面在 frontend/index.html 追加超链接（detail 除外）。结合图片流程完成初始化（git init+首次提交、前后端骨架、index.html 信息+canvas 动画+导航、readme.md、启动 bat、database.html 成功/错误提示）。
+
+
+## 2026-11-05 | opencode/mimo-v2.6-flash-free
+完成新闻列表页面，新闻的数据存在数据库表里。网页显示后端接口链接和数据内容；完成图文列表页面的显示，图片可用网络图片或自己创造。一个新的数据库表
